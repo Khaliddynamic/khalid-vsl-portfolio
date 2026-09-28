@@ -8,8 +8,8 @@ Single-file portfolio site for **khalid.vsl** — talking-head video editing & m
 
 ## Live site
 
-Published with GitHub Pages — open **Settings → Pages** to see the URL, or visit
-`https://khaliddynamic.github.io/portfolio/`
+Live at **https://khalidvsl.netlify.app/** (Netlify, auto-deploys from `main`).
+Also mirrored on GitHub Pages: `https://khaliddynamic.github.io/khalid-vsl-portfolio/`
 
 ## Tech notes
 
