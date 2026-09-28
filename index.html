@@ -327,6 +327,11 @@ input,select,textarea{font:inherit}
   transition:transform .7s var(--ease);
 }
 .work:hover .work__poster{transform:scale(1.05)}
+.work__preview{
+  position:absolute;inset:0;z-index:2;width:100%;height:100%;border:0;
+  opacity:0;transition:opacity .35s var(--ease);pointer-events:none;background:#000;
+}
+.work__preview.is-on{opacity:1}
 .work__media::after{
   content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(to top,rgba(5,8,16,.6),transparent 42%);
@@ -1903,6 +1908,65 @@ dialog.player{
       if (panel && (panel.open || panel.hasAttribute("open"))) closeDrawer();
     }
   });
+
+  /* ---------- hover video preview (muted, looped, no API/iframe persistence) ----------
+     On hover over a project card, inject a muted Vimeo "background" embed that
+     autoplays the real video; on leave, destroy it. Muted autoplay is allowed by
+     browsers without a user gesture. Disabled for reduced-motion and coarse pointers. */
+  function bindHoverPreviews(){
+    if (reduced) return;
+    if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) return;
+    var map = {};
+    published.forEach(function(p){ map[p.id] = p; });
+    $$(".work__media").forEach(function(media){
+      var shim = $(".work__shim[data-project]", media);
+      if (!shim) return;
+      var p = map[shim.getAttribute("data-project")];
+      if (!p || !p.vimeoId) return;
+      var frame = null, leaveTimer = null, openTimer = null;
+
+      function inject(){
+        if (frame || !media.isConnected) return;
+        frame = document.createElement("iframe");
+        frame.className = "work__preview";
+        frame.setAttribute("src",
+          "https://player.vimeo.com/video/" + p.vimeoId +
+          "?background=1&autoplay=1&muted=1&loop=1&title=0&byline=0&portrait=0&badge=0&dnt=1&transparent=1");
+        frame.setAttribute("allow", "autoplay; fullscreen; picture-in-picture");
+        frame.setAttribute("loading", "eager");
+        frame.setAttribute("tabindex", "-1");
+        frame.setAttribute("aria-hidden", "true");
+        media.appendChild(frame);
+        /* fade in once the embed begins loading (timeout-backed so it also
+           fires when rAF is throttled in background/low-power contexts) */
+        var pre = frame;
+        requestAnimationFrame(function(){ if (pre) pre.classList.add("is-on"); });
+        setTimeout(function(){ if (pre) pre.classList.add("is-on"); }, 200);
+      }
+      function remove(){
+        var f = frame; frame = null;
+        if (!f) return;
+        f.classList.remove("is-on");
+        var el = f;
+        /* brief fade-out, then fully detach to stop playback/bandwidth */
+        setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 380);
+      }
+      function enter(){
+        if (openTimer) clearTimeout(openTimer);
+        if (leaveTimer){ clearTimeout(leaveTimer); leaveTimer = null; }
+        openTimer = setTimeout(inject, 120);
+      }
+      function leave(){
+        if (openTimer){ clearTimeout(openTimer); openTimer = null; }
+        if (leaveTimer) clearTimeout(leaveTimer);
+        leaveTimer = setTimeout(remove, 80);
+      }
+      media.addEventListener("mouseenter", enter);
+      media.addEventListener("mouseleave", leave);
+    });
+  }
+  bindHoverPreviews();
+
 })();
 </script>
 </body>
