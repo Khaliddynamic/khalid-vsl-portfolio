@@ -531,6 +531,10 @@ input,select,textarea{font:inherit}
 }
 .form__status[hidden]{display:none}
 .form__end{margin-top:1rem;text-align:center;font-size:.74rem;color:var(--sub)}
+.form__alt{margin-top:.7rem;text-align:center;font-size:.78rem}
+.form__alt a{color:var(--sub-2);text-decoration:underline;text-underline-offset:3px;transition:color .3s}
+.form__alt a:hover{color:var(--accent)}
+.form .btn + .btn{margin-top:.7rem}
 
 /* ============ footer ============ */
 .footer{border-top:1px solid var(--line);background:var(--bg-2)}
@@ -1086,8 +1090,8 @@ dialog.player{
         </div>
 
         <p class="contact__privacy" data-reveal>
-          Your details are used only to respond to this enquiry. The form below composes a draft in your own
-          email app — nothing is sent or stored by this website.
+          Your details are used only to respond to this enquiry. Send it via WhatsApp (opens with your message ready —
+          you press send) or by email through a free form service straight to the studio inbox. Nothing is stored on this website.
         </p>
       </div>
 
@@ -1136,12 +1140,18 @@ dialog.player{
         </label>
 
         <button class="btn btn--solid" type="submit" id="formSubmit">
-          Open Email Draft
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 14 0M13 6l6 6-6 6"/></svg>
+          Send via WhatsApp
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+        </button>
+
+        <button class="btn btn--ghost" type="submit" id="formSubmitMail">
+          Send by Email
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
         </button>
 
         <p class="form__status" id="formStatus" role="status" hidden></p>
-        <p class="form__end">This button opens your own email app with your message ready — it doesn't send anything by itself.</p>
+        <p class="form__end">WhatsApp opens with your message ready — nothing is sent until you press send there. “Send by Email” delivers via a free form service straight to the studio inbox.</p>
+        <p class="form__alt"><a href="mailto:khalid1editor@gmail.com?subject=Project%20enquiry" id="mailtoFallback">Prefer email in your own mail app? Open a draft instead.</a></p>
       </form>
     </div>
   </div>
@@ -1193,7 +1203,7 @@ dialog.player{
      ============================================================ */
   var CONFIG = {
     brand: "khalid.vsl",
-    email: "hello@khalid.vsl",                       // ⚠ unverified — owner to confirm
+    email: "khalid1editor@gmail.com",              // ✓ confirmed by owner
     whatsapp: "https://wa.me/212646173884",          // ⚠ unverified — owner to confirm
     instagram: "https://www.instagram.com/khalid.vsl/", // ⚠ unverified — owner to confirm
     showreel: {                                       // leave empty until a REAL showreel exists
@@ -1204,8 +1214,10 @@ dialog.player{
       duration: ""    // e.g. "01:24" — only if verified
     },
     form: {
-      mode: "mailto",              // "mailto" (default) or "endpoint"
-      endpoint: "",                // set a real URL to switch to server submission
+      mode: "channels",            // "channels" (WhatsApp + email backend) | "mailto" | "endpoint"
+      endpoint: "",                // legacy: set a real URL to switch to server submission
+      whatsappNumber: "212646173884",  // ✓ confirmed by owner — enquiries arrive here
+      emailBackend: "https://formsubmit.co/ajax/khalid1editor@gmail.com", // free FormSubmit → owner inbox (activation email sent on first submit)
       budgetRanges: [              // ⚠ indicative bands — currency NOT confirmed, do not present as fixed prices
         "Under $300", "$300–$700", "$700–$1,500", "$1,500+"
       ]
@@ -1648,7 +1660,9 @@ dialog.player{
      ============================================================ */
   var form = document.getElementById("contactForm");
   var submitBtn = document.getElementById("formSubmit");
+  var submitMailBtn = document.getElementById("formSubmitMail");
   var statusEl = document.getElementById("formStatus");
+  var fallbackLink = document.getElementById("mailtoFallback");
   var fields = {
     name: { el: document.getElementById("f-name"), err: document.getElementById("err-name"), field: document.getElementById("field-name") },
     email: { el: document.getElementById("f-email"), err: document.getElementById("err-email"), field: document.getElementById("field-email") },
@@ -1684,18 +1698,82 @@ dialog.player{
 
   function setStatus(msg){ statusEl.textContent = msg; statusEl.hidden = !msg; }
 
+  function collect(){
+    return {
+      name: fields.name.el.value.trim(),
+      email: fields.email.el.value.trim(),
+      ptype: fields.ptype.el.value,
+      budget: document.getElementById("f-budget").value || "Not sure yet",
+      message: fields.message.el.value.trim()
+    };
+  }
+
+  function buildBody(d){
+    return "Hi,\n\nI'd like to discuss a project.\n\n" +
+      "Name: " + d.name + "\n" +
+      "Email: " + d.email + "\n" +
+      "Project type: " + d.ptype + "\n" +
+      "Budget: " + d.budget + "\n\n" +
+      "About the project:\n" + d.message + "\n\n— " + d.name;
+  }
+
+  /* WhatsApp channel — opens wa.me with the enquiry pre-filled. Nothing sends until the visitor taps send. */
+  function sendWhatsApp(d){
+    var subject = "Project enquiry — " + d.ptype + " (" + d.budget + ")";
+    var href = "https://wa.me/" + String(CONFIG.form.whatsappNumber).replace(/\D/g, "") +
+      "?text=" + encodeURIComponent(subject + "\n\n" + buildBody(d));
+    window.open(href, "_blank", "noopener");
+    setStatus("WhatsApp should now be open with your message ready — nothing is sent until you press send there.");
+  }
+
+  /* Email channel — real submission via a free form service to the studio inbox. */
+  function sendEmailBackend(d){
+    submitMailBtn.disabled = true;
+    submitMailBtn.textContent = "Sending…";
+    setStatus("");
+    fetch(CONFIG.form.emailBackend, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({
+        _subject: "Website enquiry — " + d.ptype + " (" + d.budget + ")",
+        name: d.name, email: d.email, ptype: d.ptype, budget: d.budget, message: d.message
+      })
+    }).then(function(r){
+      if (!r.ok) throw new Error("bad status " + r.status);
+      return r.json();
+    }).then(function(){
+      submitMailBtn.disabled = false;
+      submitMailBtn.textContent = "Send by Email";
+      setStatus("Thanks — your message was delivered by email. I'll reply as soon as I can.");
+      form.reset();
+    }).catch(function(){
+      submitMailBtn.disabled = false;
+      submitMailBtn.textContent = "Send by Email";
+      setStatus("Email delivery hit a snag — please use WhatsApp or the draft link below; your details are still in the form.");
+    });
+  }
+
+  /* Draft fallback — builds a plain-text draft and encodes the whole href once. */
+  function sendMailto(d){
+    var subject = "Project enquiry — " + d.ptype + (d.budget ? " (" + d.budget + ")" : "");
+    var href = "mailto:" + CONFIG.email + "?subject=" +
+      encodeURIComponent(subject) + "&body=" + encodeURIComponent(buildBody(d));
+    window.location.href = href;
+    setStatus("Your email app should now be open with the draft ready. Nothing is sent until you press send there.");
+  }
+
   form.addEventListener("submit", function(e){
     e.preventDefault();
     if (!validate()){
       setStatus("");
       return;
     }
-    var name = fields.name.el.value.trim();
-    var email = fields.email.el.value.trim();
-    var ptype = fields.ptype.el.value;
-    var budget = document.getElementById("f-budget").value || "Not sure yet";
-    var msg = fields.message.el.value.trim();
-
+    var d = collect();
+    var submitter = e.submitter || e.target.querySelector("button[type=submit]");
+    if (submitter && submitter.id === "formSubmitMail" && CONFIG.form.emailBackend){
+      sendEmailBackend(d);
+      return;
+    }
     if (CONFIG.form.mode === "endpoint" && CONFIG.form.endpoint){
       /* real endpoint: genuine submission, CSRF/validation are server-side */
       submitBtn.disabled = true;
@@ -1704,38 +1782,39 @@ dialog.player{
       fetch(CONFIG.form.endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({ name: name, email: email, ptype: ptype, budget: budget, message: msg })
+        body: JSON.stringify(d)
       }).then(function(r){
         if (!r.ok) throw new Error("bad status " + r.status);
         submitBtn.disabled = false;
-        submitBtn.textContent = "Open Email Draft";
+        submitBtn.textContent = "Send via WhatsApp";
         setStatus("Thanks — your message was sent. I'll reply as soon as I can.");
         form.reset();
       }).catch(function(){
         submitBtn.disabled = false;
-        submitBtn.textContent = "Open Email Draft";
+        submitBtn.textContent = "Send via WhatsApp";
         setStatus("Something went wrong sending your message. Please try again — your details are still in the form.");
       });
       return;
     }
-
-    /* mailto fallback — builds a plain-text draft and encodes the whole href once */
-    var subject = "Project enquiry — " + ptype + (budget ? " (" + budget + ")" : "");
-    var body = "Hi,\n\nI'd like to discuss a project.\n\n" +
-      "Name: " + name + "\n" +
-      "Email: " + email + "\n" +
-      "Project type: " + ptype + "\n" +
-      "Budget: " + budget + "\n\n" +
-      "About the project:\n" + msg + "\n\n— " + name;
-    var href = "mailto:" + CONFIG.email + "?subject=" +
-      encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-    submitBtn.disabled = true; /* duplicate-submit guard */
-    window.location.href = href;
-    setTimeout(function(){
-      submitBtn.disabled = false;
-      setStatus("Your email app should now be open with the draft ready. Nothing is sent until you press send there.");
-    }, 600);
+    if (CONFIG.form.mode === "mailto" || !CONFIG.form.whatsappNumber){
+      sendMailto(d);
+      return;
+    }
+    sendWhatsApp(d);
   });
+
+  /* the draft fallback link always composes from current inputs (validated) */
+  if (fallbackLink){
+    fallbackLink.addEventListener("click", function(e){
+      if (!validate()){
+        e.preventDefault();
+        setStatus("");
+        return;
+      }
+      e.preventDefault();
+      sendMailto(collect());
+    });
+  }
 
   /* easy ESC closing for non-dialog fallback browsers */
   document.addEventListener("keydown", function(e){
