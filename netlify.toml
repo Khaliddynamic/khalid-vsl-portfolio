@@ -1,0 +1,5 @@
+# Deployed artifact: the single-file site at the repo root.
+# No build step — Netlify publishes index.html (and its assets) as-is.
+[build]
+  command = ""
+  publish = "."
