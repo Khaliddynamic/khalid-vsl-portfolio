@@ -114,53 +114,54 @@ export default function Contact() {
   return (
     <section className="sec contact" id="contact">
       <div className="wrap">
-        <Reveal>
-          <span className="sec__label"><b>04</b> Start a project</span>
-        </Reveal>
+        <div className="contact__panel">
+          <Reveal>
+            <span className="sec__label"><b>04</b> Start a project</span>
+          </Reveal>
 
-        <Reveal delay={0.05}>
-          <h2 className="contact__title">
-            Let's talk<span className="accent">.</span>
-          </h2>
-        </Reveal>
+          <div className="contact__grid">
+            <div className="contact__side">
+              <Reveal delay={0.05}>
+                <h2 className="contact__title">
+                  Let's talk<span className="accent">.</span>
+                </h2>
+              </Reveal>
 
-        <Reveal delay={0.1}>
-          <p className="contact__lead">
-            Use the form, WhatsApp, Instagram, or email. Whatever's easiest — I'll reply with
-            next steps and a quote.
-          </p>
-        </Reveal>
+              <Reveal delay={0.1}>
+                <p className="contact__lead">
+                  Use the form, WhatsApp, Instagram, or email. Whatever's easiest — I'll reply with
+                  next steps and a quote.
+                </p>
+              </Reveal>
 
-        <div className="contact__grid">
-          <div className="contact__side">
-            <Reveal>
-              <div className="chatstack">
-                <a className="chatbtn" href={site.whatsapp} target="_blank" rel="noreferrer">
-                  <span>WhatsApp</span>
-                  <small>Chat directly</small>
-                </a>
-                <a className="chatbtn" href={site.instagram} target="_blank" rel="noreferrer">
-                  <span>Instagram</span>
-                  <small>@khalid.vsl</small>
-                </a>
-                <a className="chatbtn" href={`mailto:${site.email}`}>
-                  <span>Email</span>
-                  <small>{site.email}</small>
-                </a>
-              </div>
-            </Reveal>
+              <Reveal>
+                <div className="chatstack">
+                  <a className="chatbtn" href={site.whatsapp} target="_blank" rel="noreferrer">
+                    <span>WhatsApp</span>
+                    <small>Chat directly</small>
+                  </a>
+                  <a className="chatbtn" href={site.instagram} target="_blank" rel="noreferrer">
+                    <span>Instagram</span>
+                    <small>@khalid.vsl</small>
+                  </a>
+                  <a className="chatbtn" href={`mailto:${site.email}`}>
+                    <span>Email</span>
+                    <small>{site.email}</small>
+                  </a>
+                </div>
+              </Reveal>
 
-            <Reveal delay={0.08}>
-              <div className="facts">
-                <div><span>Stack</span><b>Premiere · After Effects</b></div>
-                <div><span>Formats</span><b>9:16 · 16:9 · 1:1</b></div>
-              </div>
-              <p className="contact__privacy">{contact.privacy}</p>
-            </Reveal>
-          </div>
+              <Reveal delay={0.08}>
+                <div className="facts">
+                  <div><span>Stack</span><b>Premiere · After Effects</b></div>
+                  <div><span>Formats</span><b>9:16 · 16:9 · 1:1</b></div>
+                </div>
+                <p className="contact__privacy">{contact.privacy}</p>
+              </Reveal>
+            </div>
 
-          <Reveal delay={0.12}>
-            <form className="form" ref={formRef} noValidate onSubmit={onSubmit}>
+            <Reveal delay={0.12}>
+              <form className="form" ref={formRef} noValidate onSubmit={onSubmit}>
               <div className="frow frow--2">
                 <label className={`field ${errors.name ? "field--invalid" : ""}`}>
                   <span className="fl">Name</span>
@@ -236,6 +237,7 @@ export default function Contact() {
               </p>
             </form>
           </Reveal>
+          </div>
         </div>
       </div>
     </section>

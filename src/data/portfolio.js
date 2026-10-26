@@ -2,7 +2,8 @@ const year = new Date().getFullYear()
 
 export const site = {
   brand: "khalid.vsl",
-  role: ["Video editor", "& motion designer"],
+  role: ["Video", "Editor"],
+  roleSupport: "& Motion Designer",
   location: "Casablanca, Morocco",
   coords: "33.57°N",
   availability: "Available for selected projects",

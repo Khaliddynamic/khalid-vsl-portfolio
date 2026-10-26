@@ -73,7 +73,7 @@ function WorkCard({ project, hidden, playing, dragRef, onPlay, onStop, onCenter 
           <span className={`work__video${revealed ? " is-on" : ""}`}>
             <iframe
               ref={frameRef}
-              src={`https://player.vimeo.com/video/${project.vimeoId}?autoplay=1&playsinline=1&autopause=0&title=0&byline=0&portrait=0&color=00D2FF&dnt=1`}
+              src={`https://player.vimeo.com/video/${project.vimeoId}?autoplay=1&playsinline=1&autopause=0&title=0&byline=0&portrait=0&color=FF4D00&dnt=1`}
               allow="autoplay; fullscreen; picture-in-picture"
               allowFullScreen
               referrerPolicy="strict-origin-when-cross-origin"
@@ -133,7 +133,7 @@ export default function Work() {
       if (card.hidden) return
       const rect = card.getBoundingClientRect()
       const distance = Math.abs(rect.left + rect.width / 2 - mid)
-      const opacity = Math.max(0.14, Math.min(1, 1 - distance / (rect.width * 1.55)))
+      const opacity = Math.max(0.35, Math.min(1, 1 - distance / (rect.width * 1.75)))
       card.style.opacity = opacity.toFixed(3)
     })
   }, [])

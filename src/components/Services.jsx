@@ -3,7 +3,7 @@ import { Reveal } from "./Reveal"
 
 export default function Services() {
   return (
-    <section className="sec" id="services">
+    <section className="sec sec--tint" id="services">
       <div className="wrap">
         <Reveal>
           <span className="sec__label"><b>02</b> Services</span>

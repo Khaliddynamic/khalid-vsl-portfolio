@@ -3,7 +3,9 @@
 Minimal, type-led portfolio for **khalid.vsl** — talking-head video editing and motion
 graphics for doctors, educators, and personal brands.
 
-Palette: deep navy `#070B14`, cyan `#00D2FF`, off-white `#F3F7FC`.
+Palette: warm white `#FAF8F5` / `#E8E6E3`, editorial ink `#171717`, saturated orange accent
+`#FF4D00` with `#FF7A32` support. Type-first layout; structure comes from hairline rules,
+generous whitespace, and the type scale.
 
 ## Structure
 
@@ -18,8 +20,9 @@ The site is one editorial sequence:
 5. **Contact** — direct channels (WhatsApp / Instagram / email) and a minimal enquiry form
 6. **Footer** — brand, year, back to top
 
-No cards, gradients, or decorative panels — structure comes from hairline rules, generous
-whitespace, and the type scale.
+No decorative card shells — panels are flat warm-white or, where featured (contact), solid
+orange. The hero is a soft radial orange field anchored to the headline, fading to warm
+white top-right.
 
 ## Two builds
 
@@ -71,7 +74,7 @@ npm run lint
 index.html               live single-file portfolio (HTML + CSS + JS)
 app.html                 React entry
 src/App.jsx              section composition
-src/index.css            design system (navy + cyan minimal)
+src/index.css            design system (warm white + orange, tokens in :root)
 src/data/portfolio.js    projects, services, process, contact
 src/components/          Hero, Work, Services, Process, Contact, StickyNav, Footer
 ```
