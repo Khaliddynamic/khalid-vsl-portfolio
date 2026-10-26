@@ -12,6 +12,13 @@ export default function Hero({ onNavigate }) {
   return (
     <section className="hero" id="top">
       <div className="hero__bg" aria-hidden="true" />
+      <div className="hero__media" aria-hidden="true">
+        <svg viewBox="0 0 640 640" fill="none">
+          <path d="M96 432 C 64 208, 238 56, 424 118 C 574 172, 612 336, 506 468 C 382 618, 142 584, 96 432" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M18 516 C 148 436, 302 468, 468 292" stroke="currentColor" stroke-width="1.3"/>
+        </svg>
+        <img src="/khalid-cutout.webp" alt="" width={738} height={804} loading="eager" />
+      </div>
 
       <div className="hero__inner">
         <motion.div

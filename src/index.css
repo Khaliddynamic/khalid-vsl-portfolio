@@ -232,7 +232,7 @@ h1,h2,h3{font-family:var(--font-display);font-weight:700;letter-spacing:-.04em;l
     linear-gradient(180deg,rgba(247,245,242,.6) 0%,rgba(247,245,242,0) 32%);
 }
 .hero__inner{
-  display:flex;flex-direction:column;position:relative;
+  display:flex;flex-direction:column;position:relative;z-index:1;
   width:min(1320px,calc(100% - (var(--gutter) * 2)));
   margin-inline:auto;
   padding-top:calc(var(--nav-h) + clamp(.6rem,1.6vh,1.25rem));
@@ -249,11 +249,24 @@ h1,h2,h3{font-family:var(--font-display);font-weight:700;letter-spacing:-.04em;l
   box-shadow:0 0 0 3px rgba(255,77,0,.18);animation:pulse 2.8s ease-in-out infinite;
 }
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.hero__main{
-  display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,380px);
-  align-items:end;gap:2rem clamp(2rem,5vw,5rem);
-  margin-top:auto;margin-bottom:auto;
-  padding:clamp(2.5rem,8vh,6.5rem) 0 clamp(1.75rem,4.5vh,3rem);
+.hero__media{position:absolute;right:clamp(1rem,6vw,90px);bottom:0;z-index:0;pointer-events:none}
+.hero__media::before{
+  content:"";position:absolute;left:50%;top:54%;
+  width:min(58vw,720px);height:min(58vw,720px);
+  transform:translate(-50%,-50%);
+  background:radial-gradient(closest-side at 47% 55%,
+    rgba(255,92,10,.55) 0%, rgba(255,118,38,.26) 46%, rgba(255,150,100,0) 78%);
+  filter:blur(28px);
+}
+.hero__media svg{position:absolute;left:-16%;top:5%;width:132%;height:auto;color:var(--accent);opacity:.55}
+.hero__media img{position:relative;display:block;height:clamp(430px,64vh,660px);width:auto}
+@media(min-width:961px){
+  /* desktop: content is one left column, cutout portrait lives full-bleed right */
+  .hero__main{
+    display:flex;flex-direction:column;align-items:flex-start;
+  }
+  .hero__portrait{display:none}
+  .hero__strip{width:min(100%,620px)}
 }
 .hero__title{
   font-size:var(--fs-display);
@@ -702,6 +715,7 @@ html.js [data-reveal].in{opacity:1;transform:none}
   /* the gradient becomes a soft band anchored to the headline block,
      so the orange never floods the empty space below the content */
   .hero{min-height:auto}
+  .hero__media{display:none}
   .hero__bg{
     background:
       radial-gradient(80% 26% at 104% -2%, #FFFFFF 0%, rgba(255,255,255,0) 72%),
