@@ -57,6 +57,7 @@ export default function Hero({ onNavigate }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
+            <figure className="hero__portrait"><img src="/khalid.jpg" alt="Portrait of Khalid" width={720} height={720} onError={(e) => { e.currentTarget.closest('.hero__portrait').style.display = 'none'; }} /></figure>
             <p className="hero__lead">{site.lead}</p>
             <div className="hero__actions">
               <a className="btn btn--solid" href="#contact" onClick={(e) => go(e, "contact")}>
