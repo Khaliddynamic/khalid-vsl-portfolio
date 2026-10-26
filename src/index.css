@@ -696,11 +696,13 @@ html.js [data-reveal].in{opacity:1;transform:none}
   .hero{min-height:auto}
   .hero__bg{
     background:
-      radial-gradient(120% clamp(210px,30vw,290px) at 34% clamp(340px,50vw,440px),
-        #FF4D00 0%, #FF4D00 44%, #FF5006 51%, rgba(255,94,20,.88) 58%,
-        rgba(255,150,100,.35) 70%, rgba(255,150,100,0) 82%),
       radial-gradient(80% 26% at 104% -2%, #FFFFFF 0%, rgba(255,255,255,0) 72%),
       linear-gradient(170deg,#F2F0EC 0%,#FAF8F5 40%,#F3F0EB 76%,#EFECE7 100%);
+  }
+  /* flat warm-white field: the accent lives in the type, not the bg */
+  .hero__line--display{
+    color:var(--accent);
+    text-shadow:none;
   }
   .hero__strip{margin-top:clamp(3rem,8vh,5rem)}
   .hero__aside{gap:1.15rem}
