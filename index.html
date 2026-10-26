@@ -54,8 +54,8 @@
     linear-gradient(96deg, rgba(250,248,245,0) 41%, rgba(250,248,245,.45) 53%,
       rgba(250,248,245,.9) 65%, #FAF8F5 78%, #FAF8F5 100%),
     radial-gradient(72% 58% at 6% 110%, #EF4400 0%, #F84A02 30%, rgba(255,77,0,0) 78%),
-    linear-gradient(to top, #FF4D00 0%, #FF4D00 42%, #FF5107 52%,
-      rgba(255,90,18,.9) 60%, rgba(255,120,40,.55) 70%, rgba(255,150,100,0) 80%),
+    linear-gradient(to top, #FF4D00 0%, #FF4D00 48%, #FF5207 56%,
+      rgba(255,94,20,.8) 63%, rgba(255,150,100,.25) 70%, rgba(255,150,100,0) 77%),
     radial-gradient(56% 50% at 102% -6%, #FFFFFF 0%, rgba(255,255,255,0) 72%),
     linear-gradient(165deg, #EFEDEA 0%, #F6F4F1 34%, #FAF8F5 56%, #F1EEE9 100%);
   --grad-warm:linear-gradient(180deg,#FAF8F5 0%,#F3F0EC 100%);
@@ -244,10 +244,10 @@ h1,h2,h3{font-family:var(--font-display);font-weight:700;letter-spacing:-.04em;l
   background:var(--grad-hero);
 }
 .hero__bg::before{
-  content:"";position:absolute;left:-24%;bottom:-44%;
-  width:80vw;height:80vw;max-width:1250px;max-height:1250px;
+  content:"";position:absolute;left:-24%;bottom:-70%;
+  width:76vw;height:76vw;max-width:1150px;max-height:1150px;
   background:radial-gradient(closest-side at 46% 46%,rgba(255,77,0,.85) 0%,#FF4F03 55%,rgba(255,90,12,.4) 78%,rgba(255,122,50,0) 100%);
-  filter:blur(80px);opacity:.6;pointer-events:none;
+  filter:blur(80px);opacity:.45;pointer-events:none;
 }
 .hero__bg::after{
   content:"";position:absolute;inset:0;pointer-events:none;
@@ -720,7 +720,7 @@ html.js [data-reveal].in{opacity:1;transform:none}
   .hero{min-height:auto}
   .hero__bg{
     background:
-      radial-gradient(140% clamp(190px,34vw,320px) at 34% clamp(260px,44vw,380px),
+      radial-gradient(120% clamp(210px,30vw,290px) at 34% clamp(340px,50vw,440px),
         #FF4D00 0%, #FF4D00 44%, #FF5006 51%, rgba(255,94,20,.88) 58%,
         rgba(255,150,100,.35) 70%, rgba(255,150,100,0) 82%),
       radial-gradient(80% 26% at 104% -2%, #FFFFFF 0%, rgba(255,255,255,0) 72%),
