@@ -12,13 +12,6 @@ export default function Hero({ onNavigate }) {
   return (
     <section className="hero" id="top">
       <div className="hero__bg" aria-hidden="true" />
-      <div className="hero__media" aria-hidden="true">
-        <svg viewBox="0 0 640 640" fill="none">
-          <path d="M96 432 C 64 208, 238 56, 424 118 C 574 172, 612 336, 506 468 C 382 618, 142 584, 96 432" stroke="currentColor" stroke-width="1.6"/>
-          <path d="M18 516 C 148 436, 302 468, 468 292" stroke="currentColor" stroke-width="1.3"/>
-        </svg>
-        <img src="/khalid-cutout.webp" alt="" width={738} height={804} loading="eager" />
-      </div>
 
       <div className="hero__inner">
         <motion.div
@@ -64,7 +57,6 @@ export default function Hero({ onNavigate }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
-            <figure className="hero__portrait"><img src="/khalid.jpg" alt="Portrait of Khalid" width={720} height={720} onError={(e) => { e.currentTarget.closest('.hero__portrait').style.display = 'none'; }} /></figure>
             <p className="hero__lead">{site.lead}</p>
             <div className="hero__actions">
               <a className="btn btn--solid" href="#contact" onClick={(e) => go(e, "contact")}>
