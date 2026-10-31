@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react"
 import { nav, site } from "../data/portfolio"
-import { Icon } from "./icons"
 
-export default function StickyNav({ onNavigate }) {
+export default function StickyNav() {
   const [scrolled, setScrolled] = useState(false)
+  const [active, setActive] = useState("")
   const [open, setOpen] = useState(false)
   const barRef = useRef(null)
   const panelRef = useRef(null)
@@ -22,6 +22,24 @@ export default function StickyNav({ onNavigate }) {
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
+  /* scroll spy — active section drives the orange underline */
+  useEffect(() => {
+    if (!("IntersectionObserver" in window)) return undefined
+    const links = nav
+      .map((item) => ({ item, el: document.getElementById(item.id) }))
+      .filter((x) => x.el)
+    const spy = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) setActive(en.target.id)
+        })
+      },
+      { rootMargin: "-40% 0px -55% 0px" }
+    )
+    links.forEach((x) => spy.observe(x.el))
+    return () => spy.disconnect()
+  }, [])
+
   useEffect(() => {
     const panel = panelRef.current
     if (!panel) return
@@ -38,37 +56,35 @@ export default function StickyNav({ onNavigate }) {
     setOpen(false)
     const el = document.getElementById(id)
     if (el) el.scrollIntoView({ behavior: "smooth" })
-    onNavigate?.(id)
   }
 
   return (
     <>
       <header className={`nav ${scrolled ? "is-scrolled" : ""}`}>
         <div className="nav__inner wrap">
-          <a
-            className="brand"
-            href="#top"
-            onClick={(e) => jump(e, "top")}
-          >
-            <span className="dot" aria-hidden="true" />
-            khalid<span className="k">.vsl</span>
+          <a className="nav__brand" href="#top" onClick={(e) => jump(e, "top")}>
+            khalid.vsl<sup>®</sup>
           </a>
 
-          <nav className="nav__links" aria-label="Primary">
+          <nav className="nav__links" aria-label="Primary" id="navLinks">
             {nav.map((item) => (
-              <a key={item.id} href={`#${item.id}`} onClick={(e) => jump(e, item.id)}>
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className={active === item.id ? "is-active" : ""}
+                onClick={(e) => jump(e, item.id)}
+              >
                 {item.label}
               </a>
             ))}
           </nav>
 
           <div className="nav__right">
-            <a
-              className="nav__cta"
-              href="#contact"
-              onClick={(e) => jump(e, "contact")}
-            >
-              Available for work <Icon name="upRight" size={12} />
+            <a className="nav__cta" href="#contact" onClick={(e) => jump(e, "contact")}>
+              Discuss a Project
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M7 17 17 7M8 7h9v9" />
+              </svg>
             </a>
             <button
               className="nav__burger"
@@ -103,14 +119,13 @@ export default function StickyNav({ onNavigate }) {
               {item.label}
             </a>
           ))}
-          <a
-            className="btn btn--solid drawer__btn"
-            href="#contact"
-            onClick={(e) => jump(e, "contact")}
-          >
-            Start a project
+          <a className="btn btn--solid drawer__btn" href="#contact" onClick={(e) => jump(e, "contact")}>
+            Discuss a Project
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M7 17 17 7M8 7h9v9" />
+            </svg>
           </a>
-          <p className="mono" style={{ marginTop: "2rem", color: "var(--sub-2)" }}>
+          <p className="mono" style={{ marginTop: "2rem", color: "var(--muted)" }}>
             {site.location}
           </p>
         </div>

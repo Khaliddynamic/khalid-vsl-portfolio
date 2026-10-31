@@ -3,20 +3,22 @@ import { Reveal } from "./Reveal"
 
 export default function Process() {
   return (
-    <section className="sec" id="process">
+    <section className="sec sec--tint" id="process">
       <div className="wrap">
         <Reveal>
-          <span className="sec__label"><b>03</b> Process</span>
+          <span className="sec__label">
+            <b>05</b> Process
+          </span>
         </Reveal>
 
         <div className="sec__head">
           <Reveal>
-            <h2 className="sec__title">From footage to final cut.</h2>
+            <h2 className="sec__title">
+              Simple process. Exceptional <span className="accent">attention to detail.</span>
+            </h2>
           </Reveal>
           <Reveal delay={0.08}>
-            <p className="sec__lead">
-              A simple working process. Scope, edit, notes, delivery — every step agreed upfront.
-            </p>
+            <p className="sec__lead">Four stages, no friction — you always know what happens next.</p>
           </Reveal>
         </div>
 

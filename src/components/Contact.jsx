@@ -116,22 +116,37 @@ export default function Contact() {
       <div className="wrap">
         <div className="contact__panel">
           <Reveal>
-            <span className="sec__label"><b>04</b> Start a project</span>
+            <span className="sec__label">
+              <b>06</b> Let's create
+            </span>
           </Reveal>
 
           <div className="contact__grid">
             <div className="contact__side">
               <Reveal delay={0.05}>
                 <h2 className="contact__title">
-                  Let's talk<span className="accent">.</span>
+                  Have a project in mind? Let's make it <span className="accent">worth watching.</span>
                 </h2>
               </Reveal>
 
               <Reveal delay={0.1}>
                 <p className="contact__lead">
-                  Use the form, WhatsApp, Instagram, or email. Whatever's easiest — I'll reply with
-                  next steps and a quote.
+                  Tell me what you're working on. I'd love to explore how we can bring your vision to life.
                 </p>
+              </Reveal>
+
+              <Reveal>
+                <div className="contact__cta">
+                  <a className="btn btn--solid" href={`mailto:${site.email}?subject=Project%20enquiry`}>
+                    Discuss a Project
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M7 17 17 7M8 7h9v9" />
+                    </svg>
+                  </a>
+                  <a className="contact__mail" href={`mailto:${site.email}`}>
+                    {site.email}
+                  </a>
+                </div>
               </Reveal>
 
               <Reveal>
@@ -153,90 +168,125 @@ export default function Contact() {
 
               <Reveal delay={0.08}>
                 <div className="facts">
-                  <div><span>Stack</span><b>Premiere · After Effects</b></div>
-                  <div><span>Formats</span><b>9:16 · 16:9 · 1:1</b></div>
+                  <div>
+                    <span>Stack</span>
+                    <b>Premiere Pro · After Effects</b>
+                  </div>
+                  <div>
+                    <span>Formats</span>
+                    <b>9:16 · 16:9 · 1:1</b>
+                  </div>
+                  <div>
+                    <span>Base</span>
+                    <b>Casablanca · Worldwide</b>
+                  </div>
                 </div>
                 <p className="contact__privacy">{contact.privacy}</p>
               </Reveal>
             </div>
 
-            <Reveal delay={0.12}>
-              <form className="form" ref={formRef} noValidate onSubmit={onSubmit}>
-              <div className="frow frow--2">
-                <label className={`field ${errors.name ? "field--invalid" : ""}`}>
-                  <span className="fl">Name</span>
-                  <input type="text" name="name" autoComplete="name" placeholder="Your name" required aria-invalid={!!errors.name} />
-                  {errors.name && <span className="form__err" role="alert">{errors.name}</span>}
-                </label>
-                <label className={`field ${errors.email ? "field--invalid" : ""}`}>
-                  <span className="fl">Email</span>
-                  <input type="email" name="email" autoComplete="email" placeholder="you@example.com" required aria-invalid={!!errors.email} />
-                  {errors.email && <span className="form__err" role="alert">{errors.email}</span>}
-                </label>
-              </div>
+            <Reveal delay={0.1}>
+              <form className="form" id="contactForm" method="post" action="#" novalidate ref={formRef}>
+                <div className="form__row">
+                  <div className={`field${errors.name ? " field--invalid" : ""}`} id="field-name">
+                    <label htmlFor="f-name">Name</label>
+                    <input type="text" name="name" id="f-name" autoComplete="name" placeholder="Your name" required />
+                    <p className="form__err" id="err-name" role="alert" hidden={!errors.name}>
+                      {errors.name || "Please enter your name."}
+                    </p>
+                  </div>
+                  <div className={`field${errors.email ? " field--invalid" : ""}`} id="field-email">
+                    <label htmlFor="f-email">Email</label>
+                    <input type="email" name="email" id="f-email" autoComplete="email" placeholder="you@example.com" required />
+                    <p className="form__err" id="err-email" role="alert" hidden={!errors.email}>
+                      {errors.email || "Please enter a valid email address."}
+                    </p>
+                  </div>
+                </div>
 
-              <label className={`field ${errors.ptype ? "field--invalid" : ""}`}>
-                <span className="fl">Project type</span>
-                <select name="ptype" required defaultValue="" aria-invalid={!!errors.ptype}>
-                  <option value="" disabled>Select a project type</option>
-                  {contact.projectTypes.map((t) => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
-                {errors.ptype && <span className="form__err" role="alert">{errors.ptype}</span>}
-              </label>
+                <div className={`field${errors.ptype ? " field--invalid" : ""}`} id="field-type">
+                  <label htmlFor="f-ptype">Project type</label>
+                  <select name="ptype" id="f-ptype" required>
+                    <option value="" selected disabled>
+                      Select a project type
+                    </option>
+                    {contact.projectTypes.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="form__err" id="err-type" role="alert" hidden={!errors.ptype}>
+                    {errors.ptype || "Please choose a project type."}
+                  </p>
+                </div>
 
-              <label className="field">
-                <span className="fl">Budget (indicative)</span>
-                <select name="budget" defaultValue="">
-                  {contact.budgets.map((b) => (
-                    <option key={b} value={b}>{b}</option>
-                  ))}
-                </select>
-                <span className="fnote">Indicative ranges — the final quote depends on the scope we agree on.</span>
-              </label>
+                <div className="field" id="field-budget">
+                  <label htmlFor="f-budget">Budget (optional)</label>
+                  <select name="budget" id="f-budget">
+                    {contact.budgets.map((b, i) => (
+                      <option key={b} value={i === 0 ? "" : b}>
+                        {b}
+                      </option>
+                    ))}
+                  </select>
+                  <small className="form__hint">
+                    Indicative ranges — the final quote depends on the scope we agree on.
+                  </small>
+                </div>
 
-              <label className={`field ${errors.message ? "field--invalid" : ""}`}>
-                <span className="fl">About the project</span>
-                <textarea
-                  name="message"
-                  rows={5}
-                  placeholder="One or two lines about the footage and what you need."
-                  required
-                  aria-invalid={!!errors.message}
-                />
-                {errors.message && <span className="form__err" role="alert">{errors.message}</span>}
-              </label>
+                <div className={`field${errors.message ? " field--invalid" : ""}`} id="field-message">
+                  <label htmlFor="f-message">Project description</label>
+                  <textarea
+                    name="message"
+                    id="f-message"
+                    rows="5"
+                    placeholder="One or two lines about the footage and what you need."
+                    required
+                  />
+                  <p className="form__err" id="err-message" role="alert" hidden={!errors.message}>
+                    {errors.message || "Please add a short message."}
+                  </p>
+                </div>
 
-              <div className="form__actions">
-                <button className="btn btn--solid" type="submit" disabled={sending}>
-                  Send via WhatsApp
-                </button>
-                <button className="btn btn--ghost" type="button" onClick={onMail} disabled={sending}>
-                  {sending ? "Sending…" : "Send by email"}
-                </button>
-              </div>
+                <div className="form__actions">
+                  <button className="btn btn--dark" type="submit" id="formSubmit" onClick={onSubmit}>
+                    Send via WhatsApp
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M7 17 17 7M8 7h9v9" />
+                    </svg>
+                  </button>
+                  <button className="btn btn--ghost" type="submit" id="formSubmitMail" onClick={onMail} disabled={sending}>
+                    {sending ? "Sending…" : "Send by email"}
+                  </button>
+                </div>
 
-              {status && <p className="form__status" role="status">{status}</p>}
-
-              <p className="form__end">
-                WhatsApp opens with your message ready — nothing is sent until you press send
-                there. “Send by email” delivers via a free form service straight to the studio inbox.
-              </p>
-              <p className="form__alt">
-                <button
-                  type="button"
-                  className="linklike"
-                  onClick={() => {
-                    const data = collect()
-                    if (validate(data)) draft(data)
-                  }}
-                >
-                  Prefer email in your own mail app? Open a draft instead.
-                </button>
-              </p>
-            </form>
-          </Reveal>
+                <p className="form__status" id="formStatus" role="status" hidden={!status}>
+                  {status}
+                </p>
+                <p className="form__note">
+                  WhatsApp opens with your message ready — nothing is sent until you press send there. "Send by
+                  email" delivers via a free form service straight to the studio inbox.
+                </p>
+                <p className="form__fallback">
+                  <a
+                    href={`mailto:${site.email}?subject=Project%20enquiry`}
+                    id="mailtoFallback"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      const data = collect()
+                      if (!validate(data)) {
+                        setStatus("")
+                        return
+                      }
+                      draft(data)
+                    }}
+                  >
+                    Prefer email in your own mail app? Open a draft instead.
+                  </a>
+                </p>
+              </form>
+            </Reveal>
           </div>
         </div>
       </div>

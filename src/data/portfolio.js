@@ -2,26 +2,29 @@ const year = new Date().getFullYear()
 
 export const site = {
   brand: "khalid.vsl",
-  role: ["Video", "Editor"],
-  roleSupport: "& Motion Designer",
+  eyebrow: "Independent video editor & motion designer",
+  headlineA: "Your story deserves",
+  headlineB: "a better edit",
+  lead:
+    "I help brands, creators, and businesses turn raw footage into clean, cinematic videos through storytelling, thoughtful pacing, and premium motion design.",
   location: "Casablanca, Morocco",
   coords: "33.57°N",
   availability: "Available for selected projects",
-  lead:
-    "Talking-head editing and motion graphics for doctors, educators, and personal brands — clean audio, purposeful captions, and visuals that hold attention.",
-  specialties: ["Talking heads", "Motion graphics", "Short-form", "9:16 · 16:9 · 1:1"],
   email: "khalid1editor@gmail.com",
   whatsapp: "https://wa.me/212646173884",
   instagram: "https://www.instagram.com/khalid.vsl/",
+  portrait: "/khalid-portrait.png",
   year,
 }
 
 export const nav = [
   { id: "work", label: "Work" },
   { id: "services", label: "Services" },
-  { id: "process", label: "Process" },
+  { id: "about", label: "About" },
   { id: "contact", label: "Contact" },
 ]
+
+export const featuredId = "mariam-motion"
 
 export const projects = [
   {
@@ -29,6 +32,9 @@ export const projects = [
     title: "Dr Saheer — IBD",
     category: "talking",
     categoryLabel: "Talking head",
+    industry: "Healthcare",
+    tags: "Editing · Audio · Captions",
+    span: "7",
     ratio: "9:16",
     duration: "0:55",
     aspectRatio: 9 / 16,
@@ -44,6 +50,9 @@ export const projects = [
     title: "Dr. Talaa — Consultation",
     category: "talking",
     categoryLabel: "Talking head",
+    industry: "Healthcare",
+    tags: "Editing · Audio · Captions",
+    span: "5",
     ratio: "9:16",
     duration: "0:32",
     aspectRatio: 9 / 16,
@@ -59,6 +68,9 @@ export const projects = [
     title: "Dr Amr — Crowded Teeth",
     category: "talking",
     categoryLabel: "Talking head",
+    industry: "Healthcare",
+    tags: "Editing · Audio · Captions",
+    span: "5",
     ratio: "9:16",
     duration: "0:50",
     aspectRatio: 9 / 16,
@@ -74,6 +86,9 @@ export const projects = [
     title: "Dr Salma — Vitamins",
     category: "talking",
     categoryLabel: "Talking head",
+    industry: "Healthcare",
+    tags: "Editing · Audio · Captions",
+    span: "7",
     ratio: "9:16",
     duration: "0:37",
     aspectRatio: 9 / 16,
@@ -89,6 +104,9 @@ export const projects = [
     title: "Dr Haitham — Confused Implant",
     category: "talking",
     categoryLabel: "Talking head",
+    industry: "Healthcare",
+    tags: "Editing · Audio · Captions",
+    span: "7",
     ratio: "9:16",
     duration: "0:17",
     aspectRatio: 9 / 16,
@@ -104,6 +122,9 @@ export const projects = [
     title: "Dr Mohamad — Ortho Fact",
     category: "talking",
     categoryLabel: "Talking head",
+    industry: "Healthcare",
+    tags: "Editing · Audio · Captions",
+    span: "5",
     ratio: "9:16",
     duration: "0:30",
     aspectRatio: 9 / 16,
@@ -119,6 +140,9 @@ export const projects = [
     title: "Dr Fifi",
     category: "talking",
     categoryLabel: "Talking head",
+    industry: "Healthcare",
+    tags: "Editing · Audio · Captions",
+    span: "5",
     ratio: "9:16",
     duration: "0:43",
     aspectRatio: 9 / 16,
@@ -133,7 +157,10 @@ export const projects = [
     id: "mariam-motion",
     title: "Motion Graphics — Mariam",
     category: "motion",
-    categoryLabel: "Motion graphics",
+    categoryLabel: "Motion design",
+    industry: "Personal brand",
+    tags: "Motion graphics · Kinetic type",
+    span: "7",
     ratio: "9:16",
     duration: "0:51",
     aspectRatio: 9 / 16,
@@ -148,7 +175,10 @@ export const projects = [
     id: "gobird-motion",
     title: "Motion Graphics — GoBird",
     category: "motion",
-    categoryLabel: "Motion graphics",
+    categoryLabel: "Motion design",
+    industry: "Brand",
+    tags: "Animated logo · Branding sequence",
+    span: "12",
     ratio: "9:16",
     duration: "0:31",
     aspectRatio: 9 / 16,
@@ -162,67 +192,122 @@ export const projects = [
 ]
 
 export const filters = [
-  { id: "all", label: "All" },
-  { id: "talking", label: "Talking heads" },
-  { id: "motion", label: "Motion graphics" },
+  { id: "all", label: "All Work" },
+  { id: "talking", label: "Talking Head" },
+  { id: "motion", label: "Motion Design" },
 ]
+
+export const collaborations = [
+  {
+    title: "Healthcare",
+    text: "Educational talking-head content for doctors and clinics — clear explanations, clean audio, and captions that make complex topics easy to follow.",
+    items: [
+      ["Dr Saheer", "IBD series"],
+      ["Dr. Talaa", "Consultation"],
+      ["Dr Salma", "Vitamins"],
+    ],
+  },
+  {
+    title: "Education & explainers",
+    text: "Explainer-first editing for educators — pacing and visuals that hold attention while the lesson does the work.",
+    items: [
+      ["Dr Amr", "Crowded teeth"],
+      ["Dr Haitham", "Implant facts"],
+      ["Dr Mohamad", "Ortho facts"],
+      ["Dr Fifi", "Practice content"],
+    ],
+  },
+  {
+    title: "Personal brands & studios",
+    text: "Motion design and short-form content for creators building a name — kinetic type, animated identities, platform-ready exports.",
+    items: [
+      ["Mariam", "Motion graphics"],
+      ["GoBird", "Brand animation"],
+    ],
+  },
+]
+
+export const collaborationsNote =
+  "Client names appear as project titles out of respect for private agreements. Full case files and references are shared on request."
 
 export const services = [
   {
-    num: "/01",
-    title: "Talking-head editing",
-    text:
-      "Clean, watchable edits that start from the person on camera — strong pacing, clean audio, and captions that keep viewers through to the payoff.",
-    deliverables: ["Edited master", "Captions", "Audio clean-up"],
+    num: "01",
+    title: "Video Editing",
+    text: "Thoughtful pacing, clean cuts, polished audio, and storytelling that keeps every second intentional.",
+    capabilities: [
+      "Talking-head editing",
+      "Story-driven pacing",
+      "Audio cleanup",
+      "Professional captions",
+    ],
   },
   {
-    num: "/02",
-    title: "Short-form packages",
-    text:
-      "Reels and feed clips for brands and creators, structured to make the idea land fast — hooks, captions, and export-ready ratios.",
-    deliverables: ["Hooks", "Captions", "Export ratios"],
+    num: "02",
+    title: "Motion Design",
+    text: "Purposeful animation and visual storytelling that make complex ideas easier to understand and impossible to ignore.",
+    capabilities: [
+      "Motion graphics",
+      "Kinetic typography",
+      "Animated explainers",
+      "Brand-aligned visuals",
+    ],
   },
   {
-    num: "/03",
-    title: "Motion graphics",
-    text:
-      "Titles, kinetic type, and animated overlays that make your message instantly readable — polished, on-brand, and matched to your cut.",
-    deliverables: ["Titles", "Kinetic type", "Overlays"],
+    num: "03",
+    title: "Short-Form Content",
+    text: "Platform-ready videos designed to communicate quickly without sacrificing quality.",
+    capabilities: [
+      "Instagram Reels",
+      "YouTube Shorts",
+      "Promotional content",
+      "Multi-format exports",
+    ],
   },
 ]
+
+export const about = {
+  photo: "/khalid-portrait.png",
+  paragraphs: [
+    "I'm Khalid, an independent video editor and motion designer based in Casablanca, Morocco.",
+    "I create clean, cinematic content for brands, businesses, and creators who care about how their story is told.",
+    "My approach combines purposeful editing, thoughtful motion design, and attention to the small details that make a video feel complete.",
+  ],
+  facts: ["Adobe Premiere Pro", "After Effects", "Casablanca, Morocco", "Available worldwide"],
+}
 
 export const process = [
   {
     num: "01",
-    title: "Brief",
-    text: "Send the footage and a short brief. I confirm scope, ratios, and file specs before starting.",
+    title: "Discover",
+    text: "Understand the brief, objectives, and creative direction.",
   },
   {
     num: "02",
-    title: "Edit",
-    text: "I build the cut around clear pacing and audio, add captions, and refine until the message is easy to follow.",
+    title: "Create",
+    text: "Build the edit and motion elements with purposeful storytelling.",
   },
   {
     num: "03",
-    title: "Feedback",
-    text: "You review a draft. I apply your notes and tighten any section that doesn't land.",
+    title: "Refine",
+    text: "Collaborate on feedback and polish the details.",
   },
   {
     num: "04",
-    title: "Delivery",
-    text: "You receive export-ready files in the formats and ratios your channel needs.",
+    title: "Deliver",
+    text: "Provide export-ready assets optimized for the intended platforms.",
   },
 ]
 
 export const contact = {
   projectTypes: [
-    "Talking-head editing",
-    "Short-form content package",
-    "Motion graphics",
+    "Video editing",
+    "Motion design",
+    "Short-form content",
     "Other / not sure",
   ],
   budgets: ["Not sure yet", "Under $300", "$300–$700", "$700–$1,500", "$1,500+"],
   privacy:
-    "Your details are used only to respond to this enquiry. Send it via WhatsApp (opens with your message ready — you press send) or by email through a free form service straight to the studio inbox. Nothing is stored on this website.",
+    "Your details are used only to respond to this enquiry. WhatsApp opens with your message ready — you press send. Email submissions go through a free form service straight to the studio inbox. Nothing is stored on this website.",
   formEndpoint: "https://formsubmit.co/ajax/khalid1editor@gmail.com",
 }

@@ -1,38 +1,40 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <defs>
-    <linearGradient id="bg" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0" stop-color="#FF4D00"/>
-      <stop offset="0.34" stop-color="#FF5A0C"/>
-      <stop offset="0.72" stop-color="#FBF7F2"/>
-      <stop offset="1" stop-color="#FAF8F5"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="0.62" cy="1.08" r="0.7">
-      <stop offset="0" stop-color="#FF4D00"/>
-      <stop offset="1" stop-color="#FF4D00" stop-opacity="0"/>
+    <radialGradient id="glow" cx="0.85" cy="-0.1" r="0.85">
+      <stop offset="0" stop-color="#F27A35" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#F27A35" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="vig" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0.6" stop-color="#171717" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.55"/>
+    </linearGradient>
   </defs>
 
-  <rect width="1200" height="630" fill="url(#bg)"/>
-  <rect width="1200" height="630" fill="url(#glow)" opacity="0.55"/>
+  <!-- charcoal foundation -->
+  <rect width="1200" height="630" fill="#171717"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect width="1200" height="630" fill="url(#vig)"/>
 
-  <!-- soft top light -->
-  <ellipse cx="1020" cy="40" rx="420" ry="220" fill="#FFFFFF" opacity="0.55"/>
+  <!-- editorial hairline frame -->
+  <rect x="40" y="40" width="1120" height="550" fill="none" stroke="#F6F3ED" stroke-opacity="0.14"/>
 
-  <g font-family="'Inter Tight','Helvetica Neue',Arial,sans-serif">
-    <text x="96" y="196" font-size="26" font-weight="600" letter-spacing="8" fill="#7B4A2E">PORTFOLIO — 2026</text>
+  <g font-family="'Space Grotesk','Inter Tight','Helvetica Neue',Arial,sans-serif">
+    <text x="92" y="150" font-size="22" font-weight="500" letter-spacing="7" fill="#8B8B87" font-family="'JetBrains Mono','SF Mono',Menlo,monospace">khalid.vsl® — PORTFOLIO 2026</text>
 
-    <text x="92" y="330" font-size="128" font-weight="800" fill="#171717" letter-spacing="-2">Video</text>
-    <text x="92" y="452" font-size="128" font-weight="800" fill="#FFFFFF" letter-spacing="-2">Editor</text>
-    <text x="96" y="512" font-size="34" font-weight="500" fill="#171717" letter-spacing="-0.5">&amp; Motion Designer — talking-heads · short-form · motion</text>
+    <text x="88" y="300" font-size="104" font-weight="600" letter-spacing="-3" fill="#F6F3ED">Your story deserves</text>
+    <text x="88" y="410" font-size="104" font-weight="600" letter-spacing="-3" fill="#F6F3ED">a better edit<tspan fill="#F27A35">.</tspan></text>
+
+    <text x="92" y="480" font-size="26" font-weight="500" letter-spacing="0" fill="#8B8B87" font-family="'Inter','Helvetica Neue',Arial,sans-serif">Independent video editor &amp; motion designer — Casablanca, Morocco · Worldwide</text>
   </g>
 
-  <g font-family="'SF Mono',Menlo,Monaco,Consolas,monospace">
-    <text x="96" y="580" font-size="20" fill="#8A5A40" letter-spacing="3">khalidvsl.netlify.app</text>
+  <!-- signature play chip -->
+  <g>
+    <circle cx="1005" cy="155" r="56" fill="#F27A35"/>
+    <path d="M988 128v54c0 4.5 4.9 7.2 8.8 4.9l42.8-27a4.8 4.8 0 0 0 0-8.2l-42.8-27a4.8 4.8 0 0 0-8.8 4.3Z" fill="#171717"/>
   </g>
 
-  <!-- play glyph -->
-  <g transform="translate(986 96)">
-    <circle cx="52" cy="52" r="52" fill="rgba(255,255,255,0.92)"/>
-    <path d="M42 28v48c0 4.4 4.8 7.1 8.6 5L85 58.6a5.8 5.8 0 0 0 0-10L50.6 23c-3.8-2.1-8.6 0.6-8.6 5Z" fill="#FF4D00"/>
+  <g font-family="'JetBrains Mono','SF Mono',Menlo,monospace">
+    <text x="92" y="556" font-size="19" fill="#F27A35" letter-spacing="3">SELECTED WORK · 2026</text>
+    <text x="1108" y="556" font-size="19" fill="#8B8B87" letter-spacing="3" text-anchor="end">khalidvsl.netlify.app</text>
   </g>
 </svg>
