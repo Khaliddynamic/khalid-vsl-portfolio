@@ -8,30 +8,20 @@ export default function Footer() {
 
   return (
     <footer className="footer">
-      <div className="wrap">
-        <div className="footer__grid">
-          <div className="footer__brand">
-            <b>
-              khalid.vsl<sup>®</sup>
-            </b>
-            <span>Independent Video Editor &amp; Motion Designer</span>
-          </div>
-          <nav className="footer__links" aria-label="Footer">
-            <a href={site.instagram} target="_blank" rel="noreferrer">
-              Instagram
-            </a>
-            <a href={`mailto:${site.email}`}>Email</a>
-            <a href="#top" onClick={toTop}>
-              Back to Top
-            </a>
-          </nav>
-        </div>
-        <div className="footer__legal">
-          <span>
-            © <span id="footYear">{site.year}</span> {site.brand} — Crafted with intention.
-          </span>
-          <span>Casablanca · Worldwide</span>
-        </div>
+      <div className="wrap footer__inner">
+        <span className="footer__brand">khalid.vsl</span>
+        <span className="footer__legal">
+          © <span id="footYear">{site.year}</span> Khalid — Casablanca, Morocco
+        </span>
+        <nav className="footer__links" aria-label="Footer">
+          <a href={site.instagram} target="_blank" rel="noreferrer">
+            Instagram
+          </a>
+          <a href={`mailto:${site.email}`}>Email</a>
+          <a href="#top" onClick={toTop}>
+            Back to top
+          </a>
+        </nav>
       </div>
     </footer>
   )

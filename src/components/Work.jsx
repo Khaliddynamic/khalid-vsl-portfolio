@@ -1,137 +1,152 @@
-import { useState } from "react"
-import { filters, projects } from "../data/portfolio"
+import { projects, workLayout } from "../data/portfolio"
 import { playerOpen } from "./playerBus"
 import { Reveal } from "./Reveal"
 
 const ARROW = (
-  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M7 17 17 7M8 7h9v9" />
   </svg>
 )
 
-function WorkCard({ project, wide }) {
+const PLAY = (
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z" />
+  </svg>
+)
+
+function byId(id) {
+  return projects.find((p) => p.id === id)
+}
+
+function Still({ project, eager = false }) {
   return (
-    <article
-      className={`work${wide ? " work--wide" : ""}`}
-      data-cat={project.category}
-      data-span={project.span}
+    <a
+      className="still work__card"
+      href={`https://vimeo.com/${project.vimeoId}`}
+      target="_blank"
+      rel="noopener"
+      aria-label={`Watch project: ${project.title}`}
+      onClick={(e) => {
+        e.preventDefault()
+        playerOpen(project.id)
+      }}
     >
-      <a
-        className="work__card"
-        style={wide ? { display: "flex" } : undefined}
-        href={`https://vimeo.com/${project.vimeoId}`}
-        target="_blank"
-        rel="noopener"
-        aria-label={`Watch project: ${project.title}`}
-        onClick={(e) => {
-          e.preventDefault()
-          playerOpen(project.id)
+      <img
+        src={project.poster}
+        alt=""
+        width="540"
+        height="960"
+        {...(eager ? { fetchPriority: "high", decoding: "async" } : { loading: "lazy", decoding: "async" })}
+        onError={(e) => {
+          e.currentTarget.closest(".still").hidden = true
         }}
-      >
-        <div className="work__media">
-          <img
-            src={project.poster}
-            alt=""
-            width="540"
-            height="960"
-            loading="lazy"
-            decoding="async"
-            onError={(e) => {
-              e.currentTarget.closest(".work").hidden = true
-            }}
-          />
-          <span className="work__go" aria-hidden="true">
-            {ARROW}
-          </span>
-          {wide ? null : (
-            <span className="work__dur">
-              {project.duration} · {project.ratio}
-            </span>
-          )}
-        </div>
-        {wide ? (
-          <div className="work__info">
-            <p className="work__cat">
-              <b>{project.industry}</b> · {project.categoryLabel}
-            </p>
-            <h3>{project.title}</h3>
-            <p className="work__services">{project.tags}</p>
-            <span
-              className="work__dur"
-              style={{ position: "static", display: "inline-flex", marginTop: "1.1rem", width: "fit-content" }}
-            >
-              {project.duration} · {project.ratio}
-            </span>
-          </div>
-        ) : (
-          <div className="work__body">
-            <div>
-              <p className="work__cat">
-                <b>{project.industry}</b> · {project.categoryLabel}
-              </p>
-              <h3>{project.title}</h3>
-              <p className="work__services">{project.tags}</p>
-            </div>
-          </div>
-        )}
-      </a>
-    </article>
+      />
+      <span className="still__play" aria-hidden="true">
+        {PLAY}
+      </span>
+    </a>
+  )
+}
+
+function Caption({ project }) {
+  return (
+    <div className="caption">
+      <b>{project.title}</b>
+      <span>{project.categoryLabel}</span>
+    </div>
   )
 }
 
 export default function Work() {
-  const [filter, setFilter] = useState("all")
-
-  const counts = {}
-  for (const p of projects) counts[p.category] = (counts[p.category] || 0) + 1
-  counts.all = projects.length
-
-  const visible = projects.filter((p) => filter === "all" || p.category === filter)
+  const feat1 = byId(workLayout.featured)
+  const [pairA, pairB] = workLayout.pair.map(byId)
+  const feat2 = byId(workLayout.featured2)
+  const minis = workLayout.minis.map(byId).filter(Boolean)
 
   return (
-    <section className="sec" id="work">
+    <section className="work" id="work">
       <div className="wrap">
         <Reveal>
-          <span className="sec__label">
-            <b>01</b> Selected work
-          </span>
-        </Reveal>
-
-        <div className="sec__head">
-          <Reveal>
-            <h2 className="sec__title">
-              Work that speaks <span className="accent">for itself.</span>
-            </h2>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <p className="sec__lead">
-              A selection of edits and motion design projects built around clarity, story, and visual impact.
-            </p>
-          </Reveal>
-        </div>
-
-        <Reveal delay={0.12}>
-          <div className="filters" id="filters" role="group" aria-label="Filter projects">
-            {filters.map((f) => (
-              <button
-                key={f.id}
-                className="pill"
-                data-filter={f.id}
-                aria-pressed={filter === f.id}
-                onClick={() => setFilter(f.id)}
-              >
-                {f.label} <span className="cnt">{String(counts[f.id] || 0).padStart(2, "0")}</span>
-              </button>
-            ))}
+          <div className="work__head">
+            <h2>Selected work</h2>
+            <span>Nine projects</span>
           </div>
         </Reveal>
       </div>
 
       <div className="wrap">
-        <div className="workgrid" id="workGrid">
-          {visible.map((p) => (
-            <WorkCard key={p.id} project={p} wide={p.span === "12"} />
-          ))}
+        <div id="workGrid">
+          {/* featured spread 1 */}
+          <Reveal>
+            <div className="grid feat">
+              <Still project={feat1} eager />
+              <div className="feat__body">
+                <p className="feat__meta">{feat1.categoryLabel}</p>
+                <h3 className="feat__title">{feat1.title}</h3>
+                <p className="feat__desc">{feat1.description}</p>
+                <a
+                  className="feat__link"
+                  href={`https://vimeo.com/${feat1.vimeoId}`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    playerOpen(feat1.id)
+                  }}
+                >
+                  Watch the project
+                  {ARROW}
+                </a>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* pair, offset */}
+          <Reveal>
+            <div className="grid pair">
+              <div className="mini mini--a">
+                <Still project={pairA} />
+                <Caption project={pairA} />
+              </div>
+              <div className="mini mini--b">
+                <Still project={pairB} />
+                <Caption project={pairB} />
+              </div>
+            </div>
+          </Reveal>
+
+          {/* featured spread 2 — mirrored */}
+          <Reveal>
+            <div className="grid feat feat--flip">
+              <div className="feat__body">
+                <p className="feat__meta">{feat2.categoryLabel}</p>
+                <h3 className="feat__title">{feat2.title}</h3>
+                <p className="feat__desc">{feat2.description}</p>
+                <a
+                  className="feat__link"
+                  href={`https://vimeo.com/${feat2.vimeoId}`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    playerOpen(feat2.id)
+                  }}
+                >
+                  Watch the project
+                  {ARROW}
+                </a>
+              </div>
+              <Still project={feat2} />
+            </div>
+          </Reveal>
+
+          {/* remaining work */}
+          <Reveal>
+            <div className="minis">
+              {minis.map((p) => (
+                <div className="mini" key={p.id}>
+                  <Still project={p} />
+                  <Caption project={p} />
+                </div>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>

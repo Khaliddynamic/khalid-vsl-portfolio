@@ -25,7 +25,8 @@ export default function PlayerDialog() {
       if (!p || !dialog) return
       clear()
       titleRef.current.textContent = p.title
-      metaRef.current.textContent = `${p.industry || p.categoryLabel} · ${p.ratio}`
+      metaRef.current.textContent =
+        `${p.categoryLabel || "Video"} · ${p.aspectRatio < 1 ? "9:16" : "16:9"}`
       openRef.current.href = `https://vimeo.com/${p.vimeoId}`
       frameRef.current.classList.toggle("player__frame--tall", p.aspectRatio < 1)
 

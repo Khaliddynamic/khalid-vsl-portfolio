@@ -1,35 +1,25 @@
-import { about, site } from "../data/portfolio"
+import { about, services, site } from "../data/portfolio"
 import { Reveal } from "./Reveal"
 
 export default function About() {
+  /* set "Casablanca" in serif italic */
+  const [before, after] = about.lede.split("Casablanca")
+
   return (
-    <section className="sec" id="about">
+    <section className="about" id="about">
       <div className="wrap">
         <Reveal>
-          <span className="sec__label">
-            <b>04</b> Behind the edit
-          </span>
+          <p className="about__label">About</p>
         </Reveal>
 
-        <div className="sec__head">
-          <Reveal>
-            <h2 className="sec__title">
-              The editor behind <span className="accent">the story.</span>
-            </h2>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <p className="sec__lead">Independent by design — one pair of hands, from first frame to final export.</p>
-          </Reveal>
-        </div>
-
-        <div className="about__grid">
+        <div className="grid about__grid">
           <Reveal>
             <figure className="about__photo">
               <img
                 src={about.photo}
-                alt={`${site.brand} — independent video editor and motion designer`}
+                alt={`Portrait of ${site.name}`}
                 width="960"
-                height="1200"
+                height="960"
                 loading="lazy"
                 decoding="async"
               />
@@ -37,20 +27,20 @@ export default function About() {
           </Reveal>
           <Reveal delay={0.08}>
             <div className="about__copy">
-              <p>{about.paragraphs[0]}</p>
-              <p>
-                I create clean, cinematic content for <strong>brands, businesses, and creators</strong> who care
-                about how their story is told.
+              <p className="about__lede">
+                {before}
+                <em>Casablanca</em>
+                {after}
               </p>
-              <p>{about.paragraphs[2]}</p>
-              <div className="about__facts">
-                {about.facts.map((f) => (
-                  <span key={f}>
-                    <i>◆</i>
-                    {f}
-                  </span>
+              <p className="about__sub">{about.sub}</p>
+              <ul className="services">
+                {services.map((s) => (
+                  <li key={s.title}>
+                    <b>{s.title}</b>
+                    <span>{s.text}</span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           </Reveal>
         </div>

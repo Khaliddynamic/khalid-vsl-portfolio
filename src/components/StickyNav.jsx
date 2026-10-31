@@ -1,28 +1,28 @@
 import { useEffect, useRef, useState } from "react"
 import { nav, site } from "../data/portfolio"
 
+const ARROW = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M7 17 17 7M8 7h9v9" />
+  </svg>
+)
+
 export default function StickyNav() {
   const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState("")
   const [open, setOpen] = useState(false)
-  const barRef = useRef(null)
   const panelRef = useRef(null)
 
   useEffect(() => {
     function onScroll() {
-      const y = window.scrollY
-      setScrolled(y > 12)
-      const max = document.documentElement.scrollHeight - window.innerHeight
-      if (barRef.current) {
-        barRef.current.style.width = `${max > 0 ? (y / max) * 100 : 0}%`
-      }
+      setScrolled(window.scrollY > 12)
     }
     onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
-  /* scroll spy — active section drives the orange underline */
+  /* scroll spy — quiet gray -> ink */
   useEffect(() => {
     if (!("IntersectionObserver" in window)) return undefined
     const links = nav
@@ -63,7 +63,7 @@ export default function StickyNav() {
       <header className={`nav ${scrolled ? "is-scrolled" : ""}`}>
         <div className="nav__inner wrap">
           <a className="nav__brand" href="#top" onClick={(e) => jump(e, "top")}>
-            khalid.vsl<sup>®</sup>
+            khalid.vsl
           </a>
 
           <nav className="nav__links" aria-label="Primary" id="navLinks">
@@ -79,26 +79,22 @@ export default function StickyNav() {
             ))}
           </nav>
 
-          <div className="nav__right">
-            <a className="nav__cta" href="#contact" onClick={(e) => jump(e, "contact")}>
-              Discuss a Project
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M7 17 17 7M8 7h9v9" />
-              </svg>
-            </a>
-            <button
-              className="nav__burger"
-              aria-label={open ? "Close menu" : "Open menu"}
-              aria-expanded={open}
-              aria-controls="mobilePanel"
-              onClick={() => setOpen((v) => !v)}
-            >
-              <i /><i /><i />
-            </button>
-          </div>
-        </div>
-        <div className="nav__progress" aria-hidden="true">
-          <i ref={barRef} />
+          <a className="nav__action" href={`mailto:${site.email}?subject=Project%20enquiry`}>
+            Start a project
+            {ARROW}
+          </a>
+          <button
+            className="nav__burger"
+            id="navBurger"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="mobilePanel"
+            onClick={() => setOpen((v) => !v)}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+              <path d="M3.5 8h17m-17 8h17" />
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -113,21 +109,14 @@ export default function StickyNav() {
         }}
       >
         <div className="drawer__inner">
-          {nav.map((item, i) => (
+          {nav.map((item) => (
             <a key={item.id} href={`#${item.id}`} onClick={(e) => jump(e, item.id)}>
-              <i>0{i + 1}</i>
               {item.label}
             </a>
           ))}
-          <a className="btn btn--solid drawer__btn" href="#contact" onClick={(e) => jump(e, "contact")}>
-            Discuss a Project
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M7 17 17 7M8 7h9v9" />
-            </svg>
+          <a className="drawer__mail" href={`mailto:${site.email}`}>
+            {site.email}
           </a>
-          <p className="mono" style={{ marginTop: "2rem", color: "var(--muted)" }}>
-            {site.location}
-          </p>
         </div>
       </dialog>
     </>
