@@ -76,7 +76,7 @@ export default function Work() {
 
       <div className="wrap">
         <div id="workGrid">
-          {/* featured spread 1 */}
+          {/* featured 1 — Mariam (motion graphics) */}
           <Reveal>
             <div className="grid feat">
               <Still project={feat1} eager />
@@ -101,7 +101,7 @@ export default function Work() {
             </div>
           </Reveal>
 
-          {/* pair, offset */}
+          {/* pair — motion + talking head, vertically offset */}
           <Reveal>
             <div className="grid pair">
               <div className="mini mini--a">
@@ -115,7 +115,7 @@ export default function Work() {
             </div>
           </Reveal>
 
-          {/* featured spread 2 — mirrored */}
+          {/* featured 2 — Dr Saheer (talking head, mirrored) */}
           <Reveal>
             <div className="grid feat feat--flip">
               <div className="feat__body">
@@ -140,7 +140,7 @@ export default function Work() {
             </div>
           </Reveal>
 
-          {/* remaining work */}
+          {/* remaining work — compact gallery */}
           <Reveal>
             <div className="minis">
               {minis.map((p) => (
