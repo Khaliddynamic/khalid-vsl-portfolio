@@ -81,7 +81,9 @@ export default function Work() {
             <div className="grid feat">
               <Still project={feat1} eager />
               <div className="feat__body">
-                <p className="feat__meta">{feat1.categoryLabel}</p>
+                <p className="feat__meta">
+                  {feat1.industry ? `${feat1.industry} — ${feat1.categoryLabel}` : feat1.categoryLabel}
+                </p>
                 <h3 className="feat__title">{feat1.title}</h3>
                 <p className="feat__desc">{feat1.description}</p>
                 <a
@@ -117,7 +119,9 @@ export default function Work() {
           <Reveal>
             <div className="grid feat feat--flip">
               <div className="feat__body">
-                <p className="feat__meta">{feat2.categoryLabel}</p>
+                <p className="feat__meta">
+                  {feat2.industry ? `${feat2.industry} — ${feat2.categoryLabel}` : feat2.categoryLabel}
+                </p>
                 <h3 className="feat__title">{feat2.title}</h3>
                 <p className="feat__desc">{feat2.description}</p>
                 <a

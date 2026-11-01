@@ -9,7 +9,7 @@ export default function About() {
     <section className="about" id="about">
       <div className="wrap">
         <Reveal>
-          <p className="about__label">About</p>
+          <h2 className="about__label">About</h2>
         </Reveal>
 
         <div className="grid about__grid">

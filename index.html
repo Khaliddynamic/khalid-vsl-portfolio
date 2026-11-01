@@ -264,6 +264,7 @@ html.js [data-reveal].in{opacity:1;transform:none}
   display:grid;grid-column:1 / -1;
   grid-template-columns:repeat(5,1fr);
   column-gap:clamp(1rem,2.5vw,2rem);
+  min-width:0;
 }
 .minis .still img{width:100%}
 @media(max-width:1024px){
@@ -271,9 +272,10 @@ html.js [data-reveal].in{opacity:1;transform:none}
   .minis .mini:last-child{grid-column:2}
 }
 @media(max-width:640px){
-  .minis{grid-template-columns:1fr 1fr;row-gap:1.75rem}
+  .minis{grid-template-columns:1fr 1fr;row-gap:1.75rem;column-gap:1rem}
   .minis .mini:last-child{grid-column:auto}
 }
+.mini{min-width:0}
 .mini{display:flex;flex-direction:column;gap:0}
 .mini .caption b{font-size:.875rem;display:block}
 .mini .caption span{margin-top:.1rem}
@@ -288,7 +290,7 @@ html.js [data-reveal].in{opacity:1;transform:none}
 
 /* ============ about ============ */
 .about{padding-top:var(--sec-y)}
-.about__label{font-size:var(--fs-meta);color:var(--gray);margin-bottom:clamp(2.5rem,6vh,4rem)}
+.about__label{font-size:var(--fs-meta);font-weight:450;letter-spacing:0;color:var(--gray);margin-bottom:clamp(2.5rem,6vh,4rem)}
 .about__grid{row-gap:2.5rem}
 .about__grid > :nth-child(1){grid-column:1 / span 4}
 .about__grid > :nth-child(1) img{width:100%;height:auto}
@@ -324,23 +326,8 @@ html.js [data-reveal].in{opacity:1;transform:none}
 }
 .contact__title .dot{color:var(--orange)}
 .contact__sub{margin-top:1.25rem;color:rgba(246,243,237,.62);max-width:38ch}
-.contact__mail{
-  display:inline-block;margin-top:clamp(2rem,5vh,3rem);
-  font-size:clamp(1.15rem,2.2vw,1.6rem);font-weight:500;letter-spacing:-.02em;
-  border-bottom:1px solid var(--line-paper);padding-bottom:.25rem;
-  transition:border-color .2s var(--ease);
-}
-.contact__mail:hover{border-color:var(--orange)}
-.contact__alt{display:flex;gap:1.75rem;margin-top:1.5rem}
-.contact__alt a{
-  display:inline-flex;align-items:center;gap:.4rem;
-  font-size:var(--fs-meta);color:rgba(246,243,237,.62);
-  transition:color .2s var(--ease);
-}
-.contact__alt a:hover{color:var(--paper)}
-.contact__alt svg{width:12px;height:12px}
 
-/* form — visually secondary, plain */
+/* form — one quiet block under the headline */
 .form{margin-top:clamp(3rem,7vh,4.5rem);padding-bottom:clamp(4rem,8vh,6rem)}
 .form__row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
 .field{margin-bottom:1.4rem}
@@ -348,23 +335,20 @@ html.js [data-reveal].in{opacity:1;transform:none}
   display:block;margin-bottom:.35rem;
   font-size:var(--fs-meta);color:rgba(246,243,237,.62);
 }
-.field input,.field select,.field textarea{
+.field input,.field textarea{
   width:100%;padding:.65rem 0;
   background:transparent;border:0;border-bottom:1px solid var(--line-paper);
   border-radius:0;color:var(--paper);font:inherit;font-size:.9375rem;
   transition:border-color .2s var(--ease);
 }
 .field textarea{min-height:96px;resize:vertical}
-.field input:focus,.field select:focus,.field textarea:focus{
+.field input:focus,.field textarea:focus{
   outline:none;border-bottom-color:var(--orange);
 }
 .field ::placeholder{color:rgba(246,243,237,.35)}
-.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23F6F3ED' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .25rem center}
-.field option{background:var(--paper);color:var(--ink)}
-.field--invalid input,.field--invalid select,.field--invalid textarea{border-bottom-color:var(--err)}
+.field--invalid input,.field--invalid textarea{border-bottom-color:var(--err)}
 .field--invalid label{color:var(--err)}
 .form__err{margin-top:.4rem;font-size:.75rem;color:#FF9D82}
-.form__hint{display:block;margin-top:.4rem;font-size:.72rem;color:rgba(246,243,237,.45)}
 .form__actions{display:flex;flex-wrap:wrap;align-items:center;gap:1.25rem;margin-top:1.75rem}
 .btn-solid{
   display:inline-flex;align-items:center;gap:.5rem;
@@ -373,17 +357,12 @@ html.js [data-reveal].in{opacity:1;transform:none}
   transition:background .2s var(--ease);
 }
 .btn-solid:hover{background:#FFFFFF}
-.btn-quiet{
-  font-size:.9rem;font-weight:450;color:rgba(246,243,237,.62);
-  border-bottom:1px solid var(--line-paper);padding-bottom:.2rem;
-  transition:color .2s var(--ease),border-color .2s var(--ease);
-}
-.btn-quiet:hover{color:var(--paper);border-color:var(--orange)}
+.btn-solid svg{width:13px;height:13px}
+.btn-solid:disabled{opacity:.6;cursor:default}
 .form__status{margin-top:1.25rem;font-size:.85rem;color:#B7CDA8}
-.form__note{margin-top:1.25rem;font-size:.75rem;line-height:1.6;color:rgba(246,243,237,.45);max-width:52ch}
-.form__fallback{margin-top:.75rem;font-size:.8rem}
-.form__fallback a{color:rgba(246,243,237,.62);text-decoration:underline;text-underline-offset:2px}
-.form__fallback a:hover{color:var(--paper)}
+.form__fallback{margin-top:.9rem;font-size:.875rem;color:rgba(246,243,237,.62)}
+.form__fallback a{color:var(--paper);text-decoration:underline;text-underline-offset:2px}
+.form__fallback a:hover{color:#FFFFFF}
 @media(max-width:640px){
   .form__row{grid-template-columns:1fr;gap:0}
 }
@@ -538,7 +517,7 @@ html.js [data-reveal].in{opacity:1;transform:none}
       <!-- featured 2 — Dr Saheer (mirrored) -->
       <div class="grid feat feat--flip" data-reveal>
         <div class="feat__body">
-          <p class="feat__meta">Talking Head</p>
+          <p class="feat__meta">Healthcare — Talking Head</p>
           <h3 class="feat__title">Dr Saheer — IBD</h3>
           <p class="feat__desc">Short-form talking-head video — clean cut, clean audio, purposeful captions.</p>
           <a class="feat__link" href="https://vimeo.com/1230048854" data-project="dr-saheer-ibd">Watch the project
@@ -597,7 +576,7 @@ html.js [data-reveal].in{opacity:1;transform:none}
 <!-- ================= ABOUT ================= -->
 <section class="about" id="about">
   <div class="wrap">
-    <p class="about__label" data-reveal>About</p>
+    <h2 class="about__label" data-reveal>About</h2>
     <div class="grid about__grid">
       <figure class="about__photo" data-reveal>
         <img src="/khalid-portrait.png" alt="Portrait of Khalid" width="960" height="960" loading="lazy" decoding="async">
@@ -627,13 +606,8 @@ html.js [data-reveal].in{opacity:1;transform:none}
 <!-- ================= CONTACT ================= -->
 <section class="contact" id="contact">
   <div class="wrap">
-    <h2 class="contact__title" data-reveal>Let's work together<span class="dot">.</span></h2>
-    <p class="contact__sub" data-reveal>Have a project in mind? Tell me about it.</p>
-    <a class="contact__mail" data-chat="email" href="mailto:khalid1editor@gmail.com?subject=Project%20enquiry" data-reveal>khalid1editor@gmail.com</a>
-    <div class="contact__alt" data-reveal>
-      <a data-chat="instagram" href="https://www.instagram.com/khalid.vsl/" target="_blank" rel="noreferrer">Instagram <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
-      <a data-chat="whatsapp" href="https://wa.me/212646173884" target="_blank" rel="noreferrer">WhatsApp <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
-    </div>
+    <h2 class="contact__title" data-reveal>Let's make something great<span class="dot">.</span></h2>
+    <p class="contact__sub" data-reveal>Have a project in mind? Tell me what you're looking to create.</p>
 
     <form class="form" id="contactForm" method="post" action="#" novalidate data-reveal>
       <div class="form__row">
@@ -649,31 +623,6 @@ html.js [data-reveal].in{opacity:1;transform:none}
         </div>
       </div>
 
-      <div class="form__row">
-        <div class="field" id="field-type">
-          <label for="f-ptype">Project type</label>
-          <select name="ptype" id="f-ptype" required>
-            <option value="" selected disabled>Select a project type</option>
-            <option value="Video editing">Video editing</option>
-            <option value="Motion design">Motion design</option>
-            <option value="Short-form content">Short-form content</option>
-            <option value="Other / not sure">Other / not sure</option>
-          </select>
-          <p class="form__err" id="err-type" role="alert" hidden>Please choose a project type.</p>
-        </div>
-        <div class="field" id="field-budget">
-          <label for="f-budget">Budget (optional)</label>
-          <select name="budget" id="f-budget">
-            <option value="" selected>Not sure yet</option>
-            <option>Under $300</option>
-            <option>$300–$700</option>
-            <option>$700–$1,500</option>
-            <option>$1,500+</option>
-          </select>
-          <small class="form__hint">Indicative ranges — the final quote depends on the scope we agree on.</small>
-        </div>
-      </div>
-
       <div class="field" id="field-message">
         <label for="f-message">Project description</label>
         <textarea name="message" id="f-message" rows="4" placeholder="One or two lines about the footage and what you need." required></textarea>
@@ -681,13 +630,14 @@ html.js [data-reveal].in{opacity:1;transform:none}
       </div>
 
       <div class="form__actions">
-        <button class="btn-solid" type="submit" id="formSubmit">Send via WhatsApp</button>
-        <button class="btn-quiet" type="submit" id="formSubmitMail">Send by email</button>
+        <button class="btn-solid" type="submit" id="formSubmitMail">
+          <span class="btn__label">Send Inquiry</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+        </button>
       </div>
 
       <p class="form__status" id="formStatus" role="status" hidden></p>
-      <p class="form__note">WhatsApp opens with your message ready — nothing is sent until you press send there. "Send by email" delivers via a free form service straight to my inbox.</p>
-      <p class="form__fallback"><a href="mailto:khalid1editor@gmail.com?subject=Project%20enquiry" id="mailtoFallback">Prefer email in your own mail app? Open a draft instead.</a></p>
+      <p class="form__fallback">Prefer email? <a href="mailto:khalid1editor@gmail.com" id="mailtoFallback">khalid1editor@gmail.com</a></p>
     </form>
   </div>
 </section>
@@ -698,9 +648,10 @@ html.js [data-reveal].in{opacity:1;transform:none}
 <footer class="footer">
   <div class="wrap footer__inner">
     <span class="footer__brand">khalid.vsl</span>
-    <span class="footer__legal">© <span id="footYear">2026</span> Khalid — Casablanca, Morocco</span>
+    <span class="footer__legal">© <span id="footYear">2026</span> Khalid — Independent Video Editor &amp; Motion Designer</span>
     <nav class="footer__links" aria-label="Footer">
       <a data-chat="instagram" href="https://www.instagram.com/khalid.vsl/" target="_blank" rel="noreferrer">Instagram</a>
+      <a data-chat="whatsapp" href="https://wa.me/212646173884" target="_blank" rel="noreferrer">WhatsApp</a>
       <a href="mailto:khalid1editor@gmail.com">Email</a>
       <a href="#top">Back to top</a>
     </nav>
@@ -1064,19 +1015,18 @@ html.js [data-reveal].in{opacity:1;transform:none}
   onScroll();
 
   /* ============================================================
-     CONTACT FORM
-     mailto mode (default): no network, no fake endpoint.
-     Endpoint mode: switch CONFIG.form.mode and set .endpoint.
+     CONTACT FORM — one primary action. Submits through the email
+     backend (FormSubmit -> studio inbox); a validated mailto draft
+     is the fallback when no backend is configured.
      ============================================================ */
   var form = document.getElementById("contactForm");
-  var submitBtn = document.getElementById("formSubmit");
   var submitMailBtn = document.getElementById("formSubmitMail");
+  var submitLabel = submitMailBtn ? submitMailBtn.querySelector(".btn__label") : null;
   var statusEl = document.getElementById("formStatus");
   var fallbackLink = document.getElementById("mailtoFallback");
   var fields = {
     name: { el: document.getElementById("f-name"), err: document.getElementById("err-name"), field: document.getElementById("field-name") },
     email: { el: document.getElementById("f-email"), err: document.getElementById("err-email"), field: document.getElementById("field-email") },
-    ptype: { el: document.getElementById("f-ptype"), err: document.getElementById("err-type"), field: document.getElementById("field-type") },
     message: { el: document.getElementById("f-message"), err: document.getElementById("err-message"), field: document.getElementById("field-message") }
   };
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1094,13 +1044,11 @@ html.js [data-reveal].in{opacity:1;transform:none}
     var ok = true, firstBad = null;
     setErr("name", "");
     setErr("email", "");
-    setErr("ptype", "");
     setErr("message", "");
     if (!fields.name.el.value.trim()){ setErr("name", "Please enter your name."); ok = false; firstBad = firstBad || fields.name.el; }
     var em = fields.email.el.value.trim();
     if (!em){ setErr("email", "Please enter your email address."); ok = false; firstBad = firstBad || fields.email.el; }
     else if (!EMAIL_RE.test(em)){ setErr("email", "That email address doesn't look right — please check it."); ok = false; firstBad = firstBad || fields.email.el; }
-    if (!fields.ptype.el.value){ setErr("ptype", "Please choose a project type."); ok = false; firstBad = firstBad || fields.ptype.el; }
     if (!fields.message.el.value.trim()){ setErr("message", "Please add a short message."); ok = false; firstBad = firstBad || fields.message.el; }
     if (firstBad){ firstBad.focus(); }
     return ok;
@@ -1112,8 +1060,6 @@ html.js [data-reveal].in{opacity:1;transform:none}
     return {
       name: fields.name.el.value.trim(),
       email: fields.email.el.value.trim(),
-      ptype: fields.ptype.el.value,
-      budget: document.getElementById("f-budget").value || "Not sure yet",
       message: fields.message.el.value.trim()
     };
   }
@@ -1121,51 +1067,40 @@ html.js [data-reveal].in{opacity:1;transform:none}
   function buildBody(d){
     return "Hi,\n\nI'd like to discuss a project.\n\n" +
       "Name: " + d.name + "\n" +
-      "Email: " + d.email + "\n" +
-      "Project type: " + d.ptype + "\n" +
-      "Budget: " + d.budget + "\n\n" +
+      "Email: " + d.email + "\n\n" +
       "About the project:\n" + d.message + "\n\n— " + d.name;
   }
 
-  /* WhatsApp channel — opens wa.me with the enquiry pre-filled. Nothing sends until the visitor taps send. */
-  function sendWhatsApp(d){
-    var subject = "Project enquiry — " + d.ptype + " (" + d.budget + ")";
-    var href = "https://wa.me/" + String(CONFIG.form.whatsappNumber).replace(/\D/g, "") +
-      "?text=" + encodeURIComponent(subject + "\n\n" + buildBody(d));
-    window.open(href, "_blank", "noopener");
-    setStatus("WhatsApp should now be open with your message ready — nothing is sent until you press send there.");
-  }
-
-  /* Email channel — real submission via a free form service to the studio inbox. */
+  /* Primary channel — real submission via a free form service straight to the studio inbox. */
   function sendEmailBackend(d){
     submitMailBtn.disabled = true;
-    submitMailBtn.textContent = "Sending…";
+    if (submitLabel) submitLabel.textContent = "Sending…";
     setStatus("");
     fetch(CONFIG.form.emailBackend, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },
       body: JSON.stringify({
-        _subject: "Website enquiry — " + d.ptype + " (" + d.budget + ")",
-        name: d.name, email: d.email, ptype: d.ptype, budget: d.budget, message: d.message
+        _subject: "Website enquiry — khalid.vsl",
+        name: d.name, email: d.email, message: d.message
       })
     }).then(function(r){
       if (!r.ok) throw new Error("bad status " + r.status);
       return r.json();
     }).then(function(){
       submitMailBtn.disabled = false;
-      submitMailBtn.textContent = "Send by Email";
-      setStatus("Thanks — your message was delivered by email. I'll reply as soon as I can.");
+      if (submitLabel) submitLabel.textContent = "Send Inquiry";
+      setStatus("Thanks — your message is on its way. I'll reply as soon as I can.");
       form.reset();
     }).catch(function(){
       submitMailBtn.disabled = false;
-      submitMailBtn.textContent = "Send by Email";
-      setStatus("Email delivery hit a snag — please use WhatsApp or the draft link below; your details are still in the form.");
+      if (submitLabel) submitLabel.textContent = "Send Inquiry";
+      setStatus("Something went wrong — please try again, or use the email link below. Your details are still in the form.");
     });
   }
 
   /* Draft fallback — builds a plain-text draft and encodes the whole href once. */
   function sendMailto(d){
-    var subject = "Project enquiry — " + d.ptype + (d.budget ? " (" + d.budget + ")" : "");
+    var subject = "Project enquiry";
     var href = "mailto:" + CONFIG.email + "?subject=" +
       encodeURIComponent(subject) + "&body=" + encodeURIComponent(buildBody(d));
     window.location.href = href;
@@ -1179,38 +1114,11 @@ html.js [data-reveal].in{opacity:1;transform:none}
       return;
     }
     var d = collect();
-    var submitter = e.submitter || e.target.querySelector("button[type=submit]");
-    if (submitter && submitter.id === "formSubmitMail" && CONFIG.form.emailBackend){
+    if (CONFIG.form.emailBackend){
       sendEmailBackend(d);
       return;
     }
-    if (CONFIG.form.mode === "endpoint" && CONFIG.form.endpoint){
-      /* real endpoint: genuine submission, CSRF/validation are server-side */
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Sending…";
-      setStatus("");
-      fetch(CONFIG.form.endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify(d)
-      }).then(function(r){
-        if (!r.ok) throw new Error("bad status " + r.status);
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Send via WhatsApp";
-        setStatus("Thanks — your message was sent. I'll reply as soon as I can.");
-        form.reset();
-      }).catch(function(){
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Send via WhatsApp";
-        setStatus("Something went wrong sending your message. Please try again — your details are still in the form.");
-      });
-      return;
-    }
-    if (CONFIG.form.mode === "mailto" || !CONFIG.form.whatsappNumber){
-      sendMailto(d);
-      return;
-    }
-    sendWhatsApp(d);
+    sendMailto(d);
   });
 
   /* the draft fallback link always composes from current inputs (validated) */

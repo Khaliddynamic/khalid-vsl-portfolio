@@ -88,10 +88,10 @@ export default function PlayerDialog() {
           </svg>
         </button>
       </div>
-      <div className="player__frame" ref={frameRef} />
+      <div className="player__frame" id="playerFrame" ref={frameRef} />
       <p className="player__note">
         Having trouble playing embedded?{" "}
-        <a href="#" target="_blank" rel="noopener" ref={openRef}>
+        <a href="#" target="_blank" rel="noopener" id="playerOpen" ref={openRef}>
           Open this video on Vimeo
         </a>
         .

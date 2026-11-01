@@ -56,6 +56,7 @@ export const projects = [
     id: "dr-saheer-ibd",
     title: "Dr Saheer — IBD",
     categoryLabel: "Talking Head",
+    industry: "Healthcare",
     aspectRatio: 9 / 16,
     vimeoId: "1230048854",
     poster:
@@ -156,14 +157,7 @@ export const about = {
 }
 
 export const contact = {
-  title: "Let's work together",
-  sub: "Have a project in mind? Tell me about it.",
-  projectTypes: [
-    "Video editing",
-    "Motion design",
-    "Short-form content",
-    "Other / not sure",
-  ],
-  budgets: ["Not sure yet", "Under $300", "$300–$700", "$700–$1,500", "$1,500+"],
+  title: "Let's make something great",
+  sub: "Have a project in mind? Tell me what you're looking to create.",
   formEndpoint: "https://formsubmit.co/ajax/khalid1editor@gmail.com",
 }
