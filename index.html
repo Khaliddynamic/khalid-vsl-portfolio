@@ -399,6 +399,13 @@ section{scroll-margin-top:calc(var(--nav-h) + 8px)}
 }
 .about__photo img{
   width:100%;height:100%;object-fit:cover;aspect-ratio:1/1;
+  /* The portrait is a cutout whose torso is guillotined by the source image's
+     bottom edge. Dissolve the lower half into the matte so the figure emerges
+     from the frame as intentional composition, with no hard crop line. */
+  -webkit-mask-image:linear-gradient(to bottom,#000 48%,rgba(0,0,0,0) 96%);
+  mask-image:linear-gradient(to bottom,#000 48%,rgba(0,0,0,0) 96%);
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-size:100% 100%;mask-size:100% 100%;
 }
 .about__copy{max-width:56ch}
 .about__title{font-size:var(--fs-h2);letter-spacing:-.04em;max-width:14ch;margin-bottom:clamp(1.25rem,3vh,2rem)}
