@@ -1,4 +1,4 @@
-import { about, services, site } from "../data/portfolio"
+import { about, services } from "../data/portfolio"
 import { Reveal } from "./Reveal"
 
 export default function About() {
@@ -14,18 +14,6 @@ export default function About() {
 
         <div className="grid about__grid">
           <Reveal>
-            <figure className="about__photo">
-              <img
-                src={about.photo}
-                alt={`Portrait of ${site.name}`}
-                width="960"
-                height="960"
-                loading="lazy"
-                decoding="async"
-              />
-            </figure>
-          </Reveal>
-          <Reveal delay={0.08}>
             <div className="about__copy">
               <p className="about__lede">
                 {before}

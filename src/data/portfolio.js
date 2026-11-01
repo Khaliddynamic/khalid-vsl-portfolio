@@ -8,7 +8,6 @@ export const site = {
   email: "khalid1editor@gmail.com",
   whatsapp: "https://wa.me/212646173884",
   instagram: "https://www.instagram.com/khalid.vsl/",
-  portrait: "/khalid-portrait.png",
   year,
 }
 
@@ -156,7 +155,6 @@ export const services = [
 ]
 
 export const about = {
-  photo: "/khalid-portrait.png",
   lede: "I'm Khalid, a video editor and motion designer based in Casablanca, working with brands and creators worldwide.",
   sub: "I focus on clear storytelling, precise pacing, and motion that adds meaning to the edit.",
 }
