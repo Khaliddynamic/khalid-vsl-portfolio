@@ -1,4 +1,5 @@
-import { projects, workLayout } from "../data/portfolio"
+import { useState } from "react"
+import { projects, workLayout, posterUrl } from "../data/portfolio"
 import { playerOpen } from "./playerBus"
 import { Reveal } from "./Reveal"
 
@@ -14,29 +15,40 @@ const PLAY = (
   </svg>
 )
 
+const GALLERY_SIZES = "(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw"
+const FEAT_SIZES = "(max-width:700px) 92vw, 544px"
+
 function byId(id) {
   return projects.find((p) => p.id === id)
 }
 
-function Still({ project, eager = false }) {
+/* responsive srcset from the same Vimeo frame — sharp on retina, light on mobile */
+function srcSet(base) {
+  return [540, 720, 1080].map((w) => `${posterUrl(base, w)} ${w}w`).join(", ")
+}
+
+function Still({ project, eager = false, sizes = GALLERY_SIZES, className = "still work__card" }) {
   return (
     <a
-      className="still work__card"
+      className={className}
       href={`https://vimeo.com/${project.vimeoId}`}
       target="_blank"
       rel="noopener"
-      aria-label={`Watch project: ${project.title}`}
+      aria-label={`Play project: ${project.title}`}
       onClick={(e) => {
         e.preventDefault()
         playerOpen(project.id)
       }}
     >
       <img
-        src={project.poster}
+        src={posterUrl(project.poster)}
+        srcSet={srcSet(project.poster)}
+        sizes={sizes}
         alt=""
         width="540"
         height="960"
-        {...(eager ? { fetchPriority: "high", decoding: "async" } : { loading: "lazy", decoding: "async" })}
+        {...(eager ? { fetchPriority: "high" } : { loading: "lazy" })}
+        decoding="async"
         onError={(e) => {
           e.currentTarget.closest(".still").hidden = true
         }}
@@ -48,20 +60,23 @@ function Still({ project, eager = false }) {
   )
 }
 
-function Caption({ project }) {
+function Mini({ project }) {
   return (
-    <div className="caption">
-      <b>{project.title}</b>
-      <span>{project.categoryLabel}</span>
+    <div className="mini">
+      <Still project={project} />
+      <div className="caption">
+        <h3 className="caption__title">{project.title}</h3>
+        <p className="caption__meta">{project.label}</p>
+      </div>
     </div>
   )
 }
 
 export default function Work() {
-  const feat1 = byId(workLayout.featured)
-  const [pairA, pairB] = workLayout.pair.map(byId)
-  const feat2 = byId(workLayout.featured2)
-  const minis = workLayout.minis.map(byId).filter(Boolean)
+  const [showAll, setShowAll] = useState(false)
+  const feat = byId(workLayout.featured)
+  const initial = workLayout.initial.map(byId).filter(Boolean)
+  const more = workLayout.more.map(byId).filter(Boolean)
 
   return (
     <section className="work" id="work">
@@ -76,22 +91,19 @@ export default function Work() {
 
       <div className="wrap">
         <div id="workGrid">
-          {/* featured 1 — Mariam (motion graphics) */}
+          {/* featured — one contained portrait spread */}
           <Reveal>
-            <div className="grid feat">
-              <Still project={feat1} eager />
+            <div className="feat">
+              <Still project={feat} eager sizes={FEAT_SIZES} className="still work__card feat__still" />
               <div className="feat__body">
-                <p className="feat__meta">
-                  {feat1.industry ? `${feat1.industry} — ${feat1.categoryLabel}` : feat1.categoryLabel}
-                </p>
-                <h3 className="feat__title">{feat1.title}</h3>
-                <p className="feat__desc">{feat1.description}</p>
+                <h3 className="feat__title">{feat.title}</h3>
+                <p className="feat__meta">{feat.label}</p>
                 <a
                   className="feat__link"
-                  href={`https://vimeo.com/${feat1.vimeoId}`}
+                  href={`https://vimeo.com/${feat.vimeoId}`}
                   onClick={(e) => {
                     e.preventDefault()
-                    playerOpen(feat1.id)
+                    playerOpen(feat.id)
                   }}
                 >
                   Watch the project
@@ -101,56 +113,35 @@ export default function Work() {
             </div>
           </Reveal>
 
-          {/* pair — motion + talking head, vertically offset */}
+          {/* gallery — the curated first showing */}
           <Reveal>
-            <div className="grid pair">
-              <div className="mini mini--a">
-                <Still project={pairA} />
-                <Caption project={pairA} />
-              </div>
-              <div className="mini mini--b">
-                <Still project={pairB} />
-                <Caption project={pairB} />
-              </div>
-            </div>
-          </Reveal>
-
-          {/* featured 2 — Dr Saheer (talking head, mirrored) */}
-          <Reveal>
-            <div className="grid feat feat--flip">
-              <div className="feat__body">
-                <p className="feat__meta">
-                  {feat2.industry ? `${feat2.industry} — ${feat2.categoryLabel}` : feat2.categoryLabel}
-                </p>
-                <h3 className="feat__title">{feat2.title}</h3>
-                <p className="feat__desc">{feat2.description}</p>
-                <a
-                  className="feat__link"
-                  href={`https://vimeo.com/${feat2.vimeoId}`}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    playerOpen(feat2.id)
-                  }}
-                >
-                  Watch the project
-                  {ARROW}
-                </a>
-              </div>
-              <Still project={feat2} />
-            </div>
-          </Reveal>
-
-          {/* remaining work — compact gallery */}
-          <Reveal>
-            <div className="minis">
-              {minis.map((p) => (
-                <div className="mini" key={p.id}>
-                  <Still project={p} />
-                  <Caption project={p} />
-                </div>
+            <div className="gallery">
+              {initial.map((p) => (
+                <Mini key={p.id} project={p} />
               ))}
             </div>
           </Reveal>
+
+          {/* remaining work — revealed in place */}
+          <div className="gallery gallery--more" id="workMore" hidden={!showAll}>
+            {more.map((p) => (
+              <Mini key={p.id} project={p} />
+            ))}
+          </div>
+
+          <div className="work__more-wrap">
+            <button
+              className={"work__more" + (showAll ? " is-open" : "")}
+              type="button"
+              id="workMoreBtn"
+              aria-expanded={showAll}
+              aria-controls="workMore"
+              onClick={() => setShowAll((v) => !v)}
+            >
+              <span className="work__more-label">{showAll ? "Show fewer" : "View All Work"}</span>
+              {ARROW}
+            </button>
+          </div>
         </div>
       </div>
     </section>

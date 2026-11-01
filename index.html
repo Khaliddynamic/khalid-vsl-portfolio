@@ -205,19 +205,18 @@ html.js [data-reveal].in{opacity:1;transform:none}
 .work{padding-top:var(--sec-y)}
 .work__head{
   display:flex;align-items:baseline;justify-content:space-between;gap:1rem;
-  margin-bottom:clamp(3rem,7vh,5rem);
+  margin-bottom:clamp(2.75rem,6vh,4.5rem);
 }
 .work__head h2{font-size:var(--fs-meta);font-weight:450;letter-spacing:0;color:var(--gray)}
 .work__head span{font-size:var(--fs-meta);color:var(--gray)}
 
-.grid{display:grid;grid-template-columns:repeat(12,1fr);column-gap:clamp(1rem,2.5vw,2rem)}
-
 /* stills — native aspect ratio, no frames, no card decoration */
 .still{display:block;position:relative;overflow:hidden;background:#E8E4DB}
-.still img{width:100%;height:auto;display:block}
+.still img{width:100%;height:auto;display:block;transition:opacity .3s var(--ease)}
+.still:hover img,.still:focus-visible img{opacity:.94}
 .still__play{
-  position:absolute;right:0.7rem;bottom:0.7rem;
-  width:36px;height:36px;border-radius:50%;
+  position:absolute;right:.7rem;bottom:.7rem;
+  width:38px;height:38px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   background:var(--paper);color:var(--ink);
   opacity:0;transition:opacity .25s var(--ease);
@@ -226,62 +225,74 @@ html.js [data-reveal].in{opacity:1;transform:none}
 .still:hover .still__play,.still:focus-visible .still__play{opacity:1}
 .still__play svg{width:15px;height:15px;margin-left:1px}
 
-/* caption under a still — title + category only */
-.caption{
-  display:flex;flex-direction:column;gap:.15rem;
-  padding-top:.6rem;
+/* featured — one contained portrait, never stretched into a wide container */
+.feat{
+  --feat-w:clamp(20rem,40vw,34rem);
+  display:grid;
+  grid-template-columns:minmax(0,var(--feat-w)) minmax(0,1fr);
+  gap:clamp(1.5rem,4vw,3.5rem);
+  align-items:end;
+  margin-bottom:clamp(4.5rem,10vh,7.5rem);
 }
-.caption b{font-size:.9rem;font-weight:500;letter-spacing:-.01em}
-.caption span{font-size:var(--fs-meta);color:var(--gray)}
-
-/* featured spread — still one side, type the other */
-.feat{align-items:center;row-gap:1.25rem;margin-bottom:clamp(5rem,11vh,8rem)}
-.feat .still{grid-column:1 / span 5}
-.feat__body{grid-column:7 / span 6;max-width:560px}
-.feat--flip .still{grid-column:8 / span 5;grid-row:1}
-.feat--flip .feat__body{grid-column:1 / span 6;grid-row:1}
-.feat__meta{font-size:var(--fs-meta);color:var(--gray)}
-.feat__title{font-size:var(--fs-h3);letter-spacing:-.035em;margin-top:.5rem;line-height:1.02}
-.feat__desc{margin-top:.9rem;color:var(--gray);line-height:1.6;max-width:40ch}
+.feat__still{max-width:var(--feat-w)}
+.feat__body{max-width:34ch;padding-bottom:.4rem}
+.feat__title{font-size:var(--fs-h3);letter-spacing:-.035em;line-height:1.05}
+.feat__meta{margin-top:.7rem;font-size:var(--fs-meta);color:var(--gray)}
 .feat__link{
   display:inline-flex;align-items:center;gap:.4rem;
-  margin-top:1.5rem;font-size:.9rem;font-weight:500;
+  margin-top:1.4rem;font-size:.9rem;font-weight:500;
   border-bottom:1px solid var(--line);padding-bottom:.15rem;
   transition:border-color .2s var(--ease);
 }
 .feat__link:hover{border-color:var(--orange)}
 .feat__link svg{width:13px;height:13px}
+.feat__link,.work__more{position:relative}
+.feat__link::after,.work__more::after{content:"";position:absolute;inset:-13px -8px}
 
-/* pair — two stills side by side, vertically offset (intentional asymmetry) */
-.pair{margin-bottom:clamp(5rem,11vh,8rem)}
-.pair .mini--a{grid-column:2 / span 4}
-.pair .mini--b{grid-column:8 / span 4;margin-top:clamp(1.5rem,4vh,3rem)}
-
-/* compact gallery of remaining work */
-.minis{
-  display:grid;grid-column:1 / -1;
-  grid-template-columns:repeat(5,1fr);
-  column-gap:clamp(.75rem,2vw,1.5rem);
-  row-gap:1.5rem;
-  min-width:0;
+/* gallery — balanced two columns under the featured spread */
+.gallery{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  column-gap:clamp(1.25rem,3vw,2.5rem);
+  row-gap:clamp(2.5rem,6vh,4rem);
 }
-.minis .still img{width:100%}
-@media(max-width:1024px){
-  .minis{grid-template-columns:repeat(3,1fr)}
+.gallery--more{margin-top:clamp(2.5rem,6vh,4rem)}
+.mini{display:flex;flex-direction:column;min-width:0}
+.caption{display:flex;flex-direction:column;gap:.25rem;padding-top:.75rem}
+.caption__title{font-size:.95rem;font-weight:500;letter-spacing:-.015em;line-height:1.3}
+.caption__meta{font-size:var(--fs-meta);color:var(--gray);line-height:1.4}
+
+/* remaining work — quiet staggered entrance, runs once */
+.gallery--more .mini{animation:workIn .5s var(--ease) both}
+.gallery--more .mini:nth-child(2){animation-delay:.07s}
+.gallery--more .mini:nth-child(3){animation-delay:.14s}
+.gallery--more .mini:nth-child(4){animation-delay:.21s}
+@keyframes workIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* view-all control — a quiet text link, not a button */
+.work__more-wrap{display:flex;justify-content:center;margin-top:clamp(2.75rem,7vh,4.5rem)}
+.work__more{
+  display:inline-flex;align-items:center;gap:.45rem;
+  font-size:.9rem;font-weight:500;
+  border-bottom:1px solid var(--line);padding-bottom:.2rem;
+  transition:border-color .2s var(--ease);
+}
+.work__more:hover{border-color:var(--orange)}
+.work__more svg{width:13px;height:13px;transition:transform .25s var(--ease)}
+.work__more:hover svg{transform:translate(1px,-1px)}
+.work__more.is-open svg{display:none}
+
+@media(max-width:700px){
+  .feat{
+    grid-template-columns:1fr;gap:1.25rem;align-items:start;
+    margin-bottom:clamp(3rem,8vh,5rem);
+  }
+  .feat__still{max-width:none}
+  .feat__body{max-width:none;padding-bottom:0}
 }
 @media(max-width:640px){
-  .minis{grid-template-columns:1fr 1fr}
-}
-.mini{min-width:0;display:flex;flex-direction:column;gap:0}
-.mini .caption b{font-size:.875rem}
-.mini .caption span{font-size:var(--fs-meta);color:var(--gray)}
-
-@media(max-width:860px){
-  .feat{row-gap:.9rem}
-  .feat .still,.feat--flip .still{grid-column:1 / -1;grid-row:auto}
-  .feat__body,.feat--flip .feat__body{grid-column:1 / -1;grid-row:auto;max-width:none}
-  .pair .mini--a,.pair .mini--b{grid-column:1 / -1;margin-top:0}
-  .pair .mini--b{margin-top:1.5rem}
+  .gallery{grid-template-columns:1fr;row-gap:2.5rem}
+  .gallery--more{margin-top:2.5rem}
 }
 
 /* ============ about ============ */
@@ -475,94 +486,93 @@ html.js [data-reveal].in{opacity:1;transform:none}
 
   <div class="wrap">
     <div id="workGrid">
-      <!-- featured 1 — Mariam (motion graphics) -->
-      <div class="grid feat" data-reveal>
-          <a class="still work__card" href="https://vimeo.com/1231078928" data-project="mariam-motion" aria-label="Watch project: Motion Graphics — Mariam">
-            <img src="https://i.vimeocdn.com/video/2206153678-251bb34d0635f7a4f08ec61ca3056dd4301f73e50323a64174d4196720dc4e58-d_540x960?region=us" alt="" width="540" height="960" fetchpriority="high" decoding="async" onerror="this.closest('.still').hidden=true">
-            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-          </a>
+
+      <!-- featured — Mariam (motion graphics), contained portrait -->
+      <div class="feat" data-reveal>
+        <a class="still work__card feat__still" href="https://vimeo.com/1231078928" data-project="mariam-motion" aria-label="Play project: Mariam">
+          <img src="https://i.vimeocdn.com/video/2206153678-251bb34d0635f7a4f08ec61ca3056dd4301f73e50323a64174d4196720dc4e58-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2206153678-251bb34d0635f7a4f08ec61ca3056dd4301f73e50323a64174d4196720dc4e58-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2206153678-251bb34d0635f7a4f08ec61ca3056dd4301f73e50323a64174d4196720dc4e58-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2206153678-251bb34d0635f7a4f08ec61ca3056dd4301f73e50323a64174d4196720dc4e58-d_1080x1920?region=us 1080w" sizes="(max-width:700px) 92vw, 544px" alt="" width="540" height="960" fetchpriority="high" decoding="async" onerror="this.closest('.still').hidden=true">
+          <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
+        </a>
         <div class="feat__body">
-          <p class="feat__meta">Motion Graphics</p>
-          <h3 class="feat__title">Motion Graphics — Mariam</h3>
-          <p class="feat__desc">Animated visuals and kinetic text built in After Effects — rhythm, type and color doing the storytelling.</p>
+          <h3 class="feat__title">Mariam</h3>
+          <p class="feat__meta">Motion Graphics · Video Editing</p>
           <a class="feat__link" href="https://vimeo.com/1231078928" data-project="mariam-motion">Watch the project
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </a>
         </div>
       </div>
 
-      <!-- pair — motion + talking head, vertically offset -->
-      <div class="grid pair" data-reveal>
-        <div class="mini mini--a">
-          <a class="still work__card" href="https://vimeo.com/1231079235" data-project="gobird-motion" aria-label="Watch project: Motion Graphics — GoBird">
-            <img src="https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_540x960?region=us" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
+      <!-- gallery — the curated first showing (five including the featured spread) -->
+      <div class="gallery" data-reveal>
+        <div class="mini">
+          <a class="still work__card" href="https://vimeo.com/1231079235" data-project="gobird-motion" aria-label="Play project: GoBird">
+            <img src="https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
             <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
           </a>
-          <div class="caption"><b>Motion Graphics — GoBird</b><span>Motion Graphics</span></div>
+          <div class="caption"><h3 class="caption__title">GoBird</h3><p class="caption__meta">Motion Graphics · Video Editing</p></div>
         </div>
-        <div class="mini mini--b">
-          <a class="still work__card" href="https://vimeo.com/1230048855" data-project="dr-salma-vitamins" aria-label="Watch project: Dr Salma — Vitamins">
-            <img src="https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_540x960?region=us" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
+        <div class="mini">
+          <a class="still work__card" href="https://vimeo.com/1230048854" data-project="dr-saheer-ibd" aria-label="Play project: Dr Saheer">
+            <img src="https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
             <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
           </a>
-          <div class="caption"><b>Dr Salma — Vitamins</b><span>Talking Head</span></div>
+          <div class="caption"><h3 class="caption__title">Dr Saheer</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
+        </div>
+        <div class="mini">
+          <a class="still work__card" href="https://vimeo.com/1230048855" data-project="dr-salma-vitamins" aria-label="Play project: Dr Salma">
+            <img src="https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
+            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
+          </a>
+          <div class="caption"><h3 class="caption__title">Dr Salma</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
+        </div>
+        <div class="mini">
+          <a class="still work__card" href="https://vimeo.com/1230048945" data-project="dr-talaa-consultation" aria-label="Play project: Dr. Talaa">
+            <img src="https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
+            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
+          </a>
+          <div class="caption"><h3 class="caption__title">Dr. Talaa</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
         </div>
       </div>
 
-      <!-- featured 2 — Dr Saheer (talking head, mirrored) -->
-      <div class="grid feat feat--flip" data-reveal>
-        <div class="feat__body">
-          <p class="feat__meta">Healthcare — Talking Head</p>
-          <h3 class="feat__title">Dr Saheer — IBD</h3>
-          <p class="feat__desc">Short-form talking-head video — clean cut, clean audio, purposeful captions.</p>
-          <a class="feat__link" href="https://vimeo.com/1230048854" data-project="dr-saheer-ibd">Watch the project
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
-          </a>
-        </div>
-          <a class="still work__card" href="https://vimeo.com/1230048854" data-project="dr-saheer-ibd" aria-label="Watch project: Dr Saheer — IBD">
-            <img src="https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_540x960?region=us" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
+      <!-- remaining work — revealed in place by the control below -->
+      <div class="gallery gallery--more" id="workMore" hidden>
+        <div class="mini">
+          <a class="still work__card" href="https://vimeo.com/1230048853" data-project="dr-amr-teeth" aria-label="Play project: Dr Amr">
+            <img src="https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
             <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
           </a>
+          <div class="caption"><h3 class="caption__title">Dr Amr</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
+        </div>
+        <div class="mini">
+          <a class="still work__card" href="https://vimeo.com/1230048852" data-project="dr-haitham-implant" aria-label="Play project: Dr Haitham">
+            <img src="https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
+            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
+          </a>
+          <div class="caption"><h3 class="caption__title">Dr Haitham</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
+        </div>
+        <div class="mini">
+          <a class="still work__card" href="https://vimeo.com/1230672379" data-project="dr-mohamad-ortho" aria-label="Play project: Dr Mohamad">
+            <img src="https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
+            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
+          </a>
+          <div class="caption"><h3 class="caption__title">Dr Mohamad</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
+        </div>
+        <div class="mini">
+          <a class="still work__card" href="https://vimeo.com/1230676466" data-project="dr-fifi" aria-label="Play project: Dr Fifi">
+            <img src="https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
+            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
+          </a>
+          <div class="caption"><h3 class="caption__title">Dr Fifi</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
+        </div>
       </div>
 
-      <!-- remaining work — compact gallery -->
-      <div class="minis" data-reveal>
-        <div class="mini">
-          <a class="still work__card" href="https://vimeo.com/1230048945" data-project="dr-talaa-consultation" aria-label="Watch project: Dr. Talaa — Consultation">
-            <img src="https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_540x960?region=us" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-          </a>
-          <div class="caption"><b>Dr. Talaa — Consultation</b><span>Talking Head</span></div>
-        </div>
-        <div class="mini">
-          <a class="still work__card" href="https://vimeo.com/1230048853" data-project="dr-amr-teeth" aria-label="Watch project: Dr Amr — Crowded Teeth">
-            <img src="https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_540x960?region=us" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-          </a>
-          <div class="caption"><b>Dr Amr — Crowded Teeth</b><span>Talking Head</span></div>
-        </div>
-        <div class="mini">
-          <a class="still work__card" href="https://vimeo.com/1230048852" data-project="dr-haitham-implant" aria-label="Watch project: Dr Haitham — Confused Implant">
-            <img src="https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_540x960?region=us" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-          </a>
-          <div class="caption"><b>Dr Haitham — Confused Implant</b><span>Talking Head</span></div>
-        </div>
-        <div class="mini">
-          <a class="still work__card" href="https://vimeo.com/1230672379" data-project="dr-mohamad-ortho" aria-label="Watch project: Dr Mohamad — Ortho Fact">
-            <img src="https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_540x960?region=us" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-          </a>
-          <div class="caption"><b>Dr Mohamad — Ortho Fact</b><span>Talking Head</span></div>
-        </div>
-        <div class="mini">
-          <a class="still work__card" href="https://vimeo.com/1230676466" data-project="dr-fifi" aria-label="Watch project: Dr Fifi">
-            <img src="https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_540x960?region=us" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-          </a>
-          <div class="caption"><b>Dr Fifi</b><span>Talking Head</span></div>
-        </div>
+      <div class="work__more-wrap">
+        <button class="work__more" type="button" id="workMoreBtn" aria-expanded="false" aria-controls="workMore">
+          <span class="work__more-label">View All Work</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+        </button>
       </div>
+
     </div>
   </div>
 </section>
@@ -711,65 +721,65 @@ html.js [data-reveal].in{opacity:1;transform:none}
     testimonials: [],    // optional [{ quote, author, role }] — only real client quotes with consent
     projects: [
       {
-        id: "dr-saheer-ibd", title: "Dr Saheer — IBD", clientLabel: "Talking Head",
+        id: "dr-saheer-ibd", title: "Dr Saheer", clientLabel: "Healthcare Content",
         category: "talking", aspectRatio: 9/16, vimeoId: "1230048854", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_540x960?region=us",
+        posterUrl: "https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_1080x1920?region=us",
         role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
         verifiedMetric: null, published: true
       },
       {
-        id: "dr-talaa-consultation", title: "Dr. Talaa — Consultation", clientLabel: "Talking Head",
+        id: "dr-talaa-consultation", title: "Dr. Talaa", clientLabel: "Healthcare Content",
         category: "talking", aspectRatio: 9/16, vimeoId: "1230048945", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_540x960?region=us",
+        posterUrl: "https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_1080x1920?region=us",
         role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
         verifiedMetric: null, published: true
       },
       {
-        id: "dr-amr-teeth", title: "Dr Amr — Crowded Teeth", clientLabel: "Talking Head",
+        id: "dr-amr-teeth", title: "Dr Amr", clientLabel: "Healthcare Content",
         category: "talking", aspectRatio: 9/16, vimeoId: "1230048853", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_540x960?region=us",
+        posterUrl: "https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_1080x1920?region=us",
         role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
         verifiedMetric: null, published: true
       },
       {
-        id: "dr-salma-vitamins", title: "Dr Salma — Vitamins", clientLabel: "Talking Head",
+        id: "dr-salma-vitamins", title: "Dr Salma", clientLabel: "Healthcare Content",
         category: "talking", aspectRatio: 9/16, vimeoId: "1230048855", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_540x960?region=us",
+        posterUrl: "https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_1080x1920?region=us",
         role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
         verifiedMetric: null, published: true
       },
       {
-        id: "dr-haitham-implant", title: "Dr Haitham — Confused Implant", clientLabel: "Talking Head",
+        id: "dr-haitham-implant", title: "Dr Haitham", clientLabel: "Healthcare Content",
         category: "talking", aspectRatio: 9/16, vimeoId: "1230048852", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_540x960?region=us",
+        posterUrl: "https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_1080x1920?region=us",
         role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
         verifiedMetric: null, published: true
       },
       {
-        id: "dr-mohamad-ortho", title: "Dr Mohamad — Ortho Fact", clientLabel: "Talking Head",
+        id: "dr-mohamad-ortho", title: "Dr Mohamad", clientLabel: "Healthcare Content",
         category: "talking", aspectRatio: 9/16, vimeoId: "1230672379", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_540x960?region=us",
+        posterUrl: "https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_1080x1920?region=us",
         role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
         verifiedMetric: null, published: true
       },
       {
-        id: "dr-fifi", title: "Dr Fifi", clientLabel: "Talking Head",
+        id: "dr-fifi", title: "Dr Fifi", clientLabel: "Healthcare Content",
         category: "talking", aspectRatio: 9/16, vimeoId: "1230676466", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_540x960?region=us",
+        posterUrl: "https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_1080x1920?region=us",
         role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
         verifiedMetric: null, published: true
       },
       {
-        id: "mariam-motion", title: "Motion Graphics — Mariam", clientLabel: "Motion Graphics",
+        id: "mariam-motion", title: "Mariam", clientLabel: "Motion Graphics",
         category: "motion", aspectRatio: 9/16, vimeoId: "1231078928", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2206153678-251bb34d0635f7a4f08ec61ca3056dd4301f73e50323a64174d4196720dc4e58-d_540x960?region=us",
+        posterUrl: "https://i.vimeocdn.com/video/2206153678-251bb34d0635f7a4f08ec61ca3056dd4301f73e50323a64174d4196720dc4e58-d_1080x1920?region=us",
         role: "Motion Designer", description: "Motion-graphics piece — animated visuals and kinetic text built in After Effects.",
         verifiedMetric: null, published: true
       },
       {
-        id: "gobird-motion", title: "Motion Graphics — GoBird", clientLabel: "Motion Graphics",
+        id: "gobird-motion", title: "GoBird", clientLabel: "Motion Graphics",
         category: "motion", aspectRatio: 9/16, vimeoId: "1231079235", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_540x960?region=us",
+        posterUrl: "https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_1080x1920?region=us",
         role: "Motion Designer", description: "Motion-graphics piece — animated logo and branding sequence in After Effects.",
         verifiedMetric: null, published: true
       }
@@ -1148,6 +1158,20 @@ html.js [data-reveal].in{opacity:1;transform:none}
     });
   }
 
+
+  /* ---------- work grid: reveal the remaining projects in place ---------- */
+  var workMore = document.getElementById("workMore");
+  var workMoreBtn = document.getElementById("workMoreBtn");
+  if (workMore && workMoreBtn){
+    workMoreBtn.addEventListener("click", function(){
+      var isOpen = workMoreBtn.getAttribute("aria-expanded") === "true";
+      workMore.hidden = isOpen;                       /* collapse when already open */
+      workMoreBtn.setAttribute("aria-expanded", isOpen ? "false" : "true");
+      workMoreBtn.classList.toggle("is-open", !isOpen);
+      var label = workMoreBtn.querySelector(".work__more-label");
+      if (label) label.textContent = isOpen ? "View All Work" : "Show fewer";
+    });
+  }
 
   /* ---------- active nav link (scroll spy) ---------- */
   var navLinks = $$("#navLinks a");

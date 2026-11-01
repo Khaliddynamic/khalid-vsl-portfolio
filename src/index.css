@@ -181,19 +181,18 @@ html.js [data-reveal].in{opacity:1;transform:none}
 .work{padding-top:var(--sec-y)}
 .work__head{
   display:flex;align-items:baseline;justify-content:space-between;gap:1rem;
-  margin-bottom:clamp(3rem,7vh,5rem);
+  margin-bottom:clamp(2.75rem,6vh,4.5rem);
 }
 .work__head h2{font-size:var(--fs-meta);font-weight:450;letter-spacing:0;color:var(--gray)}
 .work__head span{font-size:var(--fs-meta);color:var(--gray)}
 
-.grid{display:grid;grid-template-columns:repeat(12,1fr);column-gap:clamp(1rem,2.5vw,2rem)}
-
 /* stills — native aspect ratio, no frames, no card decoration */
 .still{display:block;position:relative;overflow:hidden;background:#E8E4DB}
-.still img{width:100%;height:auto;display:block}
+.still img{width:100%;height:auto;display:block;transition:opacity .3s var(--ease)}
+.still:hover img,.still:focus-visible img{opacity:.94}
 .still__play{
-  position:absolute;right:0.7rem;bottom:0.7rem;
-  width:36px;height:36px;border-radius:50%;
+  position:absolute;right:.7rem;bottom:.7rem;
+  width:38px;height:38px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   background:var(--paper);color:var(--ink);
   opacity:0;transition:opacity .25s var(--ease);
@@ -202,62 +201,74 @@ html.js [data-reveal].in{opacity:1;transform:none}
 .still:hover .still__play,.still:focus-visible .still__play{opacity:1}
 .still__play svg{width:15px;height:15px;margin-left:1px}
 
-/* caption under a still — title + category only */
-.caption{
-  display:flex;flex-direction:column;gap:.15rem;
-  padding-top:.6rem;
+/* featured — one contained portrait, never stretched into a wide container */
+.feat{
+  --feat-w:clamp(20rem,40vw,34rem);
+  display:grid;
+  grid-template-columns:minmax(0,var(--feat-w)) minmax(0,1fr);
+  gap:clamp(1.5rem,4vw,3.5rem);
+  align-items:end;
+  margin-bottom:clamp(4.5rem,10vh,7.5rem);
 }
-.caption b{font-size:.9rem;font-weight:500;letter-spacing:-.01em}
-.caption span{font-size:var(--fs-meta);color:var(--gray)}
-
-/* featured spread — still one side, type the other */
-.feat{align-items:center;row-gap:1.25rem;margin-bottom:clamp(5rem,11vh,8rem)}
-.feat .still{grid-column:1 / span 5}
-.feat__body{grid-column:7 / span 6;max-width:560px}
-.feat--flip .still{grid-column:8 / span 5;grid-row:1}
-.feat--flip .feat__body{grid-column:1 / span 6;grid-row:1}
-.feat__meta{font-size:var(--fs-meta);color:var(--gray)}
-.feat__title{font-size:var(--fs-h3);letter-spacing:-.035em;margin-top:.5rem;line-height:1.02}
-.feat__desc{margin-top:.9rem;color:var(--gray);line-height:1.6;max-width:40ch}
+.feat__still{max-width:var(--feat-w)}
+.feat__body{max-width:34ch;padding-bottom:.4rem}
+.feat__title{font-size:var(--fs-h3);letter-spacing:-.035em;line-height:1.05}
+.feat__meta{margin-top:.7rem;font-size:var(--fs-meta);color:var(--gray)}
 .feat__link{
   display:inline-flex;align-items:center;gap:.4rem;
-  margin-top:1.5rem;font-size:.9rem;font-weight:500;
+  margin-top:1.4rem;font-size:.9rem;font-weight:500;
   border-bottom:1px solid var(--line);padding-bottom:.15rem;
   transition:border-color .2s var(--ease);
 }
 .feat__link:hover{border-color:var(--orange)}
 .feat__link svg{width:13px;height:13px}
+.feat__link,.work__more{position:relative}
+.feat__link::after,.work__more::after{content:"";position:absolute;inset:-13px -8px}
 
-/* pair — two stills side by side, vertically offset (intentional asymmetry) */
-.pair{margin-bottom:clamp(5rem,11vh,8rem)}
-.pair .mini--a{grid-column:2 / span 4}
-.pair .mini--b{grid-column:8 / span 4;margin-top:clamp(1.5rem,4vh,3rem)}
-
-/* compact gallery of remaining work */
-.minis{
-  display:grid;grid-column:1 / -1;
-  grid-template-columns:repeat(5,1fr);
-  column-gap:clamp(.75rem,2vw,1.5rem);
-  row-gap:1.5rem;
-  min-width:0;
+/* gallery — balanced two columns under the featured spread */
+.gallery{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  column-gap:clamp(1.25rem,3vw,2.5rem);
+  row-gap:clamp(2.5rem,6vh,4rem);
 }
-.minis .still img{width:100%}
-@media(max-width:1024px){
-  .minis{grid-template-columns:repeat(3,1fr)}
+.gallery--more{margin-top:clamp(2.5rem,6vh,4rem)}
+.mini{display:flex;flex-direction:column;min-width:0}
+.caption{display:flex;flex-direction:column;gap:.25rem;padding-top:.75rem}
+.caption__title{font-size:.95rem;font-weight:500;letter-spacing:-.015em;line-height:1.3}
+.caption__meta{font-size:var(--fs-meta);color:var(--gray);line-height:1.4}
+
+/* remaining work — quiet staggered entrance, runs once */
+.gallery--more .mini{animation:workIn .5s var(--ease) both}
+.gallery--more .mini:nth-child(2){animation-delay:.07s}
+.gallery--more .mini:nth-child(3){animation-delay:.14s}
+.gallery--more .mini:nth-child(4){animation-delay:.21s}
+@keyframes workIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* view-all control — a quiet text link, not a button */
+.work__more-wrap{display:flex;justify-content:center;margin-top:clamp(2.75rem,7vh,4.5rem)}
+.work__more{
+  display:inline-flex;align-items:center;gap:.45rem;
+  font-size:.9rem;font-weight:500;
+  border-bottom:1px solid var(--line);padding-bottom:.2rem;
+  transition:border-color .2s var(--ease);
+}
+.work__more:hover{border-color:var(--orange)}
+.work__more svg{width:13px;height:13px;transition:transform .25s var(--ease)}
+.work__more:hover svg{transform:translate(1px,-1px)}
+.work__more.is-open svg{display:none}
+
+@media(max-width:700px){
+  .feat{
+    grid-template-columns:1fr;gap:1.25rem;align-items:start;
+    margin-bottom:clamp(3rem,8vh,5rem);
+  }
+  .feat__still{max-width:none}
+  .feat__body{max-width:none;padding-bottom:0}
 }
 @media(max-width:640px){
-  .minis{grid-template-columns:1fr 1fr}
-}
-.mini{min-width:0;display:flex;flex-direction:column;gap:0}
-.mini .caption b{font-size:.875rem}
-.mini .caption span{font-size:var(--fs-meta);color:var(--gray)}
-
-@media(max-width:860px){
-  .feat{row-gap:.9rem}
-  .feat .still,.feat--flip .still{grid-column:1 / -1;grid-row:auto}
-  .feat__body,.feat--flip .feat__body{grid-column:1 / -1;grid-row:auto;max-width:none}
-  .pair .mini--a,.pair .mini--b{grid-column:1 / -1;margin-top:0}
-  .pair .mini--b{margin-top:1.5rem}
+  .gallery{grid-template-columns:1fr;row-gap:2.5rem}
+  .gallery--more{margin-top:2.5rem}
 }
 
 /* ============ about ============ */

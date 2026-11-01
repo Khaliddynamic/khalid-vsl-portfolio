@@ -41,6 +41,7 @@ export default function PlayerDialog() {
       frameRef.current.appendChild(iframe)
 
       if (!dialog.open) dialog.showModal()
+      document.body.style.overflow = "hidden"
     }
 
     function onOpen(e) {
