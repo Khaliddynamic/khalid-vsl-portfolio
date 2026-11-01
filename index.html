@@ -68,6 +68,15 @@ html{scroll-behavior:smooth}
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+/* Lenis pairing (documented). Lenis drives the scroll itself with instant
+   scrollTo per frame, so native smooth must stand down while it animates,
+   heights stay natural, and nested scroll areas behave. */
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
+.lenis.lenis-stopped{overflow:hidden}
+.lenis.lenis-smooth iframe{pointer-events:none}
+.lenis.lenis-smooth #playerDialog iframe{pointer-events:auto}
 body{
   margin:0;background:var(--paper);color:var(--ink);
   font-family:var(--font-sans);font-size:var(--fs-body);line-height:1.6;
@@ -1105,12 +1114,16 @@ html.motion [data-reveal].in{opacity:1;transform:none}
     /* ---------- Lenis smooth scrolling (desktop pointer only) ---------- */
     if (hasLenis && desktopMQ.matches){
       lenis = new Lenis({
-        duration: 1.1,
+        /* Cinematic glide: frame-rate-independent interpolation rather than a
+           hard-timed tween, so the motion eases to rest instead of arriving.
+           lerp 0.075 is slightly longer than Lenis's 0.1 default while staying
+           fully responsive to input. Duration is intentionally omitted so
+           Lenis uses lerp. */
+        lerp: 0.075,
         wheelMultiplier: 1,
         touchMultiplier: 1.6,
         smoothWheel: true,
-        syncTouch: false,
-        easing: function(t){ return Math.min(1, 1.001 - Math.pow(2, -10 * t)); }
+        syncTouch: false
       });
       lenis.on("scroll", ScrollTrigger.update);
       gsap.ticker.add(function(time){ lenis.raf(time * 1000); });
@@ -1127,7 +1140,7 @@ html.motion [data-reveal].in{opacity:1;transform:none}
         if (!target) return;
         e.preventDefault();
         var y = (id === "#top") ? 0 : (target.getBoundingClientRect().top + window.scrollY - navH + 1);
-        if (lenis){ if (lenis.isStopped) lenis.start(); lenis.scrollTo(y, { duration: 1.1 }); }
+        if (lenis){ if (lenis.isStopped) lenis.start(); lenis.scrollTo(y, { duration: 1.2 }); }
         else window.scrollTo({ top: y, behavior: reduced ? "auto" : "smooth" });
         if (history.replaceState) history.replaceState(null, "", id);
       });
@@ -1199,7 +1212,7 @@ html.motion [data-reveal].in{opacity:1;transform:none}
           var top = stage.getBoundingClientRect().top + window.scrollY;
           var range = stage.offsetHeight - window.innerHeight;
           var y = top + range * ((k + .5) / n);
-          if (lenis) lenis.scrollTo(y, { duration: 1 });
+          if (lenis) lenis.scrollTo(y, { duration: 1.1 });
           else window.scrollTo({ top: y, behavior: "smooth" });
         });
       });
