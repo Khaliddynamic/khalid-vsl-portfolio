@@ -84,7 +84,7 @@ export default function Work() {
         <Reveal>
           <div className="work__head">
             <h2>Selected work</h2>
-            <span>Nine projects</span>
+            <span>Eight projects</span>
           </div>
         </Reveal>
       </div>

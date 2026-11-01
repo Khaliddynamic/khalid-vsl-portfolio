@@ -34,17 +34,6 @@ export function posterUrl(base, w = 720) {
  */
 export const projects = [
   {
-    id: "mariam-motion",
-    title: "Mariam",
-    category: "motion",
-    categoryLabel: "Motion Graphics",
-    label: "Motion Graphics · Video Editing",
-    aspectRatio: 9 / 16,
-    vimeoId: "1231078928",
-    poster:
-      "https://i.vimeocdn.com/video/2206153678-251bb34d0635f7a4f08ec61ca3056dd4301f73e50323a64174d4196720dc4e58",
-  },
-  {
     id: "gobird-motion",
     title: "GoBird",
     category: "motion",
@@ -135,20 +124,20 @@ export const projects = [
 ]
 
 /*
- * Curated layout. The featured spread + the initial gallery are the five
- * strongest pieces (two motion, three healthcare); the remaining four are
- * revealed on demand without leaving the page. Selection is explicit config —
- * the footage itself can't be re-graded without the source files.
+ * Curated layout. The featured spread opens with the motion piece, followed by
+ * the four strongest healthcare edits in the initial gallery; the remaining
+ * three are revealed on demand without leaving the page. Selection is explicit
+ * config — the footage itself can't be re-graded without the source files.
  */
 export const workLayout = {
-  featured: "mariam-motion",
+  featured: "gobird-motion",
   initial: [
-    "gobird-motion",
     "dr-saheer-ibd",
     "dr-salma-vitamins",
     "dr-talaa-consultation",
+    "dr-amr-teeth",
   ],
-  more: ["dr-amr-teeth", "dr-haitham-implant", "dr-mohamad-ortho", "dr-fifi"],
+  more: ["dr-haitham-implant", "dr-mohamad-ortho", "dr-fifi"],
 }
 
 export const services = [
