@@ -10,6 +10,7 @@
 <meta name="theme-color" content="#F6F3ED" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://i.vimeocdn.com" />
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
 <meta property="og:title" content="khalid.vsl — Video Editor & Motion Designer" />
 <meta property="og:description" content="Independent video editor & motion designer based in Casablanca, working with brands and creators worldwide. Clean edits, thoughtful motion, visual storytelling." />
@@ -23,12 +24,13 @@
 <meta name="twitter:image" content="https://khalidvsl.netlify.app/og-cover.png" />
 <style>
 /* ============================================================
-   khalid.vsl — editorial portfolio
+   khalid.vsl — cinematic scroll portfolio
    Paper #F6F3ED · Charcoal #171717 · Orange #F27A35 (sparing)
    Instrument Sans (display + body) · Instrument Serif (accent)
    ------------------------------------------------------------
-   Canonical design system. The same block is inlined in
-   index.html — re-inline after every edit.
+   Canonical design system. Lenis + GSAP ScrollTrigger drive the
+   scroll experience; everything degrades to a quiet static page
+   when motion is unavailable or reduced.
    ============================================================ */
 
 :root{
@@ -36,17 +38,19 @@
   --ink:#171717;
   --gray:#777773;
   --orange:#F27A35;
+  --paper-2:#EFEAE0;                      /* matte / frame fill */
   --line:rgba(23,23,23,.14);
   --line-soft:rgba(23,23,23,.07);
-  --line-paper:rgba(246,243,237,.22);   /* hairlines on charcoal */
+  --line-paper:rgba(246,243,237,.22);     /* hairlines on charcoal */
   --err:#D64F2E;
   --ok:#5F7A4F;
 
   --font-sans:"Instrument Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
   --font-serif:"Instrument Serif",Georgia,"Times New Roman",serif;
 
+  --fs-display:clamp(3.6rem,12.5vw,11rem);
   --fs-hero:clamp(3.4rem,10.5vw,9.5rem);
-  --fs-h2:clamp(2.4rem,5.2vw,4.5rem);
+  --fs-h2:clamp(2.2rem,5vw,4.25rem);
   --fs-h3:clamp(1.5rem,2.6vw,2.4rem);
   --fs-body:1rem;
   --fs-meta:.8125rem;
@@ -54,7 +58,7 @@
   --gutter:clamp(1.25rem,4vw,3.5rem);
   --max:1320px;
   --nav-h:72px;
-  --sec-y:clamp(5rem,12vh,9rem);
+  --sec-y:clamp(5.5rem,13vh,10rem);
   --ease:cubic-bezier(.22,1,.36,1);
 }
 
@@ -75,7 +79,7 @@ a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.03em;line-height:1.05}
 p{margin:0}
-ul{margin:0;padding:0;list-style:none}
+ul,ol{margin:0;padding:0;list-style:none}
 ::selection{background:var(--orange);color:var(--ink)}
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .contact :focus-visible{outline-color:var(--paper)}
@@ -92,29 +96,41 @@ section{scroll-margin-top:calc(var(--nav-h) + 8px)}
 }
 .skip:focus{top:1rem}
 
+/* section headings — one consistent editorial scale */
+.sec-head{margin-bottom:clamp(2.5rem,6vh,4.5rem)}
+.sec-head h2{font-size:var(--fs-h2);letter-spacing:-.04em;max-width:16ch}
+.sec-head .dot{color:var(--orange)}
+.sec-kicker{
+  display:block;margin-bottom:1rem;
+  font-size:var(--fs-meta);letter-spacing:.02em;color:var(--gray);
+}
+
 /* ============ navigation ============ */
 .nav{
   position:fixed;inset:0 0 auto 0;z-index:100;
   transition:background .3s var(--ease),box-shadow .3s var(--ease);
 }
 .nav.is-scrolled{
-  background:rgba(246,243,237,.92);
-  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  background:rgba(246,243,237,.82);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
   box-shadow:0 1px 0 var(--line);
 }
 .nav__inner{
   display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
   height:var(--nav-h);
 }
-.nav__brand{
-  font-size:1.05rem;font-weight:600;letter-spacing:-.02em;
-}
+.nav__brand{font-size:1.05rem;font-weight:600;letter-spacing:-.02em}
 .nav__links{display:flex;align-items:center;gap:1.75rem}
 .nav__links a{
-  font-size:.9rem;font-weight:450;color:var(--gray);
+  position:relative;font-size:.9rem;font-weight:450;color:var(--gray);
   transition:color .2s var(--ease);
 }
+.nav__links a::after{
+  content:"";position:absolute;left:0;right:100%;bottom:-.3rem;height:1px;
+  background:var(--ink);transition:right .3s var(--ease);
+}
 .nav__links a:hover,.nav__links a.is-active{color:var(--ink)}
+.nav__links a.is-active::after{right:0}
 .nav__action{
   display:inline-flex;align-items:center;gap:.4rem;
   font-size:.9rem;font-weight:500;
@@ -150,171 +166,242 @@ section{scroll-margin-top:calc(var(--nav-h) + 8px)}
 .drawer__mail{font-size:1rem!important;font-weight:450!important;color:var(--gray)}
 
 /* ============ hero ============ */
-.hero{padding-top:calc(var(--nav-h) + clamp(3.5rem,9vh,7rem))}
+.hero{
+  position:relative;
+  min-height:100svh;
+  display:flex;align-items:center;
+  padding-top:calc(var(--nav-h) + 2rem);
+  padding-bottom:clamp(3rem,8vh,6rem);
+}
+.hero__inner{width:100%}
+.hero__role{
+  font-family:var(--font-serif);font-style:italic;font-weight:400;
+  font-size:clamp(1.3rem,2.4vw,1.9rem);letter-spacing:-.01em;color:var(--gray);
+  margin-bottom:clamp(1rem,3vh,1.75rem);
+}
 .hero__title{
-  font-size:var(--fs-hero);
+  font-size:var(--fs-display);
   font-weight:600;
-  letter-spacing:-.045em;
-  line-height:.92;
+  letter-spacing:-.05em;
+  line-height:.9;
+  margin-left:-.02em;
 }
 .hero__title .dot{color:var(--orange)}
-.hero__role{
-  margin-top:1.4rem;
-  font-family:var(--font-serif);font-style:italic;font-weight:400;
-  font-size:clamp(1.35rem,2.6vw,2rem);letter-spacing:-.01em;color:var(--ink);
-}
 .hero__line{
-  margin-top:1.1rem;max-width:42ch;
-  color:var(--gray);font-size:clamp(1rem,1.3vw,1.125rem);line-height:1.65;
+  margin-top:clamp(1.25rem,3vh,2rem);max-width:44ch;
+  color:var(--ink);font-size:clamp(1.05rem,1.5vw,1.35rem);line-height:1.5;letter-spacing:-.01em;
 }
-.hero__cue{
-  display:inline-flex;align-items:center;gap:.5rem;
+.hero__cta{
+  display:inline-flex;align-items:center;gap:.55rem;
   margin-top:clamp(2.25rem,5vh,3.5rem);
-  font-size:var(--fs-meta);color:var(--gray);
-  transition:color .2s var(--ease);
+  font-size:.95rem;font-weight:500;
+  border-bottom:1px solid var(--ink);padding-bottom:.2rem;
+  transition:gap .25s var(--ease),border-color .2s var(--ease);
 }
-.hero__cue:hover{color:var(--ink)}
-.hero__cue svg{width:14px;height:14px;animation:cue 2.6s var(--ease) infinite}
-@keyframes cue{0%,100%{transform:translateY(0)}55%{transform:translateY(4px)}}
-@media(prefers-reduced-motion:reduce){.hero__cue svg{animation:none}}
+.hero__cta:hover{gap:.85rem;border-color:var(--orange)}
+.hero__cta svg{width:14px;height:14px}
+.hero__scroll{
+  position:absolute;left:var(--gutter);bottom:clamp(1.5rem,4vh,2.5rem);
+  font-size:var(--fs-meta);color:var(--gray);letter-spacing:.04em;
+}
+@media(max-width:768px){.hero__scroll{display:none}}
 
-/* entrance — once, quiet */
-html.js .hero .wrap > * {
-  opacity:0;transform:translateY(14px);
-  animation:up .5s var(--ease) forwards;
-}
-html.js .hero .wrap > *:nth-child(2){animation-delay:.07s}
-html.js .hero .wrap > *:nth-child(3){animation-delay:.14s}
-html.js .hero .wrap > *:nth-child(4){animation-delay:.21s}
-@keyframes up{to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){
-  html.js .hero .wrap > *{animation:none;opacity:1;transform:none}
-}
+/* ============ featured work — scroll-driven chapters ============ */
+.featured{position:relative;background:var(--paper)}
+.featured__stage{position:relative}
+.featured__view{position:relative}
 
-/* ============ reveal (scroll) ============ */
-html.js [data-reveal]{
-  opacity:0;transform:translateY(14px);
-  transition:opacity .45s var(--ease),transform .45s var(--ease);
+.featured__frame{
+  display:flex;flex-direction:column;justify-content:center;
+  min-height:100svh;padding-top:calc(var(--nav-h) + 1rem);padding-bottom:2.5rem;
 }
-html.js [data-reveal].in{opacity:1;transform:none}
-@media(prefers-reduced-motion:reduce){
-  html.js [data-reveal]{opacity:1;transform:none;transition:none}
-}
-
-/* ============ work ============ */
-.work{padding-top:var(--sec-y)}
-.work__head{
+.featured__head{
   display:flex;align-items:baseline;justify-content:space-between;gap:1rem;
-  margin-bottom:clamp(2.75rem,6vh,4.5rem);
+  margin-bottom:clamp(1.5rem,4vh,3rem);
 }
-.work__head h2{font-size:var(--fs-meta);font-weight:450;letter-spacing:0;color:var(--gray)}
-.work__head span{font-size:var(--fs-meta);color:var(--gray)}
+.featured__label{font-size:var(--fs-meta);color:var(--gray)}
+.featured__count{font-size:var(--fs-meta);color:var(--gray)}
+.featured__count b{color:var(--ink);font-weight:500}
 
-/* stills — native aspect ratio, no frames, no card decoration */
-.still{display:block;position:relative;overflow:hidden;background:#E8E4DB}
-.still img{width:100%;height:auto;display:block;transition:opacity .3s var(--ease)}
-.still:hover img,.still:focus-visible img{opacity:.94}
-.still__play{
-  position:absolute;right:.7rem;bottom:.7rem;
-  width:38px;height:38px;border-radius:50%;
+.slide{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:clamp(1.5rem,4vw,2.5rem);
+  align-items:center;
+  padding-bottom:clamp(3.5rem,9vh,6rem);
+}
+.slide:last-child{padding-bottom:0}
+.slide__text{max-width:32ch}
+.slide__kicker{font-size:var(--fs-meta);color:var(--gray)}
+.slide__title{
+  margin-top:.7rem;font-size:clamp(1.7rem,3.4vw,3rem);
+  letter-spacing:-.04em;line-height:1;
+}
+.slide__desc{margin-top:.9rem;color:var(--gray);font-size:1rem;line-height:1.6;max-width:34ch}
+.slide__cta{
+  display:inline-flex;align-items:center;gap:.5rem;
+  margin-top:1.5rem;font-size:.9rem;font-weight:500;
+  border-bottom:1px solid var(--line);padding-bottom:.18rem;
+  transition:gap .25s var(--ease),border-color .2s var(--ease);
+}
+.slide__cta:hover{gap:.8rem;border-color:var(--orange)}
+.slide__cta svg{width:13px;height:13px}
+
+.slide__media{display:flex;justify-content:flex-start}
+.slide__link{
+  position:relative;display:block;
+  height:clamp(300px,62vh,660px);aspect-ratio:9/16;max-width:100%;
+  overflow:hidden;background:#E8E4DB;
+}
+.slide__link img{width:100%;height:100%;object-fit:cover}
+.slide__play{
+  position:absolute;right:.8rem;bottom:.8rem;
+  width:42px;height:42px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   background:var(--paper);color:var(--ink);
   opacity:0;transition:opacity .25s var(--ease);
   pointer-events:none;
 }
-.still:hover .still__play,.still:focus-visible .still__play{opacity:1}
-.still__play svg{width:15px;height:15px;margin-left:1px}
+.slide__link:hover .slide__play,.slide__link:focus-visible .slide__play{opacity:1}
+.slide__play svg{width:16px;height:16px;margin-left:1px}
 
-/* featured — one contained portrait, never stretched into a wide container */
-.feat{
-  --feat-w:clamp(20rem,40vw,34rem);
-  display:grid;
-  grid-template-columns:minmax(0,var(--feat-w)) minmax(0,1fr);
-  gap:clamp(1.5rem,4vw,3.5rem);
-  align-items:end;
-  margin-bottom:clamp(4.5rem,10vh,7.5rem);
+/* chapter index — persistent, quiet */
+.feat-index{
+  display:flex;align-items:center;gap:.9rem;
+  margin-top:clamp(1rem,3vh,2rem);
 }
-.feat__still{max-width:var(--feat-w)}
-.feat__body{max-width:34ch;padding-bottom:.4rem}
-.feat__title{font-size:var(--fs-h3);letter-spacing:-.035em;line-height:1.05}
-.feat__meta{margin-top:.7rem;font-size:var(--fs-meta);color:var(--gray)}
-.feat__link{
+.feat-index__num{
   display:inline-flex;align-items:center;gap:.4rem;
-  margin-top:1.4rem;font-size:.9rem;font-weight:500;
-  border-bottom:1px solid var(--line);padding-bottom:.15rem;
-  transition:border-color .2s var(--ease);
+  font-size:var(--fs-meta);color:var(--gray);
+  transition:color .3s var(--ease);
 }
-.feat__link:hover{border-color:var(--orange)}
-.feat__link svg{width:13px;height:13px}
-.feat__link,.work__more{position:relative}
-.feat__link::after,.work__more::after{content:"";position:absolute;inset:-13px -8px}
+.feat-index__num::before{
+  content:"";display:block;width:18px;height:1px;background:var(--line);
+  transition:width .35s var(--ease),background .3s var(--ease);
+}
+.feat-index__num.is-active{color:var(--ink)}
+.feat-index__num.is-active::before{width:34px;background:var(--orange)}
 
-/* gallery — balanced two columns under the featured spread */
+@media(min-width:861px){
+  .slide{grid-template-columns:minmax(0,1fr) auto;gap:clamp(2rem,6vw,6rem);padding-bottom:0}
+  .slide__text{max-width:30ch}
+  .slide__media{justify-content:flex-end}
+}
+
+/* pinned scrollytelling — only when motion is enabled on desktop */
+.motion-desktop .featured__stage{height:calc(100svh * 3)}
+.motion-desktop .featured__view{
+  position:sticky;top:0;height:100svh;overflow:hidden;
+}
+.motion-desktop .featured__frame{min-height:0;height:100svh}
+.motion-desktop .featured__track{position:relative;flex:1;min-height:0}
+.motion-desktop .slide{
+  position:absolute;inset:0;
+  padding-bottom:0;margin:0;
+  opacity:0;transform:translateY(18px) scale(.985);
+  transition:opacity .6s var(--ease),transform .7s var(--ease);
+  pointer-events:none;
+}
+.motion-desktop .slide.is-active{opacity:1;transform:none;pointer-events:auto}
+@media(prefers-reduced-motion:reduce){
+  .motion-desktop .featured__stage{height:auto}
+  .motion-desktop .featured__view{position:static;height:auto;overflow:visible}
+  .motion-desktop .slide{position:static;opacity:1;transform:none;pointer-events:auto;padding-bottom:clamp(3.5rem,9vh,6rem)}
+}
+
+/* ============ gallery — the rest of the work ============ */
+.gallery-sec{padding-top:var(--sec-y)}
 .gallery{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
   column-gap:clamp(1.25rem,3vw,2.5rem);
   row-gap:clamp(2.5rem,6vh,4rem);
 }
-.gallery--more{margin-top:clamp(2.5rem,6vh,4rem)}
+
+/* stills — native aspect ratio, no card decoration */
+.still{display:block;position:relative;overflow:hidden;background:#E8E4DB}
+.still img{width:100%;height:auto;display:block;transition:opacity .35s var(--ease),transform .6s var(--ease)}
+.still:hover img,.still:focus-visible img{opacity:.94;transform:scale(1.02)}
+.still__play{
+  position:absolute;right:.7rem;bottom:.7rem;
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--paper);color:var(--ink);
+  opacity:0;transform:translateY(4px);
+  transition:opacity .25s var(--ease),transform .25s var(--ease);
+  pointer-events:none;
+}
+.still:hover .still__play,.still:focus-visible .still__play{opacity:1;transform:none}
+.still__play svg{width:15px;height:15px;margin-left:1px}
+
 .mini{display:flex;flex-direction:column;min-width:0}
 .caption{display:flex;flex-direction:column;gap:.25rem;padding-top:.75rem}
 .caption__title{font-size:.95rem;font-weight:500;letter-spacing:-.015em;line-height:1.3}
 .caption__meta{font-size:var(--fs-meta);color:var(--gray);line-height:1.4}
-
-/* remaining work — quiet staggered entrance, runs once */
-.gallery--more .mini{animation:workIn .5s var(--ease) both}
-.gallery--more .mini:nth-child(2){animation-delay:.07s}
-.gallery--more .mini:nth-child(3){animation-delay:.14s}
-.gallery--more .mini:nth-child(4){animation-delay:.21s}
-@keyframes workIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-
-/* view-all control — a quiet text link, not a button */
-.work__more-wrap{display:flex;justify-content:center;margin-top:clamp(2.75rem,7vh,4.5rem)}
-.work__more{
-  display:inline-flex;align-items:center;gap:.45rem;
-  font-size:.9rem;font-weight:500;
-  border-bottom:1px solid var(--line);padding-bottom:.2rem;
-  transition:border-color .2s var(--ease);
-}
-.work__more:hover{border-color:var(--orange)}
-.work__more svg{width:13px;height:13px;transition:transform .25s var(--ease)}
-.work__more:hover svg{transform:translate(1px,-1px)}
-.work__more.is-open svg{display:none}
-
-@media(max-width:700px){
-  .feat{
-    grid-template-columns:1fr;gap:1.25rem;align-items:start;
-    margin-bottom:clamp(3rem,8vh,5rem);
-  }
-  .feat__still{max-width:none}
-  .feat__body{max-width:none;padding-bottom:0}
-}
 @media(max-width:640px){
   .gallery{grid-template-columns:1fr;row-gap:2.5rem}
-  .gallery--more{margin-top:2.5rem}
+}
+
+/* ============ craft (services) ============ */
+.craft-sec{padding-top:var(--sec-y)}
+.craft{margin-top:clamp(1rem,3vh,2rem)}
+.craft__item{
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 1.25rem;
+  align-items:start;
+  padding:clamp(1.5rem,4vh,2.4rem) 0;
+  border-top:1px solid var(--line-soft);
+}
+.craft__item:last-child{border-bottom:1px solid var(--line-soft)}
+.craft__num{
+  font-size:var(--fs-meta);color:var(--gray);
+  padding-top:.45rem;transition:color .4s var(--ease);
+}
+.craft__body{display:grid;grid-template-columns:minmax(0,1fr);gap:.5rem;min-width:0}
+.craft__title{
+  font-size:clamp(1.4rem,2.6vw,2.1rem);letter-spacing:-.035em;line-height:1.05;
+  color:var(--gray);
+  transition:color .45s var(--ease);
+}
+.craft__text{color:var(--gray);font-size:1rem;line-height:1.6;max-width:46ch}
+.craft__item.is-active .craft__title{color:var(--ink)}
+.craft__item.is-active .craft__num{color:var(--orange)}
+@media(min-width:861px){
+  .craft__item{gap:0 2.5rem}
+  .craft__body{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:0 2.5rem;align-items:start}
+  .craft__text{padding-top:.5rem;max-width:48ch}
 }
 
 /* ============ about ============ */
 .about{padding-top:var(--sec-y)}
-.about__label{font-size:var(--fs-meta);font-weight:450;letter-spacing:0;color:var(--gray);margin-bottom:clamp(2.5rem,6vh,4rem)}
-.about__grid{row-gap:2.5rem}
-.about__copy{max-width:640px}
+.about__grid{
+  display:grid;grid-template-columns:1fr;gap:clamp(2rem,5vh,3rem);
+  align-items:center;
+}
+.about__photo{
+  position:relative;
+  width:min(100%,420px);
+  aspect-ratio:1/1;
+  padding:clamp(.7rem,2.4vw,1.35rem);
+  background:var(--paper-2);
+  border:1px solid var(--line);
+}
+.about__photo::after{
+  content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px rgba(23,23,23,.04);pointer-events:none;
+}
+.about__photo img{
+  width:100%;height:100%;object-fit:cover;aspect-ratio:1/1;
+}
+.about__copy{max-width:56ch}
+.about__title{font-size:var(--fs-h2);letter-spacing:-.04em;max-width:14ch;margin-bottom:clamp(1.25rem,3vh,2rem)}
+.about__title .dot{color:var(--orange)}
 .about__lede{
-  font-size:clamp(1.3rem,2.1vw,1.7rem);line-height:1.45;letter-spacing:-.015em;font-weight:450;
+  font-size:clamp(1.25rem,2vw,1.65rem);line-height:1.45;letter-spacing:-.015em;font-weight:450;
 }
 .about__lede em{font-family:var(--font-serif);font-style:italic;font-weight:400}
 .about__sub{margin-top:1.25rem;color:var(--gray);line-height:1.65;max-width:52ch}
-.services{margin-top:clamp(2.5rem,6vh,4rem)}
-.services li{
-  display:grid;grid-template-columns:1fr 1.4fr;gap:.5rem 2rem;align-items:baseline;
-  padding:1.15rem 0;border-top:1px solid var(--line-soft);
-}
-.services li:last-child{border-bottom:1px solid var(--line-soft)}
-.services b{font-size:1rem;font-weight:500;letter-spacing:-.01em}
-.services span{color:var(--gray);font-size:.9rem;line-height:1.6}
-@media(max-width:860px){
-  .services li{grid-template-columns:1fr}
+@media(min-width:861px){
+  .about__grid{grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:clamp(2.5rem,6vw,5rem)}
+  .about__photo{width:100%}
 }
 
 /* ============ contact ============ */
@@ -323,21 +410,13 @@ html.js [data-reveal].in{opacity:1;transform:none}
   background:var(--ink);color:var(--paper);
   padding:clamp(4.5rem,10vh,8rem) 0 0;
 }
-.contact__title{
-  font-size:var(--fs-h2);letter-spacing:-.04em;
-  max-width:12ch;
-}
+.contact__title{font-size:var(--fs-h2);letter-spacing:-.04em;max-width:12ch}
 .contact__title .dot{color:var(--orange)}
 .contact__sub{margin-top:1.25rem;color:rgba(246,243,237,.62);max-width:38ch}
-
-/* form — one quiet block under the headline */
 .form{margin-top:clamp(3rem,7vh,4.5rem);padding-bottom:clamp(4rem,8vh,6rem)}
 .form__row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
 .field{margin-bottom:1.4rem}
-.field label{
-  display:block;margin-bottom:.35rem;
-  font-size:var(--fs-meta);color:rgba(246,243,237,.62);
-}
+.field label{display:block;margin-bottom:.35rem;font-size:var(--fs-meta);color:rgba(246,243,237,.62)}
 .field input,.field textarea{
   width:100%;padding:.65rem 0;
   background:transparent;border:0;border-bottom:1px solid var(--line-paper);
@@ -345,9 +424,7 @@ html.js [data-reveal].in{opacity:1;transform:none}
   transition:border-color .2s var(--ease);
 }
 .field textarea{min-height:96px;resize:vertical}
-.field input:focus,.field textarea:focus{
-  outline:none;border-bottom-color:var(--orange);
-}
+.field input:focus,.field textarea:focus{outline:none;border-bottom-color:var(--orange)}
 .field ::placeholder{color:rgba(246,243,237,.35)}
 .field--invalid input,.field--invalid textarea{border-bottom-color:var(--err)}
 .field--invalid label{color:var(--err)}
@@ -357,18 +434,16 @@ html.js [data-reveal].in{opacity:1;transform:none}
   display:inline-flex;align-items:center;gap:.5rem;
   background:var(--paper);color:var(--ink);
   padding:.9rem 1.5rem;font-size:.9rem;font-weight:500;
-  transition:background .2s var(--ease);
+  transition:background .2s var(--ease),gap .25s var(--ease);
 }
-.btn-solid:hover{background:#FFFFFF}
+.btn-solid:hover{background:#FFFFFF;gap:.75rem}
 .btn-solid svg{width:13px;height:13px}
 .btn-solid:disabled{opacity:.6;cursor:default}
 .form__status{margin-top:1.25rem;font-size:.85rem;color:#B7CDA8}
 .form__fallback{margin-top:.9rem;font-size:.875rem;color:rgba(246,243,237,.62)}
 .form__fallback a{color:var(--paper);text-decoration:underline;text-underline-offset:2px}
 .form__fallback a:hover{color:#FFFFFF}
-@media(max-width:640px){
-  .form__row{grid-template-columns:1fr;gap:0}
-}
+@media(max-width:640px){.form__row{grid-template-columns:1fr;gap:0}}
 
 /* ============ footer ============ */
 .footer{
@@ -376,9 +451,7 @@ html.js [data-reveal].in{opacity:1;transform:none}
   border-top:1px solid var(--line-paper);
   padding:1.75rem 0;
 }
-.footer__inner{
-  display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.75rem 2rem;
-}
+.footer__inner{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.75rem 2rem}
 .footer__brand{font-size:.95rem;font-weight:600;letter-spacing:-.02em}
 .footer__legal{font-size:var(--fs-meta);color:rgba(246,243,237,.45)}
 .footer__links{display:flex;gap:1.5rem}
@@ -390,16 +463,23 @@ html.js [data-reveal].in{opacity:1;transform:none}
 .footer__links a:hover{color:var(--paper)}
 .footer__links svg{width:11px;height:11px}
 
+/* ============ reveal (scroll entrance) ============ */
+html.motion [data-reveal]{
+  opacity:0;transform:translateY(22px);
+  transition:opacity .7s var(--ease),transform .7s var(--ease);
+}
+html.motion [data-reveal].in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  html.motion [data-reveal]{opacity:1;transform:none;transition:none}
+}
+
 /* ============ player dialog ============ */
 .player{
   border:0;padding:0;background:transparent;
   width:min(960px,calc(100vw - 2rem));color:var(--paper);
 }
 .player::backdrop{background:rgba(23,23,23,.85);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.player__head{
-  display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;
-  padding:1.1rem 1.25rem;
-}
+.player__head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1.1rem 1.25rem}
 .player__title{font-size:1.1rem;letter-spacing:-.02em}
 .player__meta{margin-top:.3rem;font-size:var(--fs-meta);color:rgba(246,243,237,.62)}
 .player__close{
@@ -422,7 +502,6 @@ html.js [data-reveal].in{opacity:1;transform:none}
 .player__note a{color:var(--paper);text-decoration:underline;text-underline-offset:2px}
 .player__fallback{display:none}
 .player__fallback.show{display:block}
-
 </style>
 </head>
 <body>
@@ -461,134 +540,190 @@ html.js [data-reveal].in{opacity:1;transform:none}
 
 <!-- ================= HERO ================= -->
 <section class="hero" id="top">
-  <div class="wrap">
-    <h1 class="hero__title">Khalid<span class="dot">.</span></h1>
+  <div class="hero__inner wrap">
     <p class="hero__role">Independent Video Editor &amp; Motion Designer</p>
-    <p class="hero__line">Clean edits, thoughtful motion, and visual storytelling for brands and creators — based in Casablanca, working worldwide.</p>
-    <a class="hero__cue" href="#work">Selected work
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14m0 0-6-6m6 6 6-6"/></svg>
+    <h1 class="hero__title">Khalid<span class="dot">.</span></h1>
+    <p class="hero__line">Clean edits, thoughtful motion, and visual storytelling for brands and creators.</p>
+    <a class="hero__cta" href="#work">Explore My Work
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
     </a>
+  </div>
+  <span class="hero__scroll" aria-hidden="true">Scroll</span>
+</section>
+
+<!-- ================= FEATURED WORK (scroll-driven) ================= -->
+<section class="featured" id="work">
+  <div class="featured__stage" id="featStage">
+    <div class="featured__view">
+      <div class="featured__frame wrap">
+        <div class="featured__head">
+          <span class="featured__label">Selected work</span>
+          <span class="featured__count"><b id="featCurrent">01</b> / <span id="featTotal">03</span></span>
+        </div>
+
+        <div class="featured__track" id="featTrack">
+
+          <article class="slide is-active" data-chapter="0">
+            <div class="slide__text">
+              <p class="slide__kicker">Motion Graphics · Video Editing</p>
+              <h3 class="slide__title">GoBird</h3>
+              <p class="slide__desc">Animated logo and branding sequence built in After Effects.</p>
+              <a class="slide__cta" href="https://vimeo.com/1231079235" data-project="gobird-motion">Watch the project
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+              </a>
+            </div>
+            <figure class="slide__media">
+              <a class="slide__link" href="https://vimeo.com/1231079235" data-project="gobird-motion" aria-label="Play project: GoBird">
+                <img src="https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_1080x1920?region=us 1080w" sizes="(min-width:861px) 430px, 92vw" alt="" width="540" height="960" fetchpriority="high" decoding="async" onerror="this.closest('.slide__link').hidden=true">
+                <span class="slide__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
+              </a>
+            </figure>
+          </article>
+
+          <article class="slide" data-chapter="1">
+            <div class="slide__text">
+              <p class="slide__kicker">Healthcare Content · Video Editing</p>
+              <h3 class="slide__title">Dr Saheer</h3>
+              <p class="slide__desc">Short-form talking-head edit — clean cut, clean audio, purposeful captions.</p>
+              <a class="slide__cta" href="https://vimeo.com/1230048854" data-project="dr-saheer-ibd">Watch the project
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+              </a>
+            </div>
+            <figure class="slide__media">
+              <a class="slide__link" href="https://vimeo.com/1230048854" data-project="dr-saheer-ibd" aria-label="Play project: Dr Saheer">
+                <img src="https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_1080x1920?region=us 1080w" sizes="(min-width:861px) 430px, 92vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.slide__link').hidden=true">
+                <span class="slide__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
+              </a>
+            </figure>
+          </article>
+
+          <article class="slide" data-chapter="2">
+            <div class="slide__text">
+              <p class="slide__kicker">Healthcare Content · Video Editing</p>
+              <h3 class="slide__title">Dr Salma</h3>
+              <p class="slide__desc">Social-first edit built to hold attention — pacing, sound and caption timing.</p>
+              <a class="slide__cta" href="https://vimeo.com/1230048855" data-project="dr-salma-vitamins">Watch the project
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+              </a>
+            </div>
+            <figure class="slide__media">
+              <a class="slide__link" href="https://vimeo.com/1230048855" data-project="dr-salma-vitamins" aria-label="Play project: Dr Salma">
+                <img src="https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_1080x1920?region=us 1080w" sizes="(min-width:861px) 430px, 92vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.slide__link').hidden=true">
+                <span class="slide__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
+              </a>
+            </figure>
+          </article>
+
+        </div>
+
+        <div class="feat-index" id="featIndex" aria-label="Featured project chapters">
+          <button class="feat-index__num is-active" type="button" data-chapter="0" aria-label="GoBird">01</button>
+          <button class="feat-index__num" type="button" data-chapter="1" aria-label="Dr Saheer">02</button>
+          <button class="feat-index__num" type="button" data-chapter="2" aria-label="Dr Salma">03</button>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- ================= WORK ================= -->
-<section class="work" id="work">
+<!-- ================= GALLERY ================= -->
+<section class="gallery-sec" id="gallery">
   <div class="wrap">
-    <div class="work__head" data-reveal>
-      <h2>Selected work</h2>
-      <span>Eight projects</span>
-    </div>
-  </div>
+    <header class="sec-head" data-reveal>
+      <span class="sec-kicker">The rest of the work</span>
+      <h2>More selected work<span class="dot">.</span></h2>
+    </header>
 
-  <div class="wrap">
-    <div id="workGrid">
+    <div class="gallery" id="workGrid">
 
-      <!-- featured — GoBird (motion graphics), contained portrait -->
-      <div class="feat" data-reveal>
-        <a class="still work__card feat__still" href="https://vimeo.com/1231079235" data-project="gobird-motion" aria-label="Play project: GoBird">
-          <img src="https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_1080x1920?region=us 1080w" sizes="(max-width:700px) 92vw, 544px" alt="" width="540" height="960" fetchpriority="high" decoding="async" onerror="this.closest('.still').hidden=true">
+      <div class="mini" data-reveal>
+        <a class="still work__card" href="https://vimeo.com/1230048945" data-project="dr-talaa-consultation" aria-label="Play project: Dr. Talaa">
+          <img src="https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, 46vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
           <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
         </a>
-        <div class="feat__body">
-          <h3 class="feat__title">GoBird</h3>
-          <p class="feat__meta">Motion Graphics · Video Editing</p>
-          <a class="feat__link" href="https://vimeo.com/1231079235" data-project="gobird-motion">Watch the project
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
-          </a>
-        </div>
+        <div class="caption"><h3 class="caption__title">Dr. Talaa</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
       </div>
 
-      <!-- gallery — the curated first showing (four, plus the featured spread) -->
-      <div class="gallery" data-reveal>
-        <div class="mini">
-          <a class="still work__card" href="https://vimeo.com/1230048854" data-project="dr-saheer-ibd" aria-label="Play project: Dr Saheer">
-            <img src="https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-          </a>
-          <div class="caption"><h3 class="caption__title">Dr Saheer</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-        </div>
-        <div class="mini">
-          <a class="still work__card" href="https://vimeo.com/1230048855" data-project="dr-salma-vitamins" aria-label="Play project: Dr Salma">
-            <img src="https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-          </a>
-          <div class="caption"><h3 class="caption__title">Dr Salma</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-        </div>
-        <div class="mini">
-          <a class="still work__card" href="https://vimeo.com/1230048945" data-project="dr-talaa-consultation" aria-label="Play project: Dr. Talaa">
-            <img src="https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-          </a>
-          <div class="caption"><h3 class="caption__title">Dr. Talaa</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-        </div>
-        <div class="mini">
-          <a class="still work__card" href="https://vimeo.com/1230048853" data-project="dr-amr-teeth" aria-label="Play project: Dr Amr">
-            <img src="https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-          </a>
-          <div class="caption"><h3 class="caption__title">Dr Amr</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-        </div>
+      <div class="mini" data-reveal>
+        <a class="still work__card" href="https://vimeo.com/1230048853" data-project="dr-amr-teeth" aria-label="Play project: Dr Amr">
+          <img src="https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, 46vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
+          <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
+        </a>
+        <div class="caption"><h3 class="caption__title">Dr Amr</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
       </div>
 
-      <!-- remaining work — revealed in place by the control below -->
-      <div class="gallery gallery--more" id="workMore" hidden>
-        <div class="mini">
-          <a class="still work__card" href="https://vimeo.com/1230048852" data-project="dr-haitham-implant" aria-label="Play project: Dr Haitham">
-            <img src="https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-          </a>
-          <div class="caption"><h3 class="caption__title">Dr Haitham</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-        </div>
-        <div class="mini">
-          <a class="still work__card" href="https://vimeo.com/1230672379" data-project="dr-mohamad-ortho" aria-label="Play project: Dr Mohamad">
-            <img src="https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-          </a>
-          <div class="caption"><h3 class="caption__title">Dr Mohamad</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-        </div>
-        <div class="mini">
-          <a class="still work__card" href="https://vimeo.com/1230676466" data-project="dr-fifi" aria-label="Play project: Dr Fifi">
-            <img src="https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, (max-width:1024px) 46vw, 41vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-            <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-          </a>
-          <div class="caption"><h3 class="caption__title">Dr Fifi</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-        </div>
+      <div class="mini" data-reveal>
+        <a class="still work__card" href="https://vimeo.com/1230048852" data-project="dr-haitham-implant" aria-label="Play project: Dr Haitham">
+          <img src="https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, 46vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
+          <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
+        </a>
+        <div class="caption"><h3 class="caption__title">Dr Haitham</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
       </div>
 
-      <div class="work__more-wrap">
-        <button class="work__more" type="button" id="workMoreBtn" aria-expanded="false" aria-controls="workMore">
-          <span class="work__more-label">View All Work</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
-        </button>
+      <div class="mini" data-reveal>
+        <a class="still work__card" href="https://vimeo.com/1230672379" data-project="dr-mohamad-ortho" aria-label="Play project: Dr Mohamad">
+          <img src="https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, 46vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
+          <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
+        </a>
+        <div class="caption"><h3 class="caption__title">Dr Mohamad</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
+      </div>
+
+      <div class="mini" data-reveal>
+        <a class="still work__card" href="https://vimeo.com/1230676466" data-project="dr-fifi" aria-label="Play project: Dr Fifi">
+          <img src="https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, 46vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
+          <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
+        </a>
+        <div class="caption"><h3 class="caption__title">Dr Fifi</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
       </div>
 
     </div>
+  </div>
+</section>
+
+<!-- ================= CRAFT (services) ================= -->
+<section class="craft-sec" id="services">
+  <div class="wrap">
+    <header class="sec-head" data-reveal>
+      <span class="sec-kicker">What I do</span>
+      <h2>The craft behind the edit<span class="dot">.</span></h2>
+    </header>
+
+    <ol class="craft" id="craft">
+      <li class="craft__item" data-reveal>
+        <span class="craft__num">01</span>
+        <div class="craft__body">
+          <h3 class="craft__title">Video Editing</h3>
+          <p class="craft__text">Storytelling, pacing, sound, and polished post-production.</p>
+        </div>
+      </li>
+      <li class="craft__item" data-reveal>
+        <span class="craft__num">02</span>
+        <div class="craft__body">
+          <h3 class="craft__title">Motion Design</h3>
+          <p class="craft__text">Purposeful animation, kinetic typography, and visual communication.</p>
+        </div>
+      </li>
+      <li class="craft__item" data-reveal>
+        <span class="craft__num">03</span>
+        <div class="craft__body">
+          <h3 class="craft__title">Short-Form Content</h3>
+          <p class="craft__text">Social-first video editing for brands, creators, and businesses.</p>
+        </div>
+      </li>
+    </ol>
   </div>
 </section>
 
 <!-- ================= ABOUT ================= -->
 <section class="about" id="about">
-  <div class="wrap">
-    <h2 class="about__label" data-reveal>About</h2>
-    <div class="grid about__grid">
-      <div class="about__copy" data-reveal>
-        <p class="about__lede">I'm Khalid, a video editor and motion designer based in <em>Casablanca</em>, working with brands and creators worldwide.</p>
-        <p class="about__sub">I focus on clear storytelling, precise pacing, and motion that adds meaning to the edit.</p>
-        <ul class="services">
-          <li>
-            <b>Video editing</b>
-            <span>Clean cuts, precise pacing and sound — from raw footage to a finished piece.</span>
-          </li>
-          <li>
-            <b>Motion graphics</b>
-            <span>Titles, kinetic type and animated elements built in After Effects.</span>
-          </li>
-          <li>
-            <b>Short-form content</b>
-            <span>Vertical edits for Reels, TikTok and Shorts, built to hold attention.</span>
-          </li>
-        </ul>
-      </div>
+  <div class="wrap about__grid">
+    <figure class="about__photo" data-reveal>
+      <img src="/khalid-portrait.png" alt="Portrait of Khalid" width="960" height="960" loading="lazy" decoding="async">
+    </figure>
+    <div class="about__copy" data-reveal>
+      <h2 class="about__title">The person behind the edit<span class="dot">.</span></h2>
+      <p class="about__lede">I'm Khalid, a video editor and motion designer based in <em>Casablanca</em>, working with brands and creators worldwide.</p>
+      <p class="about__sub">I focus on clear storytelling, precise pacing, and motion that adds meaning to every edit.</p>
     </div>
   </div>
 </section>
@@ -669,137 +804,76 @@ html.js [data-reveal].in{opacity:1;transform:none}
   </p>
 </dialog>
 
+<!-- motion stack (vendored locally — served from the same origin, no CDN dependency) -->
+<script src="/vendor/gsap.min.js"></script>
+<script src="/vendor/ScrollTrigger.min.js"></script>
+<script src="/vendor/lenis.min.js"></script>
 <script>
 (function(){
   "use strict";
 
   /* ============================================================
      CONFIG — single source of truth. Edit everything here.
-     Flagged fields below are UNVERIFIED: confirm them before
-     treating them as final (contact details, budget ranges).
      ============================================================ */
   var CONFIG = {
     brand: "khalid.vsl",
-    email: "khalid1editor@gmail.com",              // ✓ confirmed by owner
-    whatsapp: "https://wa.me/212646173884",          // ⚠ unverified — owner to confirm
-    instagram: "https://www.instagram.com/khalid.vsl/", // ⚠ unverified — owner to confirm
-    showreel: {                                       // leave empty until a REAL showreel exists
-      videoUrl: "",   // direct MP4, or
-      vimeoId: "",    // Vimeo id
-      posterUrl: "",
-      previewUrl: "",
-      duration: ""    // e.g. "01:24" — only if verified
-    },
+    email: "khalid1editor@gmail.com",
+    whatsapp: "https://wa.me/212646173884",
+    instagram: "https://www.instagram.com/khalid.vsl/",
     form: {
-      mode: "channels",            // "channels" (WhatsApp + email backend) | "mailto" | "endpoint"
-      endpoint: "",                // legacy: set a real URL to switch to server submission
-      whatsappNumber: "212646173884",  // ✓ confirmed by owner — enquiries arrive here
-      emailBackend: "https://formsubmit.co/ajax/khalid1editor@gmail.com", // free FormSubmit → owner inbox (activation email sent on first submit)
-      budgetRanges: [              // ⚠ indicative bands — currency NOT confirmed, do not present as fixed prices
-        "Under $300", "$300–$700", "$700–$1,500", "$1,500+"
-      ]
+      emailBackend: "https://formsubmit.co/ajax/khalid1editor@gmail.com"
     },
-    productionUrl: "https://khalidvsl.netlify.app/",   // live site (Netlify)
-    previewImage: "",    // ⚠ supply a 1200×630 social image when live
-    about: "",           // optional personal intro (plain text or short paragraphs)
-    beforeAfter: { imageBefore: "", imageAfter: "", caption: "" }, // optional before/after example
-    caseStudies: [],     // optional [{ title, summary }]  — only genuinely verified cases
-    testimonials: [],    // optional [{ quote, author, role }] — only real client quotes with consent
     projects: [
-      {
-        id: "dr-saheer-ibd", title: "Dr Saheer", clientLabel: "Healthcare Content",
-        category: "talking", aspectRatio: 9/16, vimeoId: "1230048854", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_1080x1920?region=us",
-        role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
-        verifiedMetric: null, published: true
-      },
-      {
-        id: "dr-talaa-consultation", title: "Dr. Talaa", clientLabel: "Healthcare Content",
-        category: "talking", aspectRatio: 9/16, vimeoId: "1230048945", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_1080x1920?region=us",
-        role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
-        verifiedMetric: null, published: true
-      },
-      {
-        id: "dr-amr-teeth", title: "Dr Amr", clientLabel: "Healthcare Content",
-        category: "talking", aspectRatio: 9/16, vimeoId: "1230048853", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_1080x1920?region=us",
-        role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
-        verifiedMetric: null, published: true
-      },
-      {
-        id: "dr-salma-vitamins", title: "Dr Salma", clientLabel: "Healthcare Content",
-        category: "talking", aspectRatio: 9/16, vimeoId: "1230048855", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_1080x1920?region=us",
-        role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
-        verifiedMetric: null, published: true
-      },
-      {
-        id: "dr-haitham-implant", title: "Dr Haitham", clientLabel: "Healthcare Content",
-        category: "talking", aspectRatio: 9/16, vimeoId: "1230048852", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_1080x1920?region=us",
-        role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
-        verifiedMetric: null, published: true
-      },
-      {
-        id: "dr-mohamad-ortho", title: "Dr Mohamad", clientLabel: "Healthcare Content",
-        category: "talking", aspectRatio: 9/16, vimeoId: "1230672379", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_1080x1920?region=us",
-        role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
-        verifiedMetric: null, published: true
-      },
-      {
-        id: "dr-fifi", title: "Dr Fifi", clientLabel: "Healthcare Content",
-        category: "talking", aspectRatio: 9/16, vimeoId: "1230676466", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_1080x1920?region=us",
-        role: "Video Editor", description: "Short-form talking-head video — clean cut, clean audio, purposeful captions.",
-        verifiedMetric: null, published: true
-      },
-      {
-        id: "gobird-motion", title: "GoBird", clientLabel: "Motion Graphics",
-        category: "motion", aspectRatio: 9/16, vimeoId: "1231079235", videoUrl: "", previewUrl: "",
-        posterUrl: "https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_1080x1920?region=us",
-        role: "Motion Designer", description: "Motion-graphics piece — animated logo and branding sequence in After Effects.",
-        verifiedMetric: null, published: true
-      }
+      { id: "gobird-motion",        title: "GoBird",     clientLabel: "Motion Graphics",     vimeoId: "1231079235", aspectRatio: 9/16 },
+      { id: "dr-saheer-ibd",        title: "Dr Saheer",  clientLabel: "Healthcare Content",  vimeoId: "1230048854", aspectRatio: 9/16 },
+      { id: "dr-salma-vitamins",    title: "Dr Salma",   clientLabel: "Healthcare Content",  vimeoId: "1230048855", aspectRatio: 9/16 },
+      { id: "dr-talaa-consultation",title: "Dr. Talaa",  clientLabel: "Healthcare Content",  vimeoId: "1230048945", aspectRatio: 9/16 },
+      { id: "dr-amr-teeth",         title: "Dr Amr",     clientLabel: "Healthcare Content",  vimeoId: "1230048853", aspectRatio: 9/16 },
+      { id: "dr-haitham-implant",   title: "Dr Haitham", clientLabel: "Healthcare Content",  vimeoId: "1230048852", aspectRatio: 9/16 },
+      { id: "dr-mohamad-ortho",     title: "Dr Mohamad", clientLabel: "Healthcare Content",  vimeoId: "1230672379", aspectRatio: 9/16 },
+      { id: "dr-fifi",              title: "Dr Fifi",    clientLabel: "Healthcare Content",  vimeoId: "1230676466", aspectRatio: 9/16 }
     ]
   };
 
   /* helpers */
   function $(s, c){ return (c || document).querySelector(s); }
   function $$(s, c){ return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
-  function esc(s){
-    return String(s == null ? "" : s)
-      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-  }
 
+  var html = document.documentElement;
   var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var hasGSAP = typeof window.gsap !== "undefined" && typeof window.ScrollTrigger !== "undefined";
+  var hasLenis = typeof window.Lenis !== "undefined";
+  var desktopMQ = window.matchMedia("(min-width: 861px)");
+  var navH = 72;
 
   /* ---------- year ---------- */
   var yearEl = document.getElementById("footYear");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
   /* ---------- chat links follow CONFIG ---------- */
-  var chatLinks = {
-    whatsapp: CONFIG.whatsapp,
-    instagram: CONFIG.instagram,
-    email: "mailto:" + CONFIG.email
-  };
+  var chatLinks = { whatsapp: CONFIG.whatsapp, instagram: CONFIG.instagram, email: "mailto:" + CONFIG.email };
   Object.keys(chatLinks).forEach(function(k){
     var a = $('[data-chat="' + k + '"]');
     if (a && chatLinks[k]) a.setAttribute("href", chatLinks[k]);
   });
 
-  /* ---------- published projects (player data) ---------- */
-  var published = CONFIG.projects.filter(function(p){ return p && p.published; });
-  var grid = document.getElementById("workGrid");
-
   /* ---------- body scroll lock (shared, conflict-free) ---------- */
   var locks = 0;
+  var lenis = null;
   function lockScroll(on){
-    if (on){ locks++; document.body.style.overflow = "hidden"; }
-    else { locks = Math.max(0, locks - 1); if (!locks) document.body.style.overflow = ""; }
+    if (on){
+      locks++;
+      document.body.style.overflow = "hidden";
+      if (lenis) lenis.stop();
+      html.classList.add("is-locked");
+    } else {
+      locks = Math.max(0, locks - 1);
+      if (!locks){
+        document.body.style.overflow = "";
+        if (lenis) lenis.start();
+        html.classList.remove("is-locked");
+      }
+    }
   }
 
   /* ---------- mobile drawer (native dialog) ---------- */
@@ -811,7 +885,7 @@ html.js [data-reveal].in{opacity:1;transform:none}
     burger.setAttribute("aria-expanded", "true");
     burger.setAttribute("aria-label", "Close menu");
     lockScroll(true);
-    if (typeof panel.showModal === "function"){ var first = $("a", panel); if (first) first.focus(); }
+    var first = $("a", panel); if (first) first.focus();
   }
   function closeDrawer(){
     if (panel.open) panel.close();
@@ -827,12 +901,8 @@ html.js [data-reveal].in{opacity:1;transform:none}
       lockScroll(false);
     });
   }
-  burger.addEventListener("click", function(){
-    if (panel.open) closeDrawer(); else openDrawer();
-  });
-  panel.addEventListener("click", function(e){
-    if (e.target.closest("a")){ closeDrawer(); }
-  });
+  burger.addEventListener("click", function(){ if (panel.open) closeDrawer(); else openDrawer(); });
+  panel.addEventListener("click", function(e){ if (e.target.closest("a")) closeDrawer(); });
 
   /* ---------- project player (native dialog) ---------- */
   var pDialog = document.getElementById("playerDialog");
@@ -844,7 +914,6 @@ html.js [data-reveal].in{opacity:1;transform:none}
   var pFallback = document.getElementById("playerFallback");
   var pOpen = document.getElementById("playerOpen");
   var pClose = document.getElementById("playerClose");
-  var lastOpen = null;
   var lastFocus = null;
   var spinTimer = null;
 
@@ -856,19 +925,15 @@ html.js [data-reveal].in{opacity:1;transform:none}
     hideSpin();
     pNote.hidden = true;
     pFallback.classList.remove("show");
-    Array.prototype.slice.call(pFrame.children).forEach(function(ch){
-      if (ch !== pSpin) pFrame.removeChild(ch);
-    });
+    Array.prototype.slice.call(pFrame.children).forEach(function(ch){ if (ch !== pSpin) pFrame.removeChild(ch); });
   }
 
   function openProject(id, trigger){
     var p = null;
-    published.forEach(function(x){ if (x.id === id) p = x; });
+    CONFIG.projects.forEach(function(x){ if (x.id === id) p = x; });
     if (!p) return;
-    lastOpen = id;
     if (panel.open) closeDrawer();
-    var el = document.getElementById("work-" + id);
-    lastFocus = trigger || el || document.activeElement;
+    lastFocus = trigger || document.activeElement;
 
     clearPlayer();
     pTitle.textContent = p.title;
@@ -877,7 +942,6 @@ html.js [data-reveal].in{opacity:1;transform:none}
     pOpen.href = p.vimeoId ? ("https://vimeo.com/" + p.vimeoId) : "#";
     pFrame.classList.toggle("player__frame--tall", !!p.aspectRatio && p.aspectRatio < 1);
 
-    var wasOpen = pDialog.open;
     showSpin();
     if (p.vimeoId){
       var iframe = document.createElement("iframe");
@@ -891,53 +955,24 @@ html.js [data-reveal].in{opacity:1;transform:none}
       spinTimer = setTimeout(function(){
         hideSpin();
         pNote.hidden = false;
-        pNote.textContent = "";
-        var font = document.createElement("span");
-        font.textContent = "Still loading? ";
+        pNote.textContent = "Still loading? ";
         var lnk = document.createElement("a");
         lnk.href = "https://vimeo.com/" + p.vimeoId;
-        lnk.target = "_blank";
-        lnk.rel = "noopener";
+        lnk.target = "_blank"; lnk.rel = "noopener";
         lnk.textContent = "Open this video on Vimeo";
-        pNote.appendChild(font);
         pNote.appendChild(lnk);
         pNote.appendChild(document.createTextNode("."));
       }, 7000);
       pFrame.appendChild(iframe);
-    } else if (p.videoUrl){
-      var v = document.createElement("video");
-      v.setAttribute("controls", "");
-      v.setAttribute("autoplay", "");
-      v.setAttribute("playsinline", "");
-      v.src = p.videoUrl;
-      if (p.posterUrl) v.setAttribute("poster", p.posterUrl);
-      v.addEventListener("playing", hideSpin);
-      v.addEventListener("error", function(){
-        hideSpin();
-        pNote.hidden = false;
-        pNote.textContent = "This video couldn't be loaded right now.";
-        pFallback.classList.remove("show");
-      });
-      spinTimer = setTimeout(function(){
-        hideSpin();
-        pNote.hidden = false;
-        pNote.textContent = "Still starting… Check the controls below to play manually.";
-      }, 5000);
-      pFrame.appendChild(v);
     } else {
       hideSpin();
       pNote.hidden = false;
       pNote.textContent = "No playable file is configured for this project yet.";
     }
 
-    if (typeof pDialog.showModal === "function"){
-      if (!wasOpen) pDialog.showModal();
-      else { /* keep open, swap content */ }
-      pTitle.focus();
-    } else {
-      pDialog.setAttribute("open", "");
-      pTitle.focus();
-    }
+    if (typeof pDialog.showModal === "function"){ pDialog.showModal(); }
+    else pDialog.setAttribute("open", "");
+    pTitle.focus();
     lockScroll(true);
   }
 
@@ -946,61 +981,36 @@ html.js [data-reveal].in{opacity:1;transform:none}
     else pDialog.removeAttribute("open");
     lockScroll(false);
     hideSpin();
-    clearPlayer(); // teardown independent of the 'close' event (event is async-friendly backup)
+    clearPlayer();
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
 
   if (typeof pDialog.showModal === "function"){
     pDialog.addEventListener("close", function(){
-      lockScroll(false);
-      clearPlayer();
+      lockScroll(false); clearPlayer();
       if (lastFocus && lastFocus.focus) lastFocus.focus();
     });
     pDialog.addEventListener("cancel", function(e){ e.preventDefault(); closePlayer(); });
   }
-
   pClose.addEventListener("click", closePlayer);
 
-  /* ---------- reveal on scroll (rect-based; direct handlers — no rAF dependency) ---------- */
-  function revealCheck(){
-    if (reduced){ return; }
-    var vh = window.innerHeight || document.documentElement.clientHeight;
-    var atBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 80);
-    if (atBottom){
-      $$("[data-reveal]:not(.in)").forEach(function(el){ el.classList.add("in"); });
-      return;
-    }
-    $$("[data-reveal]:not(.in)").forEach(function(el){
-      var r = el.getBoundingClientRect();
-      if ((r.top < vh - 40 && r.bottom > 0) || r.top < 0){ el.classList.add("in"); }
-    });
-  }
-  if (reduced){
-    $$("[data-reveal]").forEach(function(el){ el.classList.add("in"); });
-  } else {
-    window.addEventListener("scroll", revealCheck, { passive:true });
-    window.addEventListener("resize", revealCheck);
-    revealCheck();
-    /* self-healing guard: keep polling briefly until every item is revealed,
-       even if scroll events are throttled or suppressed (embedded / background contexts) */
-    var poll = setInterval(function(){
-      revealCheck();
-      if ($$("[data-reveal]:not(.in)").length === 0){ clearInterval(poll); }
-    }, 600);
-  }
+  /* any [data-project] anchor opens the player (featured slides + gallery) */
+  document.addEventListener("click", function(e){
+    var a = e.target.closest ? e.target.closest("a[data-project]") : null;
+    if (!a) return;
+    e.preventDefault();
+    openProject(a.getAttribute("data-project"), a);
+  });
 
-  /* ---------- navbar state ---------- */
-  var nav = document.getElementById("nav");
-  function onScroll(){
-    nav.classList.toggle("is-scrolled", window.scrollY > 12);
-  }
-  window.addEventListener("scroll", onScroll, { passive:true });
-  onScroll();
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape"){
+      if (pDialog && (pDialog.open || pDialog.hasAttribute("open"))) closePlayer();
+      if (panel && (panel.open || panel.hasAttribute("open"))) closeDrawer();
+    }
+  });
 
   /* ============================================================
-     CONTACT FORM — one primary action. Submits through the email
-     backend (FormSubmit -> studio inbox); a validated mailto draft
-     is the fallback when no backend is configured.
+     CONTACT FORM — one primary action via the FormSubmit backend.
      ============================================================ */
   var form = document.getElementById("contactForm");
   var submitMailBtn = document.getElementById("formSubmitMail");
@@ -1015,19 +1025,15 @@ html.js [data-reveal].in{opacity:1;transform:none}
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   function setErr(key, msg){
-    var f = fields[key];
-    if (!f) return;
+    var f = fields[key]; if (!f) return;
     f.field.classList.toggle("field--invalid", !!msg);
     f.err.textContent = msg || "";
     f.err.hidden = !msg;
     if (f.el) f.el.setAttribute("aria-invalid", msg ? "true" : "false");
-    if (msg && f.err.getAttribute("role") === "alert") f.err.setAttribute("role", "alert");
   }
   function validate(){
     var ok = true, firstBad = null;
-    setErr("name", "");
-    setErr("email", "");
-    setErr("message", "");
+    setErr("name", ""); setErr("email", ""); setErr("message", "");
     if (!fields.name.el.value.trim()){ setErr("name", "Please enter your name."); ok = false; firstBad = firstBad || fields.name.el; }
     var em = fields.email.el.value.trim();
     if (!em){ setErr("email", "Please enter your email address."); ok = false; firstBad = firstBad || fields.email.el; }
@@ -1036,25 +1042,14 @@ html.js [data-reveal].in{opacity:1;transform:none}
     if (firstBad){ firstBad.focus(); }
     return ok;
   }
-
   function setStatus(msg){ statusEl.textContent = msg; statusEl.hidden = !msg; }
-
   function collect(){
-    return {
-      name: fields.name.el.value.trim(),
-      email: fields.email.el.value.trim(),
-      message: fields.message.el.value.trim()
-    };
+    return { name: fields.name.el.value.trim(), email: fields.email.el.value.trim(), message: fields.message.el.value.trim() };
   }
-
   function buildBody(d){
     return "Hi,\n\nI'd like to discuss a project.\n\n" +
-      "Name: " + d.name + "\n" +
-      "Email: " + d.email + "\n\n" +
-      "About the project:\n" + d.message + "\n\n— " + d.name;
+      "Name: " + d.name + "\nEmail: " + d.email + "\n\nAbout the project:\n" + d.message + "\n\n— " + d.name;
   }
-
-  /* Primary channel — real submission via a free form service straight to the studio inbox. */
   function sendEmailBackend(d){
     submitMailBtn.disabled = true;
     if (submitLabel) submitLabel.textContent = "Sending…";
@@ -1062,10 +1057,7 @@ html.js [data-reveal].in{opacity:1;transform:none}
     fetch(CONFIG.form.emailBackend, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({
-        _subject: "Website enquiry — khalid.vsl",
-        name: d.name, email: d.email, message: d.message
-      })
+      body: JSON.stringify({ _subject: "Website enquiry — khalid.vsl", name: d.name, email: d.email, message: d.message })
     }).then(function(r){
       if (!r.ok) throw new Error("bad status " + r.status);
       return r.json();
@@ -1080,77 +1072,199 @@ html.js [data-reveal].in{opacity:1;transform:none}
       setStatus("Something went wrong — please try again, or use the email link below. Your details are still in the form.");
     });
   }
-
-  /* Draft fallback — builds a plain-text draft and encodes the whole href once. */
   function sendMailto(d){
-    var subject = "Project enquiry";
-    var href = "mailto:" + CONFIG.email + "?subject=" +
-      encodeURIComponent(subject) + "&body=" + encodeURIComponent(buildBody(d));
+    var href = "mailto:" + CONFIG.email + "?subject=" + encodeURIComponent("Project enquiry") + "&body=" + encodeURIComponent(buildBody(d));
     window.location.href = href;
     setStatus("Your email app should now be open with the draft ready. Nothing is sent until you press send there.");
   }
-
   form.addEventListener("submit", function(e){
     e.preventDefault();
-    if (!validate()){
-      setStatus("");
-      return;
-    }
+    if (!validate()){ setStatus(""); return; }
     var d = collect();
-    if (CONFIG.form.emailBackend){
-      sendEmailBackend(d);
-      return;
-    }
+    if (CONFIG.form.emailBackend){ sendEmailBackend(d); return; }
     sendMailto(d);
   });
-
-  /* the draft fallback link always composes from current inputs (validated) */
   if (fallbackLink){
     fallbackLink.addEventListener("click", function(e){
-      if (!validate()){
-        e.preventDefault();
-        setStatus("");
-        return;
-      }
-      e.preventDefault();
-      sendMailto(collect());
+      if (!validate()){ e.preventDefault(); setStatus(""); return; }
+      e.preventDefault(); sendMailto(collect());
     });
   }
 
-  /* easy ESC closing for non-dialog fallback browsers */
-  document.addEventListener("keydown", function(e){
-    if (e.key === "Escape"){
-      if (pDialog && (pDialog.open || pDialog.hasAttribute("open"))) closePlayer();
-      if (panel && (panel.open || panel.hasAttribute("open"))) closeDrawer();
+  /* ============================================================
+     MOTION — Lenis smooth scroll + GSAP ScrollTrigger.
+     Everything below is progressive: without the libraries (or with
+     reduced-motion) the page stays a calm, fully visible static site.
+     ============================================================ */
+  var motionEnabled = hasGSAP && !reduced;
+  if (motionEnabled){
+   try{
+    html.classList.add("motion");
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* ---------- Lenis smooth scrolling (desktop pointer only) ---------- */
+    if (hasLenis && desktopMQ.matches){
+      lenis = new Lenis({
+        duration: 1.1,
+        wheelMultiplier: 1,
+        touchMultiplier: 1.6,
+        smoothWheel: true,
+        syncTouch: false,
+        easing: function(t){ return Math.min(1, 1.001 - Math.pow(2, -10 * t)); }
+      });
+      lenis.on("scroll", ScrollTrigger.update);
+      gsap.ticker.add(function(time){ lenis.raf(time * 1000); });
+      gsap.ticker.lagSmoothing(0);
+      html.classList.add("has-lenis");
     }
-  });
 
-  /* ---------- work grid: click a card to open the modal player ---------- */
-  if (grid){
-    grid.addEventListener("click", function(e){
-      var anchor = e.target.closest ? e.target.closest(".work__card, .feat__link") : null;
-      if (!anchor) return;
-      var id = anchor.getAttribute("data-project");
-      if (!id) return;
-      e.preventDefault();
-      openProject(id, anchor);
+    /* ---------- anchor links + back-to-top through Lenis ---------- */
+    $$('a[href^="#"]').forEach(function(a){
+      a.addEventListener("click", function(e){
+        var id = a.getAttribute("href");
+        if (!id || id.length < 2) return;
+        var target = document.querySelector(id);
+        if (!target) return;
+        e.preventDefault();
+        var y = (id === "#top") ? 0 : (target.getBoundingClientRect().top + window.scrollY - navH + 1);
+        if (lenis){ if (lenis.isStopped) lenis.start(); lenis.scrollTo(y, { duration: 1.1 }); }
+        else window.scrollTo({ top: y, behavior: reduced ? "auto" : "smooth" });
+        if (history.replaceState) history.replaceState(null, "", id);
+      });
     });
+
+    /* ---------- hero intro ---------- */
+    var heroItems = $$(".hero__role, .hero__title, .hero__line, .hero__cta");
+    if (heroItems.length){
+      var hl = gsap.timeline({ defaults: { ease: "power3.out", duration: .8 } });
+      hl.from(".nav__inner", { y: -12, opacity: 0, duration: .6 }, 0)
+        .from(".hero__role", { y: 20, opacity: 0 }, .05)
+        .from(".hero__title", { y: 34, opacity: 0 }, .12)
+        .from(".hero__line", { y: 20, opacity: 0, duration: .7 }, .28)
+        .from(".hero__cta", { y: 16, opacity: 0, duration: .6 }, .4)
+        .from(".hero__scroll", { opacity: 0, duration: .6 }, .6);
+    }
+
+    /* ---------- hero drifts away, handing over to the featured work ---------- */
+    gsap.to(".hero__inner", {
+      y: -46, opacity: .28, ease: "none",
+      scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true }
+    });
+
+    /* ---------- featured work — the pinned chapter scroll ---------- */
+    var track = document.getElementById("featTrack");
+    if (track){
+      var slides = $$(".slide", track);
+      var nums = $$(".feat-index__num");
+      var currentEl = document.getElementById("featCurrent");
+      var totalEl = document.getElementById("featTotal");
+      var n = slides.length;
+      var current = -1;
+
+      if (totalEl) totalEl.textContent = (n < 10 ? "0" : "") + n;
+
+      function setChapter(i){
+        if (i === current) return;
+        current = i;
+        slides.forEach(function(s, k){
+          var on = k === i;
+          s.classList.toggle("is-active", on);
+          s.setAttribute("aria-hidden", on ? "false" : "true");
+        });
+        nums.forEach(function(b, k){
+          b.classList.toggle("is-active", k === i);
+          if (k === i) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
+        });
+        if (currentEl) currentEl.textContent = (i + 1 < 10 ? "0" : "") + (i + 1);
+      }
+
+      function buildChapterScroll(){
+        if (!desktopMQ.matches){ return null; }
+        return ScrollTrigger.create({
+          trigger: document.getElementById("featStage"),
+          start: "top top",
+          end: "bottom bottom",
+          onUpdate: function(self){ setChapter(Math.min(n - 1, Math.floor(self.progress * n))); }
+        });
+      }
+
+      var chapterST = buildChapterScroll();
+      if (chapterST) setChapter(0); else current = -1;
+
+      /* chapter index click → scroll to that chapter's centre */
+      nums.forEach(function(b, k){
+        b.addEventListener("click", function(){
+          var stage = document.getElementById("featStage");
+          if (!stage || !desktopMQ.matches) return;
+          var top = stage.getBoundingClientRect().top + window.scrollY;
+          var range = stage.offsetHeight - window.innerHeight;
+          var y = top + range * ((k + .5) / n);
+          if (lenis) lenis.scrollTo(y, { duration: 1 });
+          else window.scrollTo({ top: y, behavior: "smooth" });
+        });
+      });
+
+      /* keep pin state correct on breakpoint changes */
+      var rebuild = function(){
+        if (chapterST){ chapterST.kill(); chapterST = null; }
+        html.classList.toggle("motion-desktop", desktopMQ.matches);
+        if (desktopMQ.matches){
+          chapterST = buildChapterScroll();
+          setChapter(0);
+        } else {
+          slides.forEach(function(s, k){ s.classList.toggle("is-active", k === 0); s.setAttribute("aria-hidden", "false"); });
+          current = -1;
+        }
+        ScrollTrigger.refresh();
+      };
+      html.classList.toggle("motion-desktop", desktopMQ.matches);
+      if (!desktopMQ.matches) slides.forEach(function(s){ s.setAttribute("aria-hidden", "false"); });
+      if (window.addEventListener){ window.addEventListener("resize", debounce(rebuild, 200)); }
+    }
+
+    /* ---------- scroll entrances ---------- */
+    $$("[data-reveal]").forEach(function(el){
+      ScrollTrigger.create({
+        trigger: el, start: "top 88%", once: true,
+        onEnter: function(){ el.classList.add("in"); }
+      });
+    });
+    /* anything already above the fold on load reveals immediately */
+    requestAnimationFrame(function(){
+      $$("[data-reveal]").forEach(function(el){
+        if (el.getBoundingClientRect().top < window.innerHeight * .92) el.classList.add("in");
+      });
+    });
+
+    /* ---------- craft items become active in sequence ---------- */
+    $$(".craft__item").forEach(function(item){
+      ScrollTrigger.create({
+        trigger: item, start: "top 66%", end: "bottom 34%",
+        onToggle: function(self){ item.classList.toggle("is-active", self.isActive); },
+        onEnter: function(){ item.classList.add("is-active"); }
+      });
+    });
+
+    ScrollTrigger.refresh();
+   }catch(err){
+     /* motion failed to initialise — guarantee a fully visible, static page */
+     html.classList.remove("motion","motion-desktop");
+     $$("[data-reveal]").forEach(function(el){ el.classList.add("in"); });
+     $$(".slide").forEach(function(s){ s.classList.add("is-active"); s.setAttribute("aria-hidden","false"); });
+     $$(".craft__item").forEach(function(item){ item.classList.add("is-active"); });
+   }
+  } else {
+    /* no motion libs / reduced motion — reveal everything */
+    $$("[data-reveal]").forEach(function(el){ el.classList.add("in"); });
+    $$(".slide").forEach(function(s){ s.classList.add("is-active"); s.setAttribute("aria-hidden", "false"); });
+    $$(".craft__item").forEach(function(item){ item.classList.add("is-active"); });
   }
 
-
-  /* ---------- work grid: reveal the remaining projects in place ---------- */
-  var workMore = document.getElementById("workMore");
-  var workMoreBtn = document.getElementById("workMoreBtn");
-  if (workMore && workMoreBtn){
-    workMoreBtn.addEventListener("click", function(){
-      var isOpen = workMoreBtn.getAttribute("aria-expanded") === "true";
-      workMore.hidden = isOpen;                       /* collapse when already open */
-      workMoreBtn.setAttribute("aria-expanded", isOpen ? "false" : "true");
-      workMoreBtn.classList.toggle("is-open", !isOpen);
-      var label = workMoreBtn.querySelector(".work__more-label");
-      if (label) label.textContent = isOpen ? "View All Work" : "Show fewer";
-    });
-  }
+  /* ---------- navbar state ---------- */
+  var nav = document.getElementById("nav");
+  function onScroll(){ nav.classList.toggle("is-scrolled", window.scrollY > 12); }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
 
   /* ---------- active nav link (scroll spy) ---------- */
   var navLinks = $$("#navLinks a");
@@ -1164,8 +1278,12 @@ html.js [data-reveal].in{opacity:1;transform:none}
         var id = "#" + en.target.id;
         navLinks.forEach(function(a){ a.classList.toggle("is-active", a.getAttribute("href") === id); });
       });
-    }, { rootMargin: "-40% 0px -55% 0px" });
+    }, { rootMargin: "-45% 0px -50% 0px" });
     spySections.forEach(function(s){ spy.observe(s); });
+  }
+
+  function debounce(fn, ms){
+    var t; return function(){ var args = arguments, self = this; clearTimeout(t); t = setTimeout(function(){ fn.apply(self, args); }, ms); };
   }
 
 })();
