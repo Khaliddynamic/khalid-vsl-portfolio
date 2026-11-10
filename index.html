@@ -5,7 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="Independent video editor & motion designer based in Casablanca, working with brands and creators worldwide. Clean edits, thoughtful motion, visual storytelling." />
 <title>khalid.vsl — Independent Video Editor & Motion Designer</title>
-<script>document.documentElement.classList.add('js');</script>
+<script>
+document.documentElement.classList.add('js');
+/* Pick the colour scheme before first paint so there is no flash of the
+   wrong theme. Honours a saved choice, else falls back to the OS setting. */
+(function(){
+  var t = null;
+  try { t = localStorage.getItem("khalid.theme"); } catch (e) {}
+  if (t !== "light" && t !== "dark") {
+    t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+  }
+  document.documentElement.setAttribute("data-theme", t);
+})();
+</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23171717'/%3E%3Cpath d='M13 10v12l9-6-9-6z' fill='%23F27A35'/%3E%3C/svg%3E" />
 <meta name="theme-color" content="#F6F3ED" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -46,6 +58,33 @@
   --err:#D64F2E;
   --ok:#5F7A4F;
 
+  /* translucent page surfaces — the frosted nav and the drawer veil */
+  --bg-a82:rgba(246,243,237,.82);
+  --bg-a50:rgba(246,243,237,.5);
+
+  /* The inverted band — contact, footer, skip link and the video player.
+     Always the deepest surface in the scheme, so it stays "inverted"
+     whether the page is paper or near-black. */
+  --band:#171717;
+  --band-fg:#F6F3ED;
+  --band-fg-62:rgba(246,243,237,.62);
+  --band-fg-45:rgba(246,243,237,.45);
+  --band-fg-35:rgba(246,243,237,.35);
+  --band-fg-10:rgba(246,243,237,.1);
+  --band-a85:rgba(23,23,23,.85);
+
+  /* media + frame fills */
+  --media-bg:#E8E4DB;                     /* matte behind video stills */
+  --inset-line:rgba(23,23,23,.04);        /* hairline inside the photo frame */
+
+  /* solid call-to-action button (contact form) */
+  --btn-bg:#F6F3ED;
+  --btn-fg:#171717;
+  --btn-bg-hover:#FFFFFF;
+
+  /* text drawn on the orange accent — always dark, for contrast */
+  --on-accent:#171717;
+
   --font-sans:"Instrument Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
   --font-serif:"Instrument Serif",Georgia,"Times New Roman",serif;
 
@@ -61,6 +100,45 @@
   --nav-h:72px;
   --sec-y:clamp(5.5rem,13vh,10rem);
   --ease:cubic-bezier(.22,1,.36,1);
+}
+
+/* ============ dark theme ============
+   Only colour tokens change here. Every rule below reads from these
+   variables, so the type scale, layout and motion are untouched.
+   <html data-theme="dark"> activates it — set before first paint by the
+   inline script in <head>, and flipped by the control in the nav. */
+[data-theme="dark"]{
+  --paper:#161514;                        /* page background */
+  --ink:#EDE9E1;                          /* primary text */
+  --gray:#8E8A81;                         /* muted text */
+  --paper-2:#1E1D1C;                      /* matte / frame fill */
+  --line:rgba(237,233,225,.14);
+  --line-soft:rgba(237,233,225,.07);
+
+  --bg-a82:rgba(22,21,20,.82);
+  --bg-a50:rgba(22,21,20,.5);
+
+  /* noticeably deeper than the page, so the band still reads as the
+     dramatic inverted panel it is in the light scheme */
+  --band:#060605;
+  --band-fg:#EDE9E1;
+  --band-fg-62:rgba(237,233,225,.62);
+  --band-fg-45:rgba(237,233,225,.45);
+  --band-fg-35:rgba(237,233,225,.35);
+  --band-fg-10:rgba(237,233,225,.1);
+  --band-a85:rgba(3,3,3,.85);
+  --line-paper:rgba(237,233,225,.22);
+
+  --media-bg:#1E1D1C;
+  --inset-line:rgba(0,0,0,.45);
+
+  --btn-bg:#EDE9E1;
+  --btn-fg:#161514;
+  --btn-bg-hover:#FFFFFF;
+
+  /* error/success copy sits on the dark band, so lighten it here */
+  --err:#FF9D82;
+  --ok:#B7CDA8;
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -83,6 +161,11 @@ body{
   font-family:var(--font-sans);font-size:var(--fs-body);line-height:1.6;
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
 }
+/* the colour scheme eases over instead of snapping; the global
+   reduced-motion rule above collapses this to an instant swap */
+body,.featured,.contact,.footer,.drawer__inner{
+  transition:background-color .35s var(--ease),color .35s var(--ease);
+}
 img,svg{display:block;max-width:100%}
 figure{margin:0}
 a{color:inherit;text-decoration:none}
@@ -90,9 +173,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.03em;line-height:1.05}
 p{margin:0}
 ul,ol{margin:0;padding:0;list-style:none}
-::selection{background:var(--orange);color:var(--ink)}
+::selection{background:var(--orange);color:var(--on-accent)}
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-.contact :focus-visible{outline-color:var(--paper)}
+.contact :focus-visible{outline-color:var(--band-fg)}
 :focus:not(:focus-visible){outline:none}
 [hidden]{display:none!important}
 
@@ -101,7 +184,7 @@ section{scroll-margin-top:calc(var(--nav-h) + 8px)}
 
 .skip{
   position:fixed;top:-100px;left:1rem;z-index:200;
-  background:var(--ink);color:var(--paper);padding:.7rem 1.1rem;
+  background:var(--band);color:var(--band-fg);padding:.7rem 1.1rem;
   font-size:.85rem;font-weight:500;transition:top .2s var(--ease);
 }
 .skip:focus{top:1rem}
@@ -121,7 +204,7 @@ section{scroll-margin-top:calc(var(--nav-h) + 8px)}
   transition:background .3s var(--ease),box-shadow .3s var(--ease);
 }
 .nav.is-scrolled{
-  background:rgba(246,243,237,.82);
+  background:var(--bg-a82);
   -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
   box-shadow:0 1px 0 var(--line);
 }
@@ -150,6 +233,19 @@ section{scroll-margin-top:calc(var(--nav-h) + 8px)}
 .nav__action:hover{border-color:var(--orange)}
 .nav__action svg{width:13px;height:13px;transition:transform .25s var(--ease)}
 .nav__action:hover svg{transform:translate(1px,-1px)}
+/* tool cluster — project link, theme switch, menu button */
+.nav__tools{display:flex;align-items:center;gap:.85rem}
+.nav__theme{
+  width:38px;height:38px;flex:none;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--ink);transition:background .2s var(--ease);
+}
+.nav__theme:hover{background:var(--line-soft)}
+.nav__theme-icon{width:18px;height:18px;display:block}
+.nav__theme-icon--moon{display:none}
+[data-theme="dark"] .nav__theme-icon--sun{display:none}
+[data-theme="dark"] .nav__theme-icon--moon{display:block}
+html:not(.js) .nav__theme{display:none}          /* needs JS to do anything */
 .nav__burger{display:none;width:44px;height:44px;margin-right:-10px;align-items:center;justify-content:center}
 .nav__burger svg{width:24px;height:24px}
 @media(max-width:768px){
@@ -162,7 +258,7 @@ section{scroll-margin-top:calc(var(--nav-h) + 8px)}
   border:0;padding:0;background:transparent;
   width:100%;max-width:none;height:100dvh;max-height:none;color:var(--ink);
 }
-.drawer::backdrop{background:rgba(246,243,237,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.drawer::backdrop{background:var(--bg-a50);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .drawer__inner{
   display:flex;flex-direction:column;min-height:100dvh;
   background:var(--paper);padding:calc(var(--nav-h) + 2rem) var(--gutter) 2.5rem;
@@ -261,7 +357,7 @@ section{scroll-margin-top:calc(var(--nav-h) + 8px)}
 .slide__link{
   position:relative;display:block;
   height:clamp(300px,62vh,660px);aspect-ratio:9/16;max-width:100%;
-  overflow:hidden;background:#E8E4DB;
+  overflow:hidden;background:var(--media-bg);
   border-radius:var(--r-media);
 }
 .slide__link img{width:100%;height:100%;object-fit:cover}
@@ -330,7 +426,7 @@ section{scroll-margin-top:calc(var(--nav-h) + 8px)}
 }
 
 /* stills — native aspect ratio, no card decoration */
-.still{display:block;position:relative;overflow:hidden;background:#E8E4DB;border-radius:var(--r-media)}
+.still{display:block;position:relative;overflow:hidden;background:var(--media-bg);border-radius:var(--r-media)}
 .still img{width:100%;height:auto;display:block;transition:opacity .35s var(--ease),transform .6s var(--ease)}
 .still:hover img,.still:focus-visible img{opacity:.94;transform:scale(1.02)}
 .still__play{
@@ -397,7 +493,7 @@ section{scroll-margin-top:calc(var(--nav-h) + 8px)}
   border:1px solid var(--line);
 }
 .about__photo::after{
-  content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px rgba(23,23,23,.04);pointer-events:none;
+  content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px var(--inset-line);pointer-events:none;
 }
 .about__photo img{
   width:100%;height:100%;object-fit:cover;aspect-ratio:1/1;
@@ -425,60 +521,60 @@ section{scroll-margin-top:calc(var(--nav-h) + 8px)}
 /* ============ contact ============ */
 .contact{
   margin-top:var(--sec-y);
-  background:var(--ink);color:var(--paper);
+  background:var(--band);color:var(--band-fg);
   padding:clamp(4.5rem,10vh,8rem) 0 0;
 }
 .contact__title{font-size:var(--fs-h2);letter-spacing:-.04em;max-width:12ch}
 .contact__title .dot{color:var(--orange)}
-.contact__sub{margin-top:1.25rem;color:rgba(246,243,237,.62);max-width:38ch}
+.contact__sub{margin-top:1.25rem;color:var(--band-fg-62);max-width:38ch}
 .form{margin-top:clamp(3rem,7vh,4.5rem);padding-bottom:clamp(4rem,8vh,6rem)}
 .form__row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
 .field{margin-bottom:1.4rem}
-.field label{display:block;margin-bottom:.35rem;font-size:var(--fs-meta);color:rgba(246,243,237,.62)}
+.field label{display:block;margin-bottom:.35rem;font-size:var(--fs-meta);color:var(--band-fg-62)}
 .field input,.field textarea{
   width:100%;padding:.65rem 0;
   background:transparent;border:0;border-bottom:1px solid var(--line-paper);
-  border-radius:0;color:var(--paper);font:inherit;font-size:.9375rem;
+  border-radius:0;color:var(--band-fg);font:inherit;font-size:.9375rem;
   transition:border-color .2s var(--ease);
 }
 .field textarea{min-height:96px;resize:vertical}
 .field input:focus,.field textarea:focus{outline:none;border-bottom-color:var(--orange)}
-.field ::placeholder{color:rgba(246,243,237,.35)}
+.field ::placeholder{color:var(--band-fg-35)}
 .field--invalid input,.field--invalid textarea{border-bottom-color:var(--err)}
 .field--invalid label{color:var(--err)}
 .form__err{margin-top:.4rem;font-size:.75rem;color:#FF9D82}
 .form__actions{display:flex;flex-wrap:wrap;align-items:center;gap:1.25rem;margin-top:1.75rem}
 .btn-solid{
   display:inline-flex;align-items:center;gap:.5rem;
-  background:var(--paper);color:var(--ink);
+  background:var(--btn-bg);color:var(--btn-fg);
   padding:.9rem 1.5rem;font-size:.9rem;font-weight:500;
   transition:background .2s var(--ease),gap .25s var(--ease);
 }
-.btn-solid:hover{background:#FFFFFF;gap:.75rem}
+.btn-solid:hover{background:var(--btn-bg-hover);gap:.75rem}
 .btn-solid svg{width:13px;height:13px}
 .btn-solid:disabled{opacity:.6;cursor:default}
 .form__status{margin-top:1.25rem;font-size:.85rem;color:#B7CDA8}
-.form__fallback{margin-top:.9rem;font-size:.875rem;color:rgba(246,243,237,.62)}
-.form__fallback a{color:var(--paper);text-decoration:underline;text-underline-offset:2px}
+.form__fallback{margin-top:.9rem;font-size:.875rem;color:var(--band-fg-62)}
+.form__fallback a{color:var(--band-fg);text-decoration:underline;text-underline-offset:2px}
 .form__fallback a:hover{color:#FFFFFF}
 @media(max-width:640px){.form__row{grid-template-columns:1fr;gap:0}}
 
 /* ============ footer ============ */
 .footer{
-  background:var(--ink);color:var(--paper);
+  background:var(--band);color:var(--band-fg);
   border-top:1px solid var(--line-paper);
   padding:1.75rem 0;
 }
 .footer__inner{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.75rem 2rem}
 .footer__brand{font-size:.95rem;font-weight:600;letter-spacing:-.02em}
-.footer__legal{font-size:var(--fs-meta);color:rgba(246,243,237,.45)}
+.footer__legal{font-size:var(--fs-meta);color:var(--band-fg-45)}
 .footer__links{display:flex;gap:1.5rem}
 .footer__links a{
-  font-size:var(--fs-meta);color:rgba(246,243,237,.62);
+  font-size:var(--fs-meta);color:var(--band-fg-62);
   display:inline-flex;align-items:center;gap:.35rem;
   transition:color .2s var(--ease);
 }
-.footer__links a:hover{color:var(--paper)}
+.footer__links a:hover{color:var(--band-fg)}
 .footer__links svg{width:11px;height:11px}
 
 /* ============ reveal (scroll entrance) ============ */
@@ -494,30 +590,30 @@ html.motion [data-reveal].in{opacity:1;transform:none}
 /* ============ player dialog ============ */
 .player{
   border:0;padding:0;background:transparent;
-  width:min(960px,calc(100vw - 2rem));color:var(--paper);
+  width:min(960px,calc(100vw - 2rem));color:var(--band-fg);
 }
-.player::backdrop{background:rgba(23,23,23,.85);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.player::backdrop{background:var(--band-a85);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .player__head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1.1rem 1.25rem}
 .player__title{font-size:1.1rem;letter-spacing:-.02em}
-.player__meta{margin-top:.3rem;font-size:var(--fs-meta);color:rgba(246,243,237,.62)}
+.player__meta{margin-top:.3rem;font-size:var(--fs-meta);color:var(--band-fg-62)}
 .player__close{
   width:40px;height:40px;border-radius:50%;flex:none;
   display:flex;align-items:center;justify-content:center;
-  border:1px solid var(--line-paper);color:var(--paper);
+  border:1px solid var(--line-paper);color:var(--band-fg);
   transition:background .2s var(--ease);
 }
-.player__close:hover{background:rgba(246,243,237,.1)}
+.player__close:hover{background:var(--band-fg-10)}
 .player__frame{position:relative;background:#0F0F0F;aspect-ratio:16/9;overflow:hidden;border-radius:var(--r-media)}
 .player__frame--tall{aspect-ratio:9/16;max-height:72vh;margin-inline:auto;max-width:calc(72vh * 9 / 16)}
 .player__frame iframe,.player__frame video{position:absolute;inset:0;width:100%;height:100%;border:0}
 .player__spin{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:var(--fs-meta);color:rgba(246,243,237,.62);
+  font-size:var(--fs-meta);color:var(--band-fg-62);
   opacity:0;transition:opacity .3s;pointer-events:none;
 }
 .player__spin.show{opacity:1}
-.player__note{padding:.9rem 1.25rem;font-size:.8rem;color:rgba(246,243,237,.62)}
-.player__note a{color:var(--paper);text-decoration:underline;text-underline-offset:2px}
+.player__note{padding:.9rem 1.25rem;font-size:.8rem;color:var(--band-fg-62)}
+.player__note a{color:var(--band-fg);text-decoration:underline;text-underline-offset:2px}
 .player__fallback{display:none}
 .player__fallback.show{display:block}
 </style>
@@ -535,12 +631,18 @@ html.motion [data-reveal].in{opacity:1;transform:none}
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
     </nav>
-    <a class="nav__action" href="mailto:khalid1editor@gmail.com?subject=Project%20enquiry">Start a project
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
-    </a>
-    <button class="nav__burger" id="navBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobilePanel">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3.5 8h17m-17 8h17"/></svg>
-    </button>
+    <div class="nav__tools">
+      <a class="nav__action" href="mailto:khalid1editor@gmail.com?subject=Project%20enquiry">Start a project
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      </a>
+      <button class="nav__theme" id="themeToggle" type="button" aria-label="Dark theme" aria-pressed="false">
+        <svg class="nav__theme-icon nav__theme-icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.6v2.2M12 19.2v2.2M4.5 4.5l1.6 1.6M17.9 17.9l1.6 1.6M2.6 12h2.2M19.2 12h2.2M4.5 19.5l1.6-1.6M17.9 6.1l1.6-1.6"/></svg>
+        <svg class="nav__theme-icon nav__theme-icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.4 14.6A8.6 8.6 0 0 1 9.4 3.6a8.6 8.6 0 1 0 11 11Z"/></svg>
+      </button>
+      <button class="nav__burger" id="navBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobilePanel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3.5 8h17m-17 8h17"/></svg>
+      </button>
+    </div>
   </div>
 </header>
 
@@ -1299,6 +1401,44 @@ html.motion [data-reveal].in{opacity:1;transform:none}
     $$(".slide").forEach(function(s){ s.classList.add("is-active"); s.setAttribute("aria-hidden", "false"); });
     $$(".craft__item").forEach(function(item){ item.classList.add("is-active"); });
   }
+
+  /* ============================================================
+     THEME — light / dark. The scheme is applied before first paint by
+     the inline script in <head>, so this only wires the nav control,
+     remembers the choice, and keeps following the OS while untouched.
+     ============================================================ */
+  (function initTheme(){
+    var root = document.documentElement;
+    var btn  = document.getElementById("themeToggle");
+    var meta = document.querySelector('meta[name="theme-color"]');
+    var KEY  = "khalid.theme";
+    var mq   = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+
+    function current(){ return root.getAttribute("data-theme") === "dark" ? "dark" : "light"; }
+    function paint(t){
+      root.setAttribute("data-theme", t);
+      if (btn) btn.setAttribute("aria-pressed", t === "dark" ? "true" : "false");
+      if (meta) meta.setAttribute("content", t === "dark" ? "#161514" : "#F6F3ED");
+    }
+
+    paint(current());
+
+    if (btn) btn.addEventListener("click", function(){
+      var next = current() === "dark" ? "light" : "dark";
+      saved = next;
+      paint(next);
+      try { localStorage.setItem(KEY, next); } catch (e) {}
+    });
+
+    /* no explicit choice yet → keep pace with the operating system */
+    if (mq){
+      var follow = function(e){ if (!saved) paint(e.matches ? "dark" : "light"); };
+      if (mq.addEventListener) mq.addEventListener("change", follow);
+      else if (mq.addListener) mq.addListener(follow);
+    }
+  })();
 
   /* ---------- navbar state ---------- */
   var nav = document.getElementById("nav");
