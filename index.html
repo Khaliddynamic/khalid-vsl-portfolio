@@ -539,6 +539,9 @@ html.motion [data-reveal].in{opacity:1;transform:none}
 .guide.is-live{visibility:visible;transition:opacity .5s var(--ease),visibility 0s}
 .guide.is-shown{opacity:1}
 
+/* inner wrapper — carries the idle float so it never fights the travel transform */
+.guide__float{position:absolute;left:0;top:0;width:0;height:0;will-change:transform}
+
 .guide__arrow{
   position:absolute;left:0;top:0;width:20px;height:26px;
   transform-origin:0 0;
@@ -922,11 +925,13 @@ html.motion [data-reveal].in{opacity:1;transform:none}
 <!-- ================= CURSOR GUIDE (welcome assistant, decorative) ================= -->
 <div class="guide" id="guide" aria-hidden="true">
   <span class="guide__ring" id="guideRing"></span>
-  <span class="guide__arrow" id="guideArrow">
-    <svg viewBox="0 0 20 26" aria-hidden="true"><path d="M0 0 L0 23.5 L6.6 17.6 L10.5 25.8 L14.4 24 L10.6 15.9 L19.6 15.9 Z"/></svg>
+  <span class="guide__float" id="guideFloat">
+    <span class="guide__arrow" id="guideArrow">
+      <svg viewBox="0 0 20 26" aria-hidden="true"><path d="M0 0 L0 23.5 L6.6 17.6 L10.5 25.8 L14.4 24 L10.6 15.9 L19.6 15.9 Z"/></svg>
+    </span>
+    <span class="guide__tag" id="guideTag">Your guide</span>
+    <span class="guide__bubble" id="guideBubble"><span id="guideText"></span></span>
   </span>
-  <span class="guide__tag" id="guideTag">Your guide</span>
-  <span class="guide__bubble" id="guideBubble"><span id="guideText"></span></span>
 </div>
 <button class="guide-skip" id="guideSkip" type="button">Skip intro</button>
 
@@ -966,7 +971,7 @@ html.motion [data-reveal].in{opacity:1;transform:none}
         fade: 650,                // fade duration
         projectHold: 4200         // how long the project message stays
       },
-      motion: { move: 0.72, ease: "back.out(1.4)" },   // arrival bounce
+      motion: { move: 1.05, ease: "power3.inOut", arc: 0.18, idle: 2.6 },  // self-moving glide
       messages: {
         headline: "Hey! Welcome to my portfolio.",
         cta: "Start here—see my work in action.",
@@ -1447,6 +1452,7 @@ html.motion [data-reveal].in{opacity:1;transform:none}
     var textEl  = document.getElementById("guideText");
     var tagEl   = document.getElementById("guideTag");
     var arrowEl = document.getElementById("guideArrow");
+    var floatEl = document.getElementById("guideFloat");
     var ringEl  = document.getElementById("guideRing");
     var skipBtn = document.getElementById("guideSkip");
     if (!root || !bubble || !textEl || !arrowEl || !skipBtn) return;
@@ -1467,9 +1473,12 @@ html.motion [data-reveal].in{opacity:1;transform:none}
     var prev = { x: 0, y: 0 }, currentStep = null;
     var startY = window.pageYOffset || document.documentElement.scrollTop || 0;
 
-    var MOVE = (G.motion && G.motion.move) || 0.72;
-    var EASE = (G.motion && G.motion.ease) || "back.out(1.4)";
+    var MOVE = (G.motion && G.motion.move) || 1.05;
+    var EASE = (G.motion && G.motion.ease) || "power3.inOut";
+    var ARC  = (G.motion && G.motion.arc) || 0.18;
+    var IDLE = (G.motion && G.motion.idle) || 2.6;
     var FADE = (G.timings && G.timings.fade) || 650;
+    var curRot, idleTween = null;
 
     function on(t, type, fn, opts){ t.addEventListener(type, fn, opts); listeners.push([t, type, fn, opts]); }
     function later(fn, ms){ var id = setTimeout(function(){ if (alive) fn(); }, ms); timers.push(id); return id; }
@@ -1530,17 +1539,51 @@ html.motion [data-reveal].in{opacity:1;transform:none}
       if (hasGSAP){ gsap.set(root, { x: x, y: y }); }
       else { root.style.transition = "none"; root.style.transform = "translate3d(" + x + "px," + y + "px,0)"; }
     }
-    function slideTo(x, y, fromX, fromY){
-      if (hasGSAP && !reduced){
-        if (typeof fromX === "number"){
-          gsap.fromTo(root, { x: fromX, y: fromY }, { x: x, y: y, duration: MOVE, ease: EASE, overwrite: "auto" });
-        } else {
-          gsap.to(root, { x: x, y: y, duration: MOVE, ease: EASE, overwrite: "auto" });
-        }
-      } else {
+    /* self-moving glide: accelerate away, swoop along a gentle arc, settle with a spring */
+    function travelTo(x, y, fromX, fromY){
+      if (!hasGSAP || reduced){
         root.style.transition = reduced ? "none" : ("transform " + MOVE + "s var(--ease)");
         root.style.transform = "translate3d(" + x + "px," + y + "px,0)";
+        return;
       }
+      var sx = (typeof fromX === "number") ? fromX : x;
+      var sy = (typeof fromY === "number") ? fromY : y;
+      var dx = x - sx, dy = y - sy, dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      var nx = -dy / dist, ny = dx / dist;
+      if (ny > 0){ nx = -nx; ny = -ny; }             /* bow the arc upward */
+      var amt = Math.min(dist * ARC, 80);
+      var cx = (sx + x) / 2 + nx * amt, cy = (sy + y) / 2 + ny * amt;
+      var o = { t: 0 };
+      gsap.to(o, {
+        t: 1, duration: MOVE, ease: EASE, overwrite: true,
+        onUpdate: function(){
+          var t = o.t, u = 1 - t;
+          gsap.set(root, { x: u * u * sx + 2 * u * t * cx + t * t * x,
+                           y: u * u * sy + 2 * u * t * cy + t * t * y });
+        },
+        onComplete: function(){
+          gsap.set(root, { x: x, y: y });
+          gsap.fromTo(root, { scale: 1.045 }, { scale: 1, duration: 0.5, ease: "back.out(2)", overwrite: "auto" });
+        }
+      });
+    }
+    /* the arrow turns smoothly toward each new target, shortest way round */
+    function spinArrow(to, from){
+      if (reduced || !hasGSAP || typeof from !== "number"){ arrowEl.style.rotate = to + "deg"; curRot = to; return; }
+      var target = from + (((to - from) % 360) + 540) % 360 - 180;
+      var o = { r: from };
+      gsap.to(o, { r: target, duration: MOVE, ease: EASE, overwrite: true,
+        onUpdate: function(){ arrowEl.style.rotate = o.r + "deg"; } });
+      curRot = target;
+    }
+    /* a faint idle float while it waits, so it feels alive rather than parked */
+    function startIdle(){
+      if (reduced || !hasGSAP || !floatEl || idleTween) return;
+      idleTween = gsap.to(floatEl, { y: IDLE, duration: 1.9, ease: "sine.inOut", yoyo: true, repeat: -1 });
+    }
+    function stopIdle(){
+      if (idleTween){ idleTween.kill(); idleTween = null; }
+      if (floatEl) floatEl.style.transform = "";
     }
     function measure(){
       var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -1572,8 +1615,9 @@ html.motion [data-reveal].in{opacity:1;transform:none}
       if (!r) return null;
       var side = pickSide(r, prefer);
       var a = anchorFor(r, side);
+      var rot = rotationFor(a, r);
       root.setAttribute("data-side", side);
-      arrowEl.style.rotate = rotationFor(a, r) + "deg";
+      arrowEl.style.rotate = rot + "deg";
       root.classList.add("is-live");
       snap(a.x, a.y);
       var box = measure();
@@ -1584,16 +1628,24 @@ html.motion [data-reveal].in{opacity:1;transform:none}
       else if (box.right > window.innerWidth - edge) dx = (window.innerWidth - edge) - box.right;
       if (box.top < minTop) dy = minTop - box.top;
       else if (box.bottom > window.innerHeight - edge) dy = (window.innerHeight - edge) - box.bottom;
-      return { x: a.x + dx, y: a.y + dy };
+      return { x: a.x + dx, y: a.y + dy, rot: rot };
     }
     function show(step, first){
       textEl.textContent = step.message || "";
       var p = placementFor(step);
       if (!p) return false;                 /* target absent — skip gracefully */
       currentStep = step;
-      if (first || !shown){ shown = true; slideTo(p.x, p.y, p.x, p.y + 12); }
-      else { slideTo(p.x, p.y, prev.x, prev.y); }
+      if (first || !shown){
+        shown = true;
+        curRot = p.rot;
+        snap(p.x, p.y + 14);                /* start a touch below, then rise into place */
+        travelTo(p.x, p.y, p.x, p.y + 14);
+      } else {
+        travelTo(p.x, p.y, prev.x, prev.y);
+        spinArrow(p.rot, curRot);           /* turn while travelling */
+      }
       prev.x = p.x; prev.y = p.y;
+      startIdle();
       requestAnimationFrame(function(){ root.classList.add("is-shown", "is-text"); });
       pulse();
       return true;
@@ -1602,7 +1654,8 @@ html.motion [data-reveal].in{opacity:1;transform:none}
       if (!alive || !currentStep) return;
       var p = placementFor(currentStep);
       if (!p) return;
-      slideTo(p.x, p.y, prev.x, prev.y);
+      travelTo(p.x, p.y, prev.x, prev.y);
+      spinArrow(p.rot, curRot);
       prev.x = p.x; prev.y = p.y;
     }
     on(window, "resize", debounce(reposition, 150));
@@ -1611,6 +1664,7 @@ html.motion [data-reveal].in{opacity:1;transform:none}
     function hideSkip(){ skipBtn.classList.remove("is-live"); }
 
     function fadeGuide(then){
+      stopIdle();
       root.classList.remove("is-text", "is-shown");
       if (reduced){ root.classList.remove("is-live"); if (then) then(); return; }
       later(function(){ root.classList.remove("is-live"); if (then) then(); }, FADE + 60);
@@ -1649,6 +1703,11 @@ html.motion [data-reveal].in{opacity:1;transform:none}
       alive = false;
       hideSkip();
       offAll();
+      stopIdle();
+      if (hasGSAP){
+        gsap.killTweensOf(root); gsap.killTweensOf(arrowEl);
+        if (floatEl) gsap.killTweensOf(floatEl);
+      }
       root.classList.remove("is-text", "is-shown");
       setTimeout(function(){ root.classList.remove("is-live"); }, FADE + 60);
     }
