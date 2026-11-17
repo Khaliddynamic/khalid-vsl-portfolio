@@ -1477,6 +1477,13 @@ var CONFIG = {
           frames[i].contentWindow.postMessage(JSON.stringify({ method:"addEventListener", value:"play" }), "*");
         }
       }
+      /* a 'ready' proves the player loaded. Some browsers block even
+         muted autoplay — fade the hero poster anyway, so the user sees
+         Vimeo's own play button instead of a still. */
+      setTimeout(function(){
+        var hs = document.getElementById("heroStage");
+        if (hs) hs.classList.add("is-playing");
+      }, 1600);
     }
     if (d && d.event === "play"){
       if (d.player_id === "heroVimeo"){
