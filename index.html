@@ -1,1471 +1,1611 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Independent video editor & motion designer based in Casablanca, working with brands and creators worldwide. Clean edits, thoughtful motion, visual storytelling." />
-<title>khalid.vsl — Independent Video Editor & Motion Designer</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Short-form video editing for doctors and clinics — Khalid</title>
+<meta name="description" content="I turn raw clips into Reels patients watch to the end: clean cuts, clear captions, sound and motion. Send your footage on WhatsApp — get back a ready-to-post edit.">
+<link rel="canonical" href="https://khalidvsl.netlify.app/">
+<meta name="theme-color" content="#0D0D0E">
+
+<!-- social preview — the portrait for now; a 1200x630 card can replace it later
+     (og:image and twitter:image below both point at the same file) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="khalid.vsl">
+<meta property="og:title" content="Short-form video editing for doctors and clinics — Khalid">
+<meta property="og:description" content="I turn raw clips into Reels patients watch to the end: clean cuts, clear captions, sound and motion.">
+<meta property="og:url" content="https://khalidvsl.netlify.app/">
+<meta property="og:image" content="https://khalidvsl.netlify.app/khalid-portrait.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Short-form video editing for doctors and clinics — Khalid">
+<meta name="twitter:description" content="I turn raw clips into Reels patients watch to the end: clean cuts, clear captions, sound and motion.">
+<meta name="twitter:image" content="https://khalidvsl.netlify.app/khalid-portrait.png">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23F27A35'/%3E%3Ctext x='32' y='44' font-family='Arial,sans-serif' font-size='34' font-weight='700' text-anchor='middle' fill='%2316100B'%3EK%3C/text%3E%3C/svg%3E">
+
 <script>
+/* class gates so CSS only hides things when JS is there to reveal them */
 document.documentElement.classList.add('js');
-/* Pick the colour scheme before first paint so there is no flash of the
-   wrong theme. Honours a saved choice, else falls back to the OS setting. */
+/* perf-lite: reduced motion, few cores, little RAM, or save-data →
+   static glows, no sweeps, no autoplay previews, simpler hero glass */
 (function(){
-  var t = null;
-  try { t = localStorage.getItem("khalid.theme"); } catch (e) {}
-  if (t !== "light" && t !== "dark") {
-    t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
-  }
-  document.documentElement.setAttribute("data-theme", t);
+  try{
+    var rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var nav = navigator;
+    var lowCpu = (nav.hardwareConcurrency || 8) <= 4;
+    var lowRam = (nav.deviceMemory || 8) <= 4;
+    var con = nav.connection || {};
+    var slow = con.saveData || /2g/.test(con.effectiveType || '');
+    if (rm || lowCpu || lowRam || slow) document.documentElement.classList.add('perf-lite');
+  }catch(e){}
 })();
 </script>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23171717'/%3E%3Cpath d='M13 10v12l9-6-9-6z' fill='%23F27A35'/%3E%3C/svg%3E" />
-<meta name="theme-color" content="#F6F3ED" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="preconnect" href="https://i.vimeocdn.com" />
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-<meta property="og:title" content="khalid.vsl — Video Editor & Motion Designer" />
-<meta property="og:description" content="Independent video editor & motion designer based in Casablanca, working with brands and creators worldwide. Clean edits, thoughtful motion, visual storytelling." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://khalidvsl.netlify.app/" />
-<meta property="og:image" content="https://khalidvsl.netlify.app/og-cover.png" />
-<meta property="og:image:alt" content="khalid.vsl — video editor & motion designer portfolio" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://khalidvsl.netlify.app/og-cover.png" />
+
+<!-- the player is the only third-party frame we ever load -->
+<link rel="preconnect" href="https://player.vimeo.com">
+<link rel="preconnect" href="https://i.vimeocdn.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap">
+
 <style>
 /* ============================================================
-   khalid.vsl — cinematic scroll portfolio
-   Paper #F6F3ED · Charcoal #171717 · Orange #F27A35 (sparing)
-   Instrument Sans (display + body) · Instrument Serif (accent)
-   ------------------------------------------------------------
-   Canonical design system. Lenis + GSAP ScrollTrigger drive the
-   scroll experience; everything degrades to a quiet static page
-   when motion is unavailable or reduced.
+   khalid.vsl — FLUTED GLASS
+   Dark base #0D0D0E · orange #F27A35 · amber · clinic teal #2BB5A8
+   One glass component: --rib-w / --rib-blur / tint variables.
+   The glass is the frame, never the picture.
    ============================================================ */
 
 :root{
-  --paper:#F6F3ED;
-  --ink:#171717;
-  --gray:#777773;
+  --bg:#0D0D0E;
+  --bg-2:#121214;
+  --ink:#F4F1EA;
+  --ink-2:rgba(244,241,234,.68);
+  --ink-3:rgba(244,241,234,.45);
   --orange:#F27A35;
-  --paper-2:#EFEAE0;                      /* matte / frame fill */
-  --r-media:10px;                         /* subtle rounding on video media */
-  --line:rgba(23,23,23,.14);
-  --line-soft:rgba(23,23,23,.07);
-  --line-paper:rgba(246,243,237,.22);     /* hairlines on charcoal */
-  --err:#D64F2E;
-  --ok:#5F7A4F;
+  --orange-press:#FF8A47;
+  --amber:#FFB25C;
+  --teal:#2BB5A8;
+  --on-accent:#1B100A;
 
-  /* translucent page surfaces — the frosted nav and the drawer veil */
-  --bg-a82:rgba(246,243,237,.82);
-  --bg-a50:rgba(246,243,237,.5);
+  /* ---- glass system (same values site-wide) ---- */
+  --rib-w:36px;                            /* rib period: 32–44 desktop */
+  --rib-blur:22px;                         /* background blur: 16–24 */
+  --glass-tint:rgba(255,255,255,.05);
+  --glass-dark:rgba(13,13,15,.34);         /* darker tint under text */
+  --frost-line:rgba(255,255,255,.16);      /* single 1px hairline, all around */
+  --radius:24px;                           /* panels: 20–28 */
 
-  /* The inverted band — contact, footer, skip link and the video player.
-     Always the deepest surface in the scheme, so it stays "inverted"
-     whether the page is paper or near-black. */
-  --band:#171717;
-  --band-fg:#F6F3ED;
-  --band-fg-62:rgba(246,243,237,.62);
-  --band-fg-45:rgba(246,243,237,.45);
-  --band-fg-35:rgba(246,243,237,.35);
-  --band-fg-10:rgba(246,243,237,.1);
-  --band-a85:rgba(23,23,23,.85);
-
-  /* media + frame fills */
-  --media-bg:#E8E4DB;                     /* matte behind video stills */
-  --inset-line:rgba(23,23,23,.04);        /* hairline inside the photo frame */
-
-  /* solid call-to-action button (contact form) */
-  --btn-bg:#F6F3ED;
-  --btn-fg:#171717;
-  --btn-bg-hover:#FFFFFF;
-
-  /* text drawn on the orange accent — always dark, for contrast */
-  --on-accent:#171717;
-
-  --font-sans:"Instrument Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
-  --font-serif:"Instrument Serif",Georgia,"Times New Roman",serif;
-
-  --fs-display:clamp(3.6rem,12.5vw,11rem);
-  --fs-hero:clamp(3.4rem,10.5vw,9.5rem);
-  --fs-h2:clamp(2.2rem,5vw,4.25rem);
-  --fs-h3:clamp(1.5rem,2.6vw,2.4rem);
-  --fs-body:1rem;
-  --fs-meta:.8125rem;
-
-  --gutter:clamp(1.25rem,4vw,3.5rem);
+  --line:rgba(244,241,234,.14);
+  --font:"Instrument Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
   --max:1320px;
-  --nav-h:72px;
-  --sec-y:clamp(5.5rem,13vh,10rem);
+  --gutter:clamp(1.25rem,4vw,3rem);
+  --sec-y:clamp(56px,8vw,96px);            /* section padding, max 96 */
+  --nav-h:64px;
   --ease:cubic-bezier(.22,1,.36,1);
 }
-
-/* ============ dark theme ============
-   Only colour tokens change here. Every rule below reads from these
-   variables, so the type scale, layout and motion are untouched.
-   <html data-theme="dark"> activates it — set before first paint by the
-   inline script in <head>, and flipped by the control in the nav. */
-[data-theme="dark"]{
-  --paper:#161514;                        /* page background */
-  --ink:#EDE9E1;                          /* primary text */
-  --gray:#8E8A81;                         /* muted text */
-  --paper-2:#1E1D1C;                      /* matte / frame fill */
-  --line:rgba(237,233,225,.14);
-  --line-soft:rgba(237,233,225,.07);
-
-  --bg-a82:rgba(22,21,20,.82);
-  --bg-a50:rgba(22,21,20,.5);
-
-  /* noticeably deeper than the page, so the band still reads as the
-     dramatic inverted panel it is in the light scheme */
-  --band:#060605;
-  --band-fg:#EDE9E1;
-  --band-fg-62:rgba(237,233,225,.62);
-  --band-fg-45:rgba(237,233,225,.45);
-  --band-fg-35:rgba(237,233,225,.35);
-  --band-fg-10:rgba(237,233,225,.1);
-  --band-a85:rgba(3,3,3,.85);
-  --line-paper:rgba(237,233,225,.22);
-
-  --media-bg:#1E1D1C;
-  --inset-line:rgba(0,0,0,.45);
-
-  --btn-bg:#EDE9E1;
-  --btn-fg:#161514;
-  --btn-bg-hover:#FFFFFF;
-
-  /* error/success copy sits on the dark band, so lighten it here */
-  --err:#FF9D82;
-  --ok:#B7CDA8;
+@media (max-width:640px){
+  :root{ --rib-w:24px; --rib-blur:16px; --radius:20px; }  /* 22–28 mobile */
 }
 
+/* ---------- base ---------- */
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth}
-@media(prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
-}
-/* Lenis pairing (documented). Lenis drives the scroll itself with instant
-   scrollTo per frame, so native smooth must stand down while it animates,
-   heights stay natural, and nested scroll areas behave. */
-html.lenis,html.lenis body{height:auto}
-.lenis.lenis-smooth{scroll-behavior:auto!important}
-.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
-.lenis.lenis-stopped{overflow:hidden}
-.lenis.lenis-smooth iframe{pointer-events:none}
-.lenis.lenis-smooth #playerDialog iframe{pointer-events:auto}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
-  margin:0;background:var(--paper);color:var(--ink);
-  font-family:var(--font-sans);font-size:var(--fs-body);line-height:1.6;
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--font);font-size:16px;line-height:1.6;
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overflow-x:hidden;
 }
-/* the colour scheme eases over instead of snapping; the global
-   reduced-motion rule above collapses this to an instant swap */
-body,.featured,.contact,.footer,.drawer__inner{
-  transition:background-color .35s var(--ease),color .35s var(--ease);
-}
-img,svg{display:block;max-width:100%}
-figure{margin:0}
-a{color:inherit;text-decoration:none}
+img,svg,video{display:block;max-width:100%}
+a{color:inherit}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
-h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.03em;line-height:1.05}
-p{margin:0}
-ul,ol{margin:0;padding:0;list-style:none}
+ul{margin:0;padding:0;list-style:none}
+h1,h2,h3,p{margin:0}
+.wrap{width:min(100% - (var(--gutter) * 2),var(--max));margin-inline:auto}
+:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
 ::selection{background:var(--orange);color:var(--on-accent)}
-:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-.contact :focus-visible{outline-color:var(--band-fg)}
-:focus:not(:focus-visible){outline:none}
-[hidden]{display:none!important}
-
-.wrap{max-width:var(--max);margin-inline:auto;padding-inline:var(--gutter)}
-section{scroll-margin-top:calc(var(--nav-h) + 8px)}
-
 .skip{
-  position:fixed;top:-100px;left:1rem;z-index:200;
-  background:var(--band);color:var(--band-fg);padding:.7rem 1.1rem;
-  font-size:.85rem;font-weight:500;transition:top .2s var(--ease);
+  position:fixed;top:-64px;left:16px;z-index:300;
+  background:var(--orange);color:var(--on-accent);
+  padding:.6rem 1rem;border-radius:10px;font-weight:600;text-decoration:none;
+  transition:top .2s var(--ease);
 }
-.skip:focus{top:1rem}
+.skip:focus{top:16px}
 
-/* section headings — one consistent editorial scale */
-.sec-head{margin-bottom:clamp(2.5rem,6vh,4.5rem)}
-.sec-head h2{font-size:var(--fs-h2);letter-spacing:-.04em;max-width:16ch}
-.sec-head .dot{color:var(--orange)}
-.sec-kicker{
-  display:block;margin-bottom:1rem;
-  font-size:var(--fs-meta);letter-spacing:.02em;color:var(--gray);
-}
-
-/* ============ navigation ============ */
-.nav{
-  position:fixed;inset:0 0 auto 0;z-index:100;
-  transition:background .3s var(--ease),box-shadow .3s var(--ease);
-}
-.nav.is-scrolled{
-  background:var(--bg-a82);
-  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
-  box-shadow:0 1px 0 var(--line);
-}
-.nav__inner{
-  display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
-  height:var(--nav-h);
-}
-.nav__brand{font-size:1.05rem;font-weight:600;letter-spacing:-.02em}
-.nav__links{display:flex;align-items:center;gap:1.75rem}
-.nav__links a{
-  position:relative;font-size:.9rem;font-weight:450;color:var(--gray);
-  transition:color .2s var(--ease);
-}
-.nav__links a::after{
-  content:"";position:absolute;left:0;right:100%;bottom:-.3rem;height:1px;
-  background:var(--ink);transition:right .3s var(--ease);
-}
-.nav__links a:hover,.nav__links a.is-active{color:var(--ink)}
-.nav__links a.is-active::after{right:0}
-.nav__action{
-  display:inline-flex;align-items:center;gap:.4rem;
-  font-size:.9rem;font-weight:500;
-  border-bottom:1px solid var(--line);padding-bottom:.15rem;
-  transition:border-color .2s var(--ease),color .2s var(--ease);
-}
-.nav__action:hover{border-color:var(--orange)}
-.nav__action svg{width:13px;height:13px;transition:transform .25s var(--ease)}
-.nav__action:hover svg{transform:translate(1px,-1px)}
-/* tool cluster — project link, theme switch, menu button */
-.nav__tools{display:flex;align-items:center;gap:.85rem}
-.nav__theme{
-  width:38px;height:38px;flex:none;border-radius:50%;
-  display:inline-flex;align-items:center;justify-content:center;
-  color:var(--ink);transition:background .2s var(--ease);
-}
-.nav__theme:hover{background:var(--line-soft)}
-.nav__theme-icon{width:18px;height:18px;display:block}
-.nav__theme-icon--moon{display:none}
-[data-theme="dark"] .nav__theme-icon--sun{display:none}
-[data-theme="dark"] .nav__theme-icon--moon{display:block}
-html:not(.js) .nav__theme{display:none}          /* needs JS to do anything */
-.nav__burger{display:none;width:44px;height:44px;margin-right:-10px;align-items:center;justify-content:center}
-.nav__burger svg{width:24px;height:24px}
-@media(max-width:768px){
-  .nav__links,.nav__action{display:none}
-  .nav__burger{display:flex}
-}
-
-/* drawer — plain list, no theatre */
-.drawer{
-  border:0;padding:0;background:transparent;
-  width:100%;max-width:none;height:100dvh;max-height:none;color:var(--ink);
-}
-.drawer::backdrop{background:var(--bg-a50);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
-.drawer__inner{
-  display:flex;flex-direction:column;min-height:100dvh;
-  background:var(--paper);padding:calc(var(--nav-h) + 2rem) var(--gutter) 2.5rem;
-}
-.drawer__inner a{
-  display:flex;align-items:baseline;justify-content:space-between;
-  padding:1.1rem 0;border-bottom:1px solid var(--line-soft);
-  font-size:1.7rem;font-weight:600;letter-spacing:-.03em;
-}
-.drawer__inner a small{font-size:.8125rem;font-weight:450;color:var(--gray)}
-.drawer__mail{font-size:1rem!important;font-weight:450!important;color:var(--gray)}
-
-/* ============ hero ============ */
-.hero{
+/* ---------- glass components ----------
+   .glass — SMOOTH frosted glass: one layer of backdrop blur + a dark
+   tint + a single 1px hairline. Use it for anything that carries text
+   or controls (header, chips, buttons, label strips, panels).
+   .flute — RIBBED glass, decoration only. No drawn lines anywhere:
+   the ribs exist because a) an SVG displacement filter refracts the
+   colour behind it into soft stepped vertical bands (real refraction;
+   browsers without SVG backdrop support simply lose that layer, never
+   the base look), and b) one smooth ≤6% shading wave gives each rib
+   its rounded-column read. */
+.glass{
   position:relative;
-  min-height:100svh;
-  display:flex;align-items:center;
-  padding-top:calc(var(--nav-h) + 2rem);
-  padding-bottom:clamp(3rem,8vh,6rem);
+  border-radius:var(--radius);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02)),
+    var(--glass-dark);
+  -webkit-backdrop-filter:blur(var(--rib-blur)) saturate(1.2);
+  backdrop-filter:blur(var(--rib-blur)) saturate(1.2);
+  box-shadow:
+    inset 0 0 0 1px var(--frost-line),          /* ONE clean hairline */
+    inset 0 0 28px rgba(255,255,255,.04),
+    0 18px 50px rgba(0,0,0,.42);
+  overflow:hidden;
+  isolation:isolate;
 }
-.hero__inner{width:100%}
-.hero__role{
-  font-family:var(--font-serif);font-style:italic;font-weight:400;
-  font-size:clamp(1.3rem,2.4vw,1.9rem);letter-spacing:-.01em;color:var(--gray);
-  margin-bottom:clamp(1rem,3vh,1.75rem);
+.glass > *{position:relative;z-index:1}
+/* text-bearing variant: darker tint for 4.5:1 contrast */
+.glass--tint{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015)),
+    rgba(11,11,13,.5);
+}
+/* ---- ribbed decoration: smooth shading wave only — no stops meet at
+   hard values, so no line is ever drawn. One period = --rib-w. ---- */
+.flute{position:relative}
+.flute::before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.055) 22%,
+    rgba(255,255,255,0) 50%,
+    rgba(0,0,0,.05) 78%,
+    rgba(255,255,255,0) 100%);
+  background-size:var(--rib-w) 100%;
+  background-repeat:repeat;
+}
+.flute::after{                                 /* film grain */
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:160px 160px;
+  opacity:.05;
+}
+.flute > *{position:relative;z-index:1}
+/* slow devices / reduced motion: keep frost, drop the wave */
+.perf-lite .flute::before{background:none}
+
+/* ---------- drifting colour glows ----------
+   Big, strong shapes so the glass has real colour to refract: 50–70%
+   opacity, blurred 40–60px, moved with transform only on 20–30s loops.
+   Static under perf-lite. */
+.glow{
+  position:absolute;border-radius:50%;
+  filter:blur(52px);pointer-events:none;will-change:transform;
+}
+.glow--orange{
+  width:46vmax;height:46vmax;top:-12vmax;left:-10vmax;
+  background:radial-gradient(circle,rgba(242,122,53,.62),transparent 64%);
+  animation:drift-a 26s ease-in-out infinite alternate;
+}
+.glow--amber{
+  width:36vmax;height:36vmax;top:26%;right:-14vmax;
+  background:radial-gradient(circle,rgba(255,178,92,.55),transparent 64%);
+  animation:drift-b 30s ease-in-out infinite alternate;
+}
+.glow--teal{
+  width:42vmax;height:42vmax;bottom:-16vmax;left:16%;
+  background:radial-gradient(circle,rgba(43,181,168,.55),transparent 64%);
+  animation:drift-c 24s ease-in-out infinite alternate;
+}
+@keyframes drift-a{to{transform:translate3d(9vw,7vh,0) scale(1.1)}}
+@keyframes drift-b{to{transform:translate3d(-8vw,-6vh,0) scale(1.06)}}
+@keyframes drift-c{to{transform:translate3d(6vw,-8vh,0) scale(1.12)}}
+.perf-lite .glow{animation:none}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.55rem;
+  min-height:52px;padding:0 1.5rem;border-radius:999px;
+  font-weight:600;font-size:.95rem;line-height:1;text-decoration:none;
+  transition:transform .25s var(--ease),background-color .2s var(--ease),box-shadow .25s var(--ease);
+}
+.btn svg{width:17px;height:17px;flex:none}
+.btn--solid{
+  background:var(--orange);color:var(--on-accent);
+  box-shadow:0 12px 32px rgba(242,122,53,.32);
+}
+.btn--solid:hover{background:var(--orange-press);transform:translateY(-1px)}
+.btn--solid:active{transform:translateY(0)}
+.btn--glass{
+  color:var(--ink);
+  box-shadow:inset 0 0 0 1px var(--frost-line),inset 0 0 20px rgba(255,255,255,.04),0 12px 30px rgba(0,0,0,.35);
+}
+.btn--glass:hover{transform:translateY(-1px);background:
+  linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03)),
+  rgba(20,20,24,.45)}
+
+/* ---------- floating header ---------- */
+.site-head{
+  position:fixed;top:12px;left:0;right:0;z-index:100;
+  display:flex;justify-content:center;
+  padding-inline:12px;pointer-events:none;
+}
+.site-head__bar{
+  pointer-events:auto;
+  display:flex;align-items:center;gap:1.4rem;
+  width:min(100%,var(--max));
+  height:var(--nav-h);
+  padding:0 .55rem 0 1.15rem;
+  border-radius:999px;
+  transition:background-color .3s var(--ease);
+}
+.site-head.is-scrolled .site-head__bar{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),
+    rgba(11,11,13,.6);
+}
+.site-head__brand{
+  font-weight:700;font-size:1.02rem;letter-spacing:-.02em;
+  text-decoration:none;white-space:nowrap;
+}
+.site-head__brand b{color:var(--orange)}
+.site-head__nav{display:flex;align-items:center;gap:1.3rem;margin-left:auto}
+.site-head__nav a{
+  font-size:.9rem;font-weight:500;color:var(--ink-2);
+  text-decoration:none;transition:color .2s var(--ease);
+}
+.site-head__nav a:hover{color:var(--ink)}
+.site-head__cta{
+  display:inline-flex;align-items:center;gap:.45rem;
+  min-height:44px;padding:0 1.1rem;border-radius:999px;
+  font-size:.88rem;font-weight:600;text-decoration:none;color:var(--ink);
+  box-shadow:inset 0 0 0 1px var(--frost-line),inset 0 0 16px rgba(255,255,255,.04);
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),rgba(16,16,20,.4);
+  transition:transform .25s var(--ease),background-color .2s var(--ease);
+}
+.site-head__cta:hover{transform:translateY(-1px)}
+.site-head__cta svg{width:16px;height:16px;color:#35C759}   /* WhatsApp green, icon only */
+@media (max-width:560px){
+  .site-head__bar{gap:.8rem;padding-left:.95rem}
+  .site-head__cta span{display:none}                        /* icon pill on small phones */
+  .site-head__cta{padding:0;width:44px;justify-content:center}
+}
+
+/* ---------- hero ----------
+   The glass wall is full-bleed and masked: strongest where the colour
+   is, fading softly into plain dark at the edges and bottom.
+   Layers, bottom → top:
+     hero__bg     plain dark + drifting colour glows + the blurred,
+                  enlarged copy of the hero video (the light source)
+     hero__flute  a static replica of that light run through an SVG
+                  displacement filter → real refraction: each rib shows
+                  a squeezed, shifted slice, so the colour breaks into
+                  soft stepped vertical bands. Static content = the
+                  filter is computed once, never per frame.
+     hero__veil   glass tint + one smooth ≤6% shading wave + grain,
+                  same mask — the "rib surface"
+     hero__scrim  darker tint region behind the headline for contrast
+*/
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden}
+.hero__bg{position:absolute;inset:0;overflow:hidden;background:
+  radial-gradient(120% 90% at 50% 0%,#16161a 0%,var(--bg) 58%)}
+.hero__flute,.hero__veil{position:absolute;inset:0;pointer-events:none}
+/* everything ribbed fades softly — no sharp ends anywhere */
+.hero__flute,.hero__veil{
+  -webkit-mask-image:radial-gradient(130% 105% at 50% 26%,#000 42%,rgba(0,0,0,.55) 64%,transparent 84%);
+  mask-image:radial-gradient(130% 105% at 50% 26%,#000 42%,rgba(0,0,0,.55) 64%,transparent 84%);
+}
+/* refraction: the static light copy, displaced into bands */
+.hero__flute{filter:url(#flute)}
+@media (max-width:640px){ .hero__flute{filter:url(#flute-m)} }
+.hero__flute .replica{
+  position:absolute;inset:-6%;
+  background:
+    radial-gradient(42% 44% at 18% 12%,rgba(242,122,53,.72),transparent 70%),
+    radial-gradient(34% 36% at 84% 34%,rgba(255,178,92,.6),transparent 70%),
+    radial-gradient(40% 42% at 46% 88%,rgba(43,181,168,.62),transparent 70%);
+}
+.hero__flute .replica img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:.34;
+  filter:blur(42px) saturate(1.35) brightness(.9);
+  transform:scale(1.6);
+}
+/* veil: glass tint + shading wave + grain (wave period = --rib-w) */
+.hero__veil{
+  background:
+    linear-gradient(90deg,
+      rgba(255,255,255,0) 0%,rgba(255,255,255,.055) 22%,rgba(255,255,255,0) 50%,
+      rgba(0,0,0,.05) 78%,rgba(255,255,255,0) 100%);
+  background-size:var(--rib-w) 100%;
+}
+.hero__veil::before{
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)),
+    rgba(13,13,15,.3);
+}
+.hero__veil::after{
+  content:"";position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:160px 160px;opacity:.05;
+}
+.hero__scrim{ /* darker tint region so text keeps 4.5:1 on the glass */
+  position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(58% 52% at 50% 52%,rgba(10,10,12,.48),rgba(10,10,12,.12) 62%,transparent 78%);
+}
+.perf-lite .hero__flute{display:none}          /* slow devices: plain frosted light */
+.perf-lite .hero__veil{background:none}        /* no wave — keep tint + scrim */
+.hero__inner{
+  position:relative;z-index:2;text-align:center;
+  padding-top:calc(var(--nav-h) + 3.5rem);padding-bottom:4.5rem;
+}
+@media (max-width:640px){
+  .hero{align-items:flex-start}                 /* headline hugs the top on phones */
+  .hero__inner{padding-top:calc(var(--nav-h) + 2.6rem);padding-bottom:2.75rem}
+}
+/* blurred, enlarged copy of the hero video — the light behind the glass */
+.hero__videoLight{position:absolute;inset:0;overflow:hidden}
+.hero__videoLight iframe{
+  position:absolute;left:-100%;top:-100%;width:300%;height:300%;
+  border:0;pointer-events:none;
+  filter:blur(58px) saturate(1.4) brightness(.92);
+  opacity:.55;
+}
+.perf-lite .hero__videoLight iframe{display:none}   /* static poster light instead */
+.hero__videoLight img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  filter:blur(52px) saturate(1.35) brightness(.85);
+  transform:scale(1.7);opacity:.5;
+}
+.hero__kicker{
+  font-size:.8rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);
 }
 .hero__title{
-  font-size:var(--fs-display);
-  font-weight:600;
-  letter-spacing:-.05em;
-  line-height:.9;
-  margin-left:-.02em;
+  margin-top:1rem;
+  font-size:clamp(1.62rem,1rem + 3.2vw,4.2rem);
+  font-weight:700;letter-spacing:-.035em;line-height:1.06;
+  text-wrap:balance;max-width:22ch;margin-inline:auto;
 }
-.hero__title .dot{color:var(--orange)}
-.hero__line{
-  margin-top:clamp(1.25rem,3vh,2rem);max-width:44ch;
-  color:var(--ink);font-size:clamp(1.05rem,1.5vw,1.35rem);line-height:1.5;letter-spacing:-.01em;
+.hero__sub{
+  margin:1.1rem auto 0;max-width:52ch;
+  font-size:clamp(.98rem,1rem + .2vw,1.16rem);line-height:1.55;
+  color:var(--ink-2);text-wrap:balance;
 }
-.hero__cta{
-  display:inline-flex;align-items:center;gap:.55rem;
-  margin-top:clamp(2.25rem,5vh,3.5rem);
-  font-size:.95rem;font-weight:500;
-  border-bottom:1px solid var(--ink);padding-bottom:.2rem;
-  transition:gap .25s var(--ease),border-color .2s var(--ease);
+.hero__cta{display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center;margin-top:1.9rem}
+.hero__alt{margin-top:1.15rem;font-size:.86rem;color:var(--ink-3)}
+.hero__alt a{color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+.hero__alt a:hover{color:var(--ink)}
+/* hero video slot — hidden until CONFIG.hero.vimeoId is set;
+   when on: two columns, sharp 9:16 frame right, glass wall behind */
+.hero__stage{display:none}
+.hero.has-video .hero__inner{
+  display:grid;grid-template-columns:1.05fr .72fr;align-items:center;
+  gap:clamp(2rem,5vw,4.5rem);text-align:left;width:min(100% - (var(--gutter) * 2),var(--max));
 }
-.hero__cta:hover{gap:.85rem;border-color:var(--orange)}
-.hero__cta svg{width:14px;height:14px}
-.hero__scroll{
-  position:absolute;left:var(--gutter);bottom:clamp(1.5rem,4vh,2.5rem);
-  font-size:var(--fs-meta);color:var(--gray);letter-spacing:.04em;
+.hero.has-video .hero__title{margin-inline:0}
+.hero.has-video .hero__cta{justify-content:flex-start}
+.hero.has-video .hero__stage{
+  display:block;position:relative;z-index:2;
+  width:min(100%,calc((100svh - var(--nav-h) - 5rem) * 9 / 16));
+  aspect-ratio:9/16;margin-left:auto;border-radius:var(--radius);
+  overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 0 0 1px var(--frost-line);
+  background:#000;
 }
-@media(max-width:768px){.hero__scroll{display:none}}
-
-/* ============ featured work — scroll-driven chapters ============ */
-.featured{position:relative;background:var(--paper)}
-.featured__stage{position:relative}
-.featured__view{position:relative}
-
-.featured__frame{
-  display:flex;flex-direction:column;justify-content:center;
-  min-height:100svh;padding-top:calc(var(--nav-h) + 1rem);padding-bottom:2.5rem;
+.hero__stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+/* never a black box: the poster sits over the iframe until playback
+   is confirmed, then fades */
+.hero__poster{
+  position:absolute;inset:0;z-index:2;width:100%;height:100%;
+  object-fit:cover;pointer-events:none;
+  transition:opacity .45s var(--ease);
 }
-.featured__head{
-  display:flex;align-items:baseline;justify-content:space-between;gap:1rem;
-  margin-bottom:clamp(1.5rem,4vh,3rem);
-}
-.featured__label{font-size:var(--fs-meta);color:var(--gray)}
-.featured__count{font-size:var(--fs-meta);color:var(--gray)}
-.featured__count b{color:var(--ink);font-weight:500}
-
-.slide{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:clamp(1.5rem,4vw,2.5rem);
-  align-items:center;
-  padding-bottom:clamp(3.5rem,9vh,6rem);
-}
-.slide:last-child{padding-bottom:0}
-.slide__text{max-width:32ch}
-.slide__kicker{font-size:var(--fs-meta);color:var(--gray)}
-.slide__title{
-  margin-top:.7rem;font-size:clamp(1.7rem,3.4vw,3rem);
-  letter-spacing:-.04em;line-height:1;
-}
-.slide__desc{margin-top:.9rem;color:var(--gray);font-size:1rem;line-height:1.6;max-width:34ch}
-.slide__cta{
-  display:inline-flex;align-items:center;gap:.5rem;
-  margin-top:1.5rem;font-size:.9rem;font-weight:500;
-  border-bottom:1px solid var(--line);padding-bottom:.18rem;
-  transition:gap .25s var(--ease),border-color .2s var(--ease);
-}
-.slide__cta:hover{gap:.8rem;border-color:var(--orange)}
-.slide__cta svg{width:13px;height:13px}
-
-.slide__media{display:flex;justify-content:flex-start}
-.slide__link{
-  position:relative;display:block;
-  height:clamp(300px,62vh,660px);aspect-ratio:9/16;max-width:100%;
-  overflow:hidden;background:var(--media-bg);
-  border-radius:var(--r-media);
-}
-.slide__link img{width:100%;height:100%;object-fit:cover}
-.slide__play{
-  position:absolute;right:.8rem;bottom:.8rem;
-  width:42px;height:42px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--paper);color:var(--ink);
-  opacity:0;transition:opacity .25s var(--ease);
-  pointer-events:none;
-}
-.slide__link:hover .slide__play,.slide__link:focus-visible .slide__play{opacity:1}
-.slide__play svg{width:16px;height:16px;margin-left:1px}
-
-/* chapter index — persistent, quiet */
-.feat-index{
-  display:flex;align-items:center;gap:.9rem;
-  margin-top:clamp(1rem,3vh,2rem);
-}
-.feat-index__num{
+.hero__stage.is-playing .hero__poster{opacity:0}
+.hero__sound{
+  position:absolute;right:10px;bottom:10px;z-index:3;
   display:inline-flex;align-items:center;gap:.4rem;
-  font-size:var(--fs-meta);color:var(--gray);
-  transition:color .3s var(--ease);
+  padding:.5rem .8rem;border-radius:999px;font-size:.78rem;font-weight:600;
+  background:rgba(11,11,13,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  box-shadow:inset 0 0 0 1px var(--frost-line);
 }
-.feat-index__num::before{
-  content:"";display:block;width:18px;height:1px;background:var(--line);
-  transition:width .35s var(--ease),background .3s var(--ease);
-}
-.feat-index__num.is-active{color:var(--ink)}
-.feat-index__num.is-active::before{width:34px;background:var(--orange)}
-
-@media(min-width:861px){
-  .slide{grid-template-columns:minmax(0,1fr) auto;gap:clamp(2rem,6vw,6rem);padding-bottom:0}
-  .slide__text{max-width:30ch}
-  .slide__media{justify-content:flex-end}
+@media (max-width:900px){
+  .hero.has-video .hero__inner{grid-template-columns:1fr;gap:1.6rem;text-align:center;padding-top:calc(var(--nav-h) + 2.2rem)}
+  .hero.has-video .hero__title,.hero.has-video .hero__cta{margin-inline:auto;justify-content:center}
+  .hero.has-video .hero__stage{width:min(88vw,calc(64svh * 9 / 16));margin-inline:auto}
 }
 
-/* pinned scrollytelling — only when motion is enabled on desktop */
-.motion-desktop .featured__stage{height:calc(100svh * 3)}
-.motion-desktop .featured__view{
-  position:sticky;top:0;height:100svh;overflow:hidden;
+/* ---------- work wall ---------- */
+.work{position:relative;padding:var(--sec-y) 0 var(--sec-y)}
+@media (max-width:767px){ .work{padding-bottom:calc(var(--sec-y) + 60px)} } /* clear the sticky bar */
+.work__bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.work__head{max-width:640px;margin-bottom:clamp(1.2rem,2.5vw,2rem)}
+.work__kicker{font-size:.8rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.work__title{
+  margin-top:.45rem;font-size:clamp(1.7rem,1.1rem + 2.2vw,2.9rem);
+  font-weight:700;letter-spacing:-.03em;line-height:1.08;text-wrap:balance;
 }
-.motion-desktop .featured__frame{min-height:0;height:100svh}
-.motion-desktop .featured__track{position:relative;flex:1;min-height:0}
-.motion-desktop .slide{
-  position:absolute;inset:0;
-  padding-bottom:0;margin:0;
-  opacity:0;transform:translateY(18px) scale(.985);
-  transition:opacity .6s var(--ease),transform .7s var(--ease);
-  pointer-events:none;
+.work__sub{margin-top:.5rem;color:var(--ink-2);font-size:.98rem}
+.chips{display:flex;flex-wrap:wrap;gap:.45rem;margin:1.1rem 0 1.2rem}
+.chip{
+  min-height:38px;padding:0 .85rem;border-radius:999px;
+  display:inline-flex;align-items:center;gap:.4rem;
+  font-size:.8rem;font-weight:600;color:var(--ink-2);
+  -webkit-backdrop-filter:blur(var(--rib-blur));backdrop-filter:blur(var(--rib-blur));
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)),
+    rgba(16,16,20,.42);
+  box-shadow:inset 0 0 0 1px var(--frost-line),inset 0 0 16px rgba(255,255,255,.03),0 8px 22px rgba(0,0,0,.3);
+  transition:color .2s var(--ease),background-color .2s var(--ease),transform .25s var(--ease);
 }
-.motion-desktop .slide.is-active{opacity:1;transform:none;pointer-events:auto}
-@media(prefers-reduced-motion:reduce){
-  .motion-desktop .featured__stage{height:auto}
-  .motion-desktop .featured__view{position:static;height:auto;overflow:visible}
-  .motion-desktop .slide{position:static;opacity:1;transform:none;pointer-events:auto;padding-bottom:clamp(3.5rem,9vh,6rem)}
+.chip span{position:relative}
+.chip:hover{color:var(--ink);transform:translateY(-1px)}
+.chip[aria-pressed="true"]{
+  color:#FFD9BF;
+  background:
+    linear-gradient(180deg,rgba(242,122,53,.22),rgba(242,122,53,.10)),
+    rgba(16,16,20,.5);
 }
+.chip .chip__n{font-size:.72rem;color:var(--ink-3);font-weight:600}
+.chip[aria-pressed="true"] .chip__n{color:rgba(255,217,191,.75)}
+.wall{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;
+  max-width:var(--max);margin-inline:auto;
+}
+@media (min-width:640px){ .wall{grid-template-columns:repeat(3,1fr);gap:14px} }
+@media (min-width:960px){ .wall{grid-template-columns:repeat(4,1fr)} }
+@media (min-width:1280px){ .wall{grid-template-columns:repeat(5,1fr)} }
 
-/* ============ gallery — the rest of the work ============ */
-.gallery-sec{padding-top:var(--sec-y)}
-.gallery{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  column-gap:clamp(1.25rem,3vw,2.5rem);
-  row-gap:clamp(2.5rem,6vh,4rem);
+/* card — the video area stays clear; only the label strip is glass */
+.card{width:100%;max-width:260px;margin-inline:auto}
+.card__btn{
+  display:block;width:100%;text-align:left;
+  border-radius:var(--radius);overflow:hidden;position:relative;
+  background:var(--bg-2);
+  box-shadow:0 14px 40px rgba(0,0,0,.4);
+  transition:transform .3s var(--ease),box-shadow .3s var(--ease);
 }
-
-/* stills — native aspect ratio, no card decoration */
-.still{display:block;position:relative;overflow:hidden;background:var(--media-bg);border-radius:var(--r-media)}
-.still img{width:100%;height:auto;display:block;transition:opacity .35s var(--ease),transform .6s var(--ease)}
-.still:hover img,.still:focus-visible img{opacity:.94;transform:scale(1.02)}
-.still__play{
-  position:absolute;right:.7rem;bottom:.7rem;
-  width:38px;height:38px;border-radius:50%;
+.card__btn:hover{transform:translateY(-3px);box-shadow:0 22px 55px rgba(0,0,0,.5)}
+.card__media{position:relative;aspect-ratio:9/16;overflow:hidden;display:block}
+/* posters are 100% clear at all times — no glass over thumbnails.
+   While loading, the poster simply fades in. */
+.card__poster{width:100%;height:100%;object-fit:cover;background:var(--bg-2)}
+.js .card__poster{opacity:0;transition:opacity .35s var(--ease)}
+.card.is-loaded .card__poster{opacity:1}
+.card__preview{position:absolute;inset:0;z-index:2}
+.card__preview video,.card__preview iframe{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0;
+}
+.card__play{
+  position:absolute;left:50%;top:50%;z-index:4;
+  width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  background:var(--paper);color:var(--ink);
-  opacity:0;transform:translateY(4px);
-  transition:opacity .25s var(--ease),transform .25s var(--ease);
-  pointer-events:none;
+  background:rgba(11,11,13,.5);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  box-shadow:inset 0 0 0 1px var(--frost-line),0 10px 26px rgba(0,0,0,.4);
+  transition:opacity .3s var(--ease),transform .3s var(--ease);
 }
-.still:hover .still__play,.still:focus-visible .still__play{opacity:1;transform:none}
-.still__play svg{width:15px;height:15px;margin-left:1px}
+.card__play svg{width:20px;height:20px;color:var(--ink);margin-left:2px}
+.card:hover .card__play{transform:scale(1.07)}
+.card.is-live .card__play{opacity:0;transform:scale(.8);pointer-events:none}
+/* label strip: smooth frosted glass — blur + dark tint, no ribs */
+.card__label{
+  position:absolute;left:8px;right:8px;bottom:8px;z-index:5;
+  border-radius:14px;padding:.55rem .7rem .6rem;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)),
+    rgba(10,10,12,.56);
+  -webkit-backdrop-filter:blur(var(--rib-blur));backdrop-filter:blur(var(--rib-blur));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),0 6px 18px rgba(0,0,0,.35);
+}
+.card__row{position:relative;display:flex;align-items:baseline;justify-content:space-between;gap:.5rem}
+.card__client{font-size:.85rem;font-weight:600;letter-spacing:-.01em;line-height:1.25}
+.card__dur{font-size:.72rem;color:var(--ink-3);font-variant-numeric:tabular-nums;flex:none}
+.card__tag{position:relative;display:block;margin-top:.05rem;font-size:.72rem;color:var(--ink-2);line-height:1.3}
+.card[hidden]{display:none}
 
-.mini{display:flex;flex-direction:column;min-width:0}
-.caption{display:flex;flex-direction:column;gap:.25rem;padding-top:.75rem}
-.caption__title{font-size:.95rem;font-weight:500;letter-spacing:-.015em;line-height:1.3}
-.caption__meta{font-size:var(--fs-meta);color:var(--gray);line-height:1.4}
-@media(max-width:640px){
-  .gallery{grid-template-columns:1fr;row-gap:2.5rem}
-}
+/* ============================================================
+   PHASE 2 — featured · services · process · about · contact
+   ============================================================ */
 
-/* ============ craft (services) ============ */
-.craft-sec{padding-top:var(--sec-y)}
-.craft{margin-top:clamp(1rem,3vh,2rem)}
-.craft__item{
-  display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 1.25rem;
-  align-items:start;
-  padding:clamp(1.5rem,4vh,2.4rem) 0;
-  border-top:1px solid var(--line-soft);
+/* ---------- shared section head ---------- */
+.sec-head{max-width:660px}
+.sec-kicker{font-size:.8rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.sec-title{
+  margin-top:.5rem;font-size:clamp(1.7rem,1.1rem + 2.2vw,2.9rem);
+  font-weight:700;letter-spacing:-.03em;line-height:1.08;text-wrap:balance;
 }
-.craft__item:last-child{border-bottom:1px solid var(--line-soft)}
-.craft__num{
-  font-size:var(--fs-meta);color:var(--gray);
-  padding-top:.45rem;transition:color .4s var(--ease);
-}
-.craft__body{display:grid;grid-template-columns:minmax(0,1fr);gap:.5rem;min-width:0}
-.craft__title{
-  font-size:clamp(1.4rem,2.6vw,2.1rem);letter-spacing:-.035em;line-height:1.05;
-  color:var(--gray);
-  transition:color .45s var(--ease);
-}
-.craft__text{color:var(--gray);font-size:1rem;line-height:1.6;max-width:46ch}
-.craft__item.is-active .craft__title{color:var(--ink)}
-.craft__item.is-active .craft__num{color:var(--orange)}
-@media(min-width:861px){
-  .craft__item{gap:0 2.5rem}
-  .craft__body{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:0 2.5rem;align-items:start}
-  .craft__text{padding-top:.5rem;max-width:48ch}
+.sec-sub{margin-top:.6rem;color:var(--ink-2);font-size:.98rem;text-wrap:balance}
+.blk{position:relative;padding:calc(var(--sec-y) * .82) 0}
+section[id]{scroll-margin-top:calc(var(--nav-h) + 18px)}
+.vh{ /* visually hidden (real heading for assistive tech) */
+  position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0;
 }
 
-/* ============ about ============ */
-.about{padding-top:var(--sec-y)}
-.about__grid{
-  display:grid;grid-template-columns:1fr;gap:clamp(2rem,5vh,3rem);
-  align-items:center;
+/* ---------- thin fluted divider band (ribbed decoration only) ---------- */
+.divider{
+  height:52px;max-width:var(--max);margin-inline:auto;pointer-events:none;
+  background:
+    linear-gradient(90deg,
+      rgba(255,255,255,0) 0%,rgba(255,255,255,.05) 22%,rgba(255,255,255,0) 50%,
+      rgba(0,0,0,.05) 78%,rgba(255,255,255,0) 100%),
+    linear-gradient(180deg,rgba(255,255,255,.028),rgba(255,255,255,.012));
+  background-size:var(--rib-w) 100%,100% 100%;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(255,255,255,.05);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent);
 }
-.about__photo{
-  position:relative;
-  width:min(100%,420px);
-  aspect-ratio:1/1;
-  padding:clamp(.7rem,2.4vw,1.35rem);
-  background:var(--paper-2);
-  border:1px solid var(--line);
-}
-.about__photo::after{
-  content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px var(--inset-line);pointer-events:none;
-}
-.about__photo img{
-  width:100%;height:100%;object-fit:cover;aspect-ratio:1/1;
-  /* The portrait is a cutout whose torso is guillotined by the source image's
-     bottom edge. Dissolve the lower half into the matte so the figure emerges
-     from the frame as intentional composition, with no hard crop line. */
-  -webkit-mask-image:linear-gradient(to bottom,#000 48%,rgba(0,0,0,0) 96%);
-  mask-image:linear-gradient(to bottom,#000 48%,rgba(0,0,0,0) 96%);
-  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
-  -webkit-mask-size:100% 100%;mask-size:100% 100%;
-}
-.about__copy{max-width:56ch}
-.about__title{font-size:var(--fs-h2);letter-spacing:-.04em;max-width:14ch;margin-bottom:clamp(1.25rem,3vh,2rem)}
-.about__title .dot{color:var(--orange)}
-.about__lede{
-  font-size:clamp(1.25rem,2vw,1.65rem);line-height:1.45;letter-spacing:-.015em;font-weight:450;
-}
-.about__lede em{font-family:var(--font-serif);font-style:italic;font-weight:400}
-.about__sub{margin-top:1.25rem;color:var(--gray);line-height:1.65;max-width:52ch}
-@media(min-width:861px){
-  .about__grid{grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:clamp(2.5rem,6vw,5rem)}
-  .about__photo{width:100%}
-}
+@media (max-width:640px){ .divider{height:36px} }
+.perf-lite .divider{background:
+  linear-gradient(180deg,rgba(255,255,255,.028),rgba(255,255,255,.012))}
 
-/* ============ contact ============ */
-.contact{
-  margin-top:var(--sec-y);
-  background:var(--band);color:var(--band-fg);
-  padding:clamp(4.5rem,10vh,8rem) 0 0;
+/* ---------- featured edit (GoBird) ---------- */
+.featured__grid{
+  display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);
+  gap:clamp(1.6rem,4vw,3.2rem);align-items:center;
 }
-.contact__title{font-size:var(--fs-h2);letter-spacing:-.04em;max-width:12ch}
-.contact__title .dot{color:var(--orange)}
-.contact__sub{margin-top:1.25rem;color:var(--band-fg-62);max-width:38ch}
-.form{margin-top:clamp(3rem,7vh,4.5rem);padding-bottom:clamp(4rem,8vh,6rem)}
-.form__row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-.field{margin-bottom:1.4rem}
-.field label{display:block;margin-bottom:.35rem;font-size:var(--fs-meta);color:var(--band-fg-62)}
-.field input,.field textarea{
-  width:100%;padding:.65rem 0;
-  background:transparent;border:0;border-bottom:1px solid var(--line-paper);
-  border-radius:0;color:var(--band-fg);font:inherit;font-size:.9375rem;
-  transition:border-color .2s var(--ease);
+.featured__stage{
+  position:relative;width:min(100%,378px);margin-inline:auto;
+  aspect-ratio:9/16;border-radius:var(--radius);overflow:hidden;background:#000;
+  box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 0 0 1px var(--frost-line);
 }
-.field textarea{min-height:96px;resize:vertical}
-.field input:focus,.field textarea:focus{outline:none;border-bottom-color:var(--orange)}
-.field ::placeholder{color:var(--band-fg-35)}
-.field--invalid input,.field--invalid textarea{border-bottom-color:var(--err)}
-.field--invalid label{color:var(--err)}
-.form__err{margin-top:.4rem;font-size:.75rem;color:#FF9D82}
-.form__actions{display:flex;flex-wrap:wrap;align-items:center;gap:1.25rem;margin-top:1.75rem}
-.btn-solid{
-  display:inline-flex;align-items:center;gap:.5rem;
-  background:var(--btn-bg);color:var(--btn-fg);
-  padding:.9rem 1.5rem;font-size:.9rem;font-weight:500;
-  transition:background .2s var(--ease),gap .25s var(--ease);
-}
-.btn-solid:hover{background:var(--btn-bg-hover);gap:.75rem}
-.btn-solid svg{width:13px;height:13px}
-.btn-solid:disabled{opacity:.6;cursor:default}
-.form__status{margin-top:1.25rem;font-size:.85rem;color:#B7CDA8}
-.form__fallback{margin-top:.9rem;font-size:.875rem;color:var(--band-fg-62)}
-.form__fallback a{color:var(--band-fg);text-decoration:underline;text-underline-offset:2px}
-.form__fallback a:hover{color:#FFFFFF}
-@media(max-width:640px){.form__row{grid-template-columns:1fr;gap:0}}
-
-/* ============ footer ============ */
-.footer{
-  background:var(--band);color:var(--band-fg);
-  border-top:1px solid var(--line-paper);
-  padding:1.75rem 0;
-}
-.footer__inner{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.75rem 2rem}
-.footer__brand{font-size:.95rem;font-weight:600;letter-spacing:-.02em}
-.footer__legal{font-size:var(--fs-meta);color:var(--band-fg-45)}
-.footer__links{display:flex;gap:1.5rem}
-.footer__links a{
-  font-size:var(--fs-meta);color:var(--band-fg-62);
+.featured__stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.featured__frame{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover}
+.featured__badge{
+  position:absolute;left:10px;top:10px;z-index:3;
   display:inline-flex;align-items:center;gap:.35rem;
-  transition:color .2s var(--ease);
+  padding:.38rem .65rem;border-radius:999px;font-size:.72rem;font-weight:600;color:var(--ink-2);
+  background:rgba(11,11,13,.55);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  box-shadow:inset 0 0 0 1px var(--frost-line);
 }
-.footer__links a:hover{color:var(--band-fg)}
-.footer__links svg{width:11px;height:11px}
+.featured__badge svg{width:12px;height:12px}
+.featured__panel{padding:clamp(1.6rem,3vw,2.6rem)}
+.featured__client{margin-top:.9rem;font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
+.featured__meta{margin-top:.3rem;font-size:.88rem;color:var(--ink-3)}
+.featured__cta{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.6rem}
+@media (max-width:900px){
+  .featured__grid{grid-template-columns:1fr}
+  .featured__stage{width:min(74vw,320px)}
+}
 
-/* ============ reveal (scroll entrance) ============ */
-html.motion [data-reveal]{
-  opacity:0;transform:translateY(22px);
-  transition:opacity .7s var(--ease),transform .7s var(--ease);
-}
-html.motion [data-reveal].in{opacity:1;transform:none}
-@media(prefers-reduced-motion:reduce){
-  html.motion [data-reveal]{opacity:1;transform:none;transition:none}
-}
+/* ---------- what you get (3 service cards) ---------- */
+.svcs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:clamp(1.4rem,3vw,2.2rem)}
+.svc{padding:1.5rem 1.4rem 1.6rem}
+.svc__n{font-size:.78rem;font-weight:600;letter-spacing:.12em;color:var(--orange)}
+.svc h3{margin-top:.9rem;font-size:1.12rem;font-weight:700;letter-spacing:-.015em;line-height:1.25}
+.svc p{margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--ink-2)}
+@media (max-width:900px){ .svcs{grid-template-columns:1fr} }
 
-/* ============ player dialog ============ */
+/* ---------- how it works (3 steps) ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(1.4rem,3vw,2.4rem);margin-top:clamp(1.6rem,3vw,2.4rem);list-style:none;padding:0;margin-bottom:0}
+.step{position:relative;padding-top:1.1rem;border-top:1px solid var(--line)}
+.step .step__n{font-size:2.6rem;font-weight:700;letter-spacing:-.04em;line-height:1;color:rgba(242,122,53,.9)}
+.step h3{margin-top:.7rem;font-size:1.06rem;font-weight:700;letter-spacing:-.01em}
+.step p{margin-top:.5rem;font-size:.92rem;line-height:1.55;color:var(--ink-2)}
+@media (max-width:900px){ .steps{grid-template-columns:1fr;gap:1.6rem} }
+
+/* ---------- about ---------- */
+.about__grid{
+  display:grid;grid-template-columns:minmax(240px,340px) 1fr;
+  gap:clamp(1.8rem,4vw,3.4rem);align-items:center;
+}
+.about__pic{
+  width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:var(--radius);
+  box-shadow:0 24px 60px rgba(0,0,0,.45),inset 0 0 0 1px var(--frost-line);
+}
+.about__quote{
+  font-size:clamp(1.15rem,1rem + .8vw,1.5rem);line-height:1.5;letter-spacing:-.01em;
+  font-weight:500;text-wrap:balance;
+}
+@media (max-width:760px){ .about__grid{grid-template-columns:1fr} .about__pic{max-width:300px} }
+
+/* ---------- contact ---------- */
+.contact__grid{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);
+  gap:clamp(1.8rem,4vw,3.2rem);align-items:start;
+}
+.contact__actions{display:flex;flex-direction:column;gap:.7rem;margin-top:1.6rem;max-width:420px}
+.contact__actions .btn{width:100%}
+.contact__ig{margin-top:1rem;font-size:.9rem;color:var(--ink-3)}
+.contact__ig a{color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+.contact__ig a:hover{color:var(--ink)}
+/* the enquiry card: smooth frost for the form, ribbed top band as decoration */
+.enq{padding:clamp(1.5rem,3vw,2.2rem)}
+.enq__flute{
+  height:54px;margin:calc(clamp(1.5rem,3vw,2.2rem) * -1) calc(clamp(1.5rem,3vw,2.2rem) * -1) 1.4rem;
+  background:linear-gradient(90deg,
+    rgba(255,255,255,0) 0%,rgba(255,255,255,.06) 22%,rgba(255,255,255,0) 50%,
+    rgba(0,0,0,.06) 78%,rgba(255,255,255,0) 100%);
+  background-size:var(--rib-w) 100%;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.perf-lite .enq__flute{background:none}
+.enq h3{font-size:1.2rem;font-weight:700;letter-spacing:-.015em}
+.enq__note{margin-top:.4rem;font-size:.9rem;line-height:1.5;color:var(--ink-2)}
+.field{display:grid;gap:.35rem;margin-top:.95rem}
+.field label{font-size:.8rem;font-weight:600;color:var(--ink-2);letter-spacing:.02em}
+.field label span{color:var(--ink-3);font-weight:500}
+.field input,.field textarea{
+  font:inherit;color:var(--ink);background:rgba(9,9,11,.5);
+  border:1px solid rgba(255,255,255,.14);border-radius:12px;
+  padding:.7rem .85rem;min-height:46px;width:100%;
+  transition:border-color .2s var(--ease),box-shadow .2s var(--ease);
+}
+.field textarea{min-height:110px;resize:vertical}
+.field input::placeholder,.field textarea::placeholder{color:var(--ink-3)}
+.field input:focus,.field textarea:focus{
+  outline:none;border-color:rgba(242,122,53,.65);box-shadow:0 0 0 3px rgba(242,122,53,.22);
+}
+.enq__hp{display:none}
+.enq__btn{width:100%;margin-top:1.2rem}
+.enq__btn[disabled]{opacity:.6;cursor:progress;transform:none}
+.form-status{margin-top:.9rem;font-size:.9rem;line-height:1.5;border-radius:12px;padding:.7rem .9rem}
+.form-status[hidden]{display:none}
+.form-status.is-busy{color:var(--ink-3)}
+.form-status.is-ok{
+  color:#BDEDE8;background:rgba(43,181,168,.12);
+  box-shadow:inset 0 0 0 1px rgba(43,181,168,.35);
+}
+.form-status.is-err{
+  color:#FFD9BF;background:rgba(242,122,53,.1);
+  box-shadow:inset 0 0 0 1px rgba(242,122,53,.4);
+}
+@media (max-width:960px){ .contact__grid{grid-template-columns:1fr} }
+
+/* ---------- proof strip (renders only when CONFIG.proof is set) ---------- */
+.proof{padding:0 0 calc(var(--sec-y) * .5)}
+.proof__row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.proof__cell{text-align:center;padding:1rem .8rem;border-radius:18px;box-shadow:inset 0 0 0 1px var(--line)}
+.proof__n{font-size:clamp(1.5rem,2.4vw,2.1rem);font-weight:700;letter-spacing:-.03em}
+.proof__l{margin-top:.2rem;font-size:.76rem;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase}
+@media (max-width:640px){ .proof__row{grid-template-columns:repeat(3,1fr);gap:8px} .proof__cell{padding:.8rem .4rem} }
+
+/* ---------- footer ---------- */
+.footer{border-top:1px solid var(--line);padding:1.8rem 0 calc(1.8rem + env(safe-area-inset-bottom))}
+.footer__row{display:flex;flex-wrap:wrap;align-items:center;gap:.9rem 1.6rem}
+.footer__brand{font-weight:700;letter-spacing:-.02em;text-decoration:none}
+.footer__brand b{color:var(--orange)}
+.footer__nav{display:flex;flex-wrap:wrap;gap:1.2rem;margin-left:auto}
+.footer__nav a,.footer a{color:var(--ink-2);text-decoration:none;font-size:.88rem}
+.footer__nav a:hover{color:var(--ink)}
+.footer__copy{margin-top:.9rem;font-size:.8rem;color:var(--ink-3)}
+
+/* ---------- sticky bar steps aside for the contact section ---------- */
+.stickybar.is-off{transform:translateY(calc(100% + 24px));pointer-events:none}
+.perf-lite .stickybar.is-off{transform:translateY(calc(100% + 24px))}
+
+/* ---------- player overlay ---------- */
 .player{
-  border:0;padding:0;background:transparent;
-  width:min(960px,calc(100vw - 2rem));color:var(--band-fg);
+  position:fixed;inset:12px;margin:auto;width:calc(100% - 24px);height:calc(100% - 24px);
+  max-width:none;border-radius:var(--radius);padding:0;border:0;
+  color:var(--ink);overflow:hidden;
 }
-.player::backdrop{background:var(--band-a85);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.player__head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1.1rem 1.25rem}
-.player__title{font-size:1.1rem;letter-spacing:-.02em}
-.player__meta{margin-top:.3rem;font-size:var(--fs-meta);color:var(--band-fg-62)}
+.player::backdrop{
+  background:rgba(5,5,6,.55);
+  -webkit-backdrop-filter:blur(var(--rib-blur));backdrop-filter:blur(var(--rib-blur));
+}
+@media (max-width:640px){ .player{inset:8px;width:calc(100% - 16px);height:calc(100% - 16px)} }
 .player__close{
-  width:40px;height:40px;border-radius:50%;flex:none;
+  position:absolute;top:12px;right:12px;z-index:20;
+  width:44px;height:44px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  border:1px solid var(--line-paper);color:var(--band-fg);
-  transition:background .2s var(--ease);
+  background:rgba(11,11,13,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  box-shadow:inset 0 0 0 1px var(--frost-line),0 8px 22px rgba(0,0,0,.4);
+  transition:background-color .2s var(--ease);
 }
-.player__close:hover{background:var(--band-fg-10)}
-.player__frame{position:relative;background:#0F0F0F;aspect-ratio:16/9;overflow:hidden;border-radius:var(--r-media)}
-.player__frame--tall{aspect-ratio:9/16;max-height:72vh;margin-inline:auto;max-width:calc(72vh * 9 / 16)}
-.player__frame iframe,.player__frame video{position:absolute;inset:0;width:100%;height:100%;border:0}
-.player__spin{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:var(--fs-meta);color:var(--band-fg-62);
-  opacity:0;transition:opacity .3s;pointer-events:none;
+.player__close:hover{background:rgba(30,30,36,.7)}
+.player__close svg{width:18px;height:18px}
+.player__grid{
+  position:absolute;inset:0;display:grid;
+  grid-template-columns:minmax(0,1fr) 330px;gap:0;align-items:center;
 }
-.player__spin.show{opacity:1}
-.player__note{padding:.9rem 1.25rem;font-size:.8rem;color:var(--band-fg-62)}
-.player__note a{color:var(--band-fg);text-decoration:underline;text-underline-offset:2px}
-.player__fallback{display:none}
-.player__fallback.show{display:block}
+.player__stage{
+  position:relative;height:100%;display:flex;align-items:center;justify-content:center;
+  touch-action:none;             /* vertical swipes navigate, don't scroll */
+  overscroll-behavior:contain;
+}
+.player__frame{
+  position:relative;height:min(100% - 88px,calc((100vw - 460px) * 16 / 9));
+  aspect-ratio:9/16;border-radius:18px;overflow:hidden;background:#000;
+  box-shadow:0 30px 90px rgba(0,0,0,.6);
+}
+.player__poster{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  filter:brightness(.72);
+  transition:opacity .35s var(--ease);
+}
+.player__iframe{
+  position:absolute;inset:0;width:100%;height:100%;border:0;opacity:0;
+  transition:opacity .35s var(--ease);
+}
+.player.is-playing .player__poster,
+.player.is-playing .player__spinner{opacity:0;pointer-events:none}
+.player.is-playing .player__iframe{opacity:1}
+.player__spinner{
+  position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;
+  border-radius:50%;border:3px solid rgba(255,255,255,.18);border-top-color:var(--orange);
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.player__nav{
+  position:absolute;top:50%;z-index:20;margin-top:-24px;
+  width:48px;height:48px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(11,11,13,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  box-shadow:inset 0 0 0 1px var(--frost-line),0 10px 26px rgba(0,0,0,.45);
+  transition:background-color .2s var(--ease),transform .2s var(--ease);
+}
+.player__nav:hover{background:rgba(30,30,36,.72);transform:scale(1.05)}
+.player__nav svg{width:19px;height:19px}
+.player__nav--prev{left:14px}
+.player__nav--next{right:calc(330px + 14px)}   /* clears the side panel on desktop */
+.player__side{
+  position:relative;height:100%;display:flex;flex-direction:column;justify-content:center;
+  padding:4.2rem 2rem 2rem;overflow:auto;
+  border-left:1px solid var(--line);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.008)),
+    rgba(10,10,12,.3);
+}
+.player__client{font-size:1.35rem;font-weight:700;letter-spacing:-.02em}
+.player__meta{margin-top:.25rem;font-size:.84rem;color:var(--ink-3)}
+.player__did{margin-top:1.4rem}
+.player__did h3{font-size:.78rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.player__bullets{margin-top:.7rem;display:grid;gap:.55rem}
+.player__bullets li{
+  position:relative;padding-left:1.15rem;font-size:.94rem;color:var(--ink-2);line-height:1.45;
+}
+.player__bullets li::before{
+  content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;border-radius:50%;
+  background:var(--orange);
+}
+.player__cta{margin-top:1.8rem}
+.player__cta .btn{width:100%}
+/* mobile: video on top, info under it */
+@media (max-width:900px){
+  .player__grid{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;overflow:auto}
+  .player__stage{height:100%;min-height:0}
+  .player__frame{height:min(100% - 24px,calc((100vw - 40px) * 16 / 9))}
+  .player__nav--next{right:14px}
+  .player__side{
+    border-left:0;border-top:1px solid var(--line);
+    padding:1.3rem 1.3rem calc(1.3rem + env(safe-area-inset-bottom));
+  }
+  .player__cta .btn{width:auto}
+}
+
+/* ---------- mobile sticky WhatsApp bar (appears after the hero) ---------- */
+.stickybar{
+  position:fixed;left:12px;right:12px;z-index:90;
+  bottom:calc(12px + env(safe-area-inset-bottom));
+  transform:translateY(calc(100% + 24px));
+  transition:transform .45s var(--ease);
+  border-radius:22px;padding:10px;
+  pointer-events:none;
+}
+.stickybar.is-on{transform:translateY(0);pointer-events:auto}
+.stickybar .btn{width:100%}
+@media (min-width:768px){ .stickybar{display:none} }
+.perf-lite .stickybar{transition:none}
+
+/* ---------- reveal (small fade-ins only) ---------- */
+.js .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.js .reveal.in{opacity:1;transform:none}
+.js .wall.reveal{transform:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .glow,.perf-lite .glow{animation:none}
+  .js .reveal{opacity:1;transform:none;transition:none}
+  .js .card__poster{transition:none}
+  .stickybar{transition:none}
+  .player__spinner{animation-duration:1.6s}
+}
 </style>
 </head>
 <body>
+<a class="skip" href="#work">Skip to the work</a>
 
-<a class="skip" href="#main">Skip to content</a>
+<!-- SVG refraction filters: a horizontal saw-tooth displacement map,
+     tiled at exactly --rib-w (36px desktop / 24px mobile). Each rib
+     samples a slightly squeezed, shifted slice of the light behind it —
+     real reeded-glass optics, no drawn lines. Browsers without SVG
+     filter support simply skip the layer (the frosted base remains). -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="flute" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feImage href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='rgb(0,0,0)'/%3E%3Cstop offset='1' stop-color='rgb(255,0,0)'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='36' height='36' fill='url(%23g)'/%3E%3C/svg%3E" x="0" y="0" width="36" height="36" preserveAspectRatio="none" result="map"/>
+      <feTile in="map" result="tiled"/>
+      <feDisplacementMap in="SourceGraphic" in2="tiled" scale="16" xChannelSelector="R" yChannelSelector="B"/>
+    </filter>
+    <filter id="flute-m" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feImage href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='rgb(0,0,0)'/%3E%3Cstop offset='1' stop-color='rgb(255,0,0)'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='24' height='24' fill='url(%23g)'/%3E%3C/svg%3E" x="0" y="0" width="24" height="24" preserveAspectRatio="none" result="map"/>
+      <feTile in="map" result="tiled"/>
+      <feDisplacementMap in="SourceGraphic" in2="tiled" scale="11" xChannelSelector="R" yChannelSelector="B"/>
+    </filter>
+  </defs>
+</svg>
 
-<!-- ================= NAV ================= -->
-<header class="nav" id="nav">
-  <div class="nav__inner wrap">
-    <a class="nav__brand" href="#top">khalid.vsl</a>
-    <nav class="nav__links" aria-label="Primary" id="navLinks">
+<!-- ================= HEADER ================= -->
+<header class="site-head" id="siteHead">
+  <div class="site-head__bar glass">
+    <a class="site-head__brand" href="#top">khalid<b>.vsl</b></a>
+    <nav class="site-head__nav" aria-label="Primary">
       <a href="#work">Work</a>
-      <a href="#about">About</a>
+      <a href="#process">Process</a>
       <a href="#contact">Contact</a>
-    </nav>
-    <div class="nav__tools">
-      <a class="nav__action" href="mailto:khalid1editor@gmail.com?subject=Project%20enquiry">Start a project
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      <a class="site-head__cta" href="https://wa.me/212646173884?text=Hi%20Khalid%2C%20I%20need%20Reels%20edited%20for%20my%20clinic." target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.4 15.2L2 22l4.9-1.6A9.9 9.9 0 1 0 12.04 2Zm0 18.1a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-2.9 1 1-2.9-.2-.3a8.2 8.2 0 1 1 6.6 3.6Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.7.9-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.6-1.3.1-.2 0-.3 0-.5l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s1 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
+        <span>WhatsApp</span>
       </a>
-      <button class="nav__theme" id="themeToggle" type="button" aria-label="Dark theme" aria-pressed="false">
-        <svg class="nav__theme-icon nav__theme-icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.6v2.2M12 19.2v2.2M4.5 4.5l1.6 1.6M17.9 17.9l1.6 1.6M2.6 12h2.2M19.2 12h2.2M4.5 19.5l1.6-1.6M17.9 6.1l1.6-1.6"/></svg>
-        <svg class="nav__theme-icon nav__theme-icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.4 14.6A8.6 8.6 0 0 1 9.4 3.6a8.6 8.6 0 1 0 11 11Z"/></svg>
-      </button>
-      <button class="nav__burger" id="navBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobilePanel">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3.5 8h17m-17 8h17"/></svg>
-      </button>
-    </div>
+    </nav>
   </div>
 </header>
 
-<!-- mobile drawer -->
-<dialog id="mobilePanel" class="drawer" aria-label="Menu">
-  <div class="drawer__inner">
-    <a href="#work">Work</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-    <a class="drawer__mail" data-chat="email" href="mailto:khalid1editor@gmail.com">khalid1editor@gmail.com</a>
-  </div>
-</dialog>
-
 <main id="main">
-
 <!-- ================= HERO ================= -->
 <section class="hero" id="top">
+  <div class="hero__bg" aria-hidden="true">
+    <div class="hero__videoLight" id="heroVideoLight" hidden></div>
+    <div class="glow glow--orange"></div>
+    <div class="glow glow--amber"></div>
+    <div class="glow glow--teal"></div>
+  </div>
+  <div class="hero__flute" id="heroFlute" aria-hidden="true">
+    <div class="replica" id="heroReplica"></div>
+  </div>
+  <div class="hero__veil" aria-hidden="true"></div>
+  <div class="hero__scrim" aria-hidden="true"></div>
+
   <div class="hero__inner wrap">
-    <p class="hero__role">Independent Video Editor &amp; Motion Designer</p>
-    <h1 class="hero__title">Khalid<span class="dot">.</span></h1>
-    <p class="hero__line">Clean edits, thoughtful motion, and visual storytelling for brands and creators.</p>
-    <a class="hero__cta" href="#work">Explore My Work
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
-    </a>
+    <div>
+      <p class="hero__kicker">Reels · TikTok · Shorts</p>
+      <h1 class="hero__title">Short-form video editing for doctors and clinics.</h1>
+      <p class="hero__sub">I turn raw clips into Reels patients watch to the end: clean cuts, clear captions, sound and motion.</p>
+      <div class="hero__cta">
+        <a class="btn btn--solid" href="https://wa.me/212646173884?text=Hi%20Khalid%2C%20I%20need%20Reels%20edited%20for%20my%20clinic." target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.4 15.2L2 22l4.9-1.6A9.9 9.9 0 1 0 12.04 2Zm0 18.1a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-2.9 1 1-2.9-.2-.3a8.2 8.2 0 1 1 6.6 3.6Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.7.9-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.6-1.3.1-.2 0-.3 0-.5l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s1 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
+          WhatsApp me
+        </a>
+        <a class="btn btn--glass" href="#work">See the work</a>
+      </div>
+      <p class="hero__alt">Prefer Instagram? DM <a href="https://instagram.com/khalid.vsl" target="_blank" rel="noopener">@khalid.vsl</a></p>
+    </div>
+    <!-- hero video slot — appears automatically when CONFIG.hero.vimeoId is set -->
+    <div class="hero__stage" id="heroStage" hidden></div>
   </div>
-  <span class="hero__scroll" aria-hidden="true">Scroll</span>
 </section>
 
-<!-- ================= FEATURED WORK (scroll-driven) ================= -->
-<section class="featured" id="work">
-  <div class="featured__stage" id="featStage">
-    <div class="featured__view">
-      <div class="featured__frame wrap">
-        <div class="featured__head">
-          <span class="featured__label">Selected work</span>
-          <span class="featured__count"><b id="featCurrent">01</b> / <span id="featTotal">03</span></span>
-        </div>
+<!-- ================= PROOF STRIP (renders only when CONFIG.proof has real numbers) ================= -->
+<section class="proof" id="proof" hidden aria-label="Track record">
+  <div class="wrap"><div class="proof__row" id="proofRow"></div></div>
+</section>
 
-        <div class="featured__track" id="featTrack">
+<!-- ================= WORK WALL ================= -->
+<section class="work" id="work">
+  <div class="work__bg" aria-hidden="true">
+    <div class="glow glow--teal" style="top:10%;left:-20vmax;bottom:auto"></div>
+    <div class="glow glow--orange" style="width:30vmax;height:30vmax;bottom:-8vmax;right:-14vmax;top:auto;left:auto"></div>
+  </div>
+  <div class="wrap">
+    <header class="work__head reveal">
+      <p class="work__kicker">The work</p>
+      <h2 class="work__title">Recent edits, straight off the timeline.</h2>
+      <p class="work__sub">Tap any card to watch it with sound.</p>
+    </header>
 
-          <article class="slide is-active" data-chapter="0">
-            <div class="slide__text">
-              <p class="slide__kicker">Motion Graphics · Video Editing</p>
-              <h3 class="slide__title">GoBird</h3>
-              <p class="slide__desc">Animated logo and branding sequence built in After Effects.</p>
-              <a class="slide__cta" href="https://vimeo.com/1231079235" data-project="gobird-motion">Watch the project
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
-              </a>
-            </div>
-            <figure class="slide__media">
-              <a class="slide__link" href="https://vimeo.com/1231079235" data-project="gobird-motion" aria-label="Play project: GoBird">
-                <img src="https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_1080x1920?region=us 1080w" sizes="(min-width:861px) 430px, 92vw" alt="" width="540" height="960" fetchpriority="high" decoding="async" onerror="this.closest('.slide__link').hidden=true">
-                <span class="slide__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-              </a>
-            </figure>
-          </article>
+    <div class="chips reveal" role="group" aria-label="Filter the work">
+      <button class="chip" type="button" data-filter="all" aria-pressed="true"><span>All</span> <span class="chip__n" data-count="all"></span></button>
+      <button class="chip" type="button" data-filter="talking" aria-pressed="false"><span>Talking head</span> <span class="chip__n" data-count="talking"></span></button>
+      <button class="chip" type="button" data-filter="motion" aria-pressed="false"><span>Motion graphics</span> <span class="chip__n" data-count="motion"></span></button>
+    </div>
 
-          <article class="slide" data-chapter="1">
-            <div class="slide__text">
-              <p class="slide__kicker">Healthcare Content · Video Editing</p>
-              <h3 class="slide__title">Dr Saheer</h3>
-              <p class="slide__desc">Short-form talking-head edit — clean cut, clean audio, purposeful captions.</p>
-              <a class="slide__cta" href="https://vimeo.com/1230048854" data-project="dr-saheer-ibd">Watch the project
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
-              </a>
-            </div>
-            <figure class="slide__media">
-              <a class="slide__link" href="https://vimeo.com/1230048854" data-project="dr-saheer-ibd" aria-label="Play project: Dr Saheer">
-                <img src="https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b-d_1080x1920?region=us 1080w" sizes="(min-width:861px) 430px, 92vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.slide__link').hidden=true">
-                <span class="slide__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-              </a>
-            </figure>
-          </article>
+    <ul class="wall reveal" id="wall"></ul>
+    <noscript><p style="color:var(--ink-2)">My videos live on Vimeo — enable JavaScript to browse them here, or watch at vimeo.com.</p></noscript>
+  </div>
+</section>
 
-          <article class="slide" data-chapter="2">
-            <div class="slide__text">
-              <p class="slide__kicker">Healthcare Content · Video Editing</p>
-              <h3 class="slide__title">Dr Salma</h3>
-              <p class="slide__desc">Social-first edit built to hold attention — pacing, sound and caption timing.</p>
-              <a class="slide__cta" href="https://vimeo.com/1230048855" data-project="dr-salma-vitamins">Watch the project
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
-              </a>
-            </div>
-            <figure class="slide__media">
-              <a class="slide__link" href="https://vimeo.com/1230048855" data-project="dr-salma-vitamins" aria-label="Play project: Dr Salma">
-                <img src="https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f-d_1080x1920?region=us 1080w" sizes="(min-width:861px) 430px, 92vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.slide__link').hidden=true">
-                <span class="slide__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-              </a>
-            </figure>
-          </article>
-
-        </div>
-
-        <div class="feat-index" id="featIndex" aria-label="Featured project chapters">
-          <button class="feat-index__num is-active" type="button" data-chapter="0" aria-label="GoBird">01</button>
-          <button class="feat-index__num" type="button" data-chapter="1" aria-label="Dr Saheer">02</button>
-          <button class="feat-index__num" type="button" data-chapter="2" aria-label="Dr Salma">03</button>
-        </div>
+<!-- ================= FEATURED EDIT ================= -->
+<section class="blk featured" id="featured">
+  <h2 class="vh">Featured edit — GoBird logo animation</h2>
+  <div class="wrap">
+    <div class="featured__grid">
+      <div class="featured__stage" id="featuredStage">
+        <img src="https://i.vimeocdn.com/video/2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90-d_1080x1920?region=us"
+             alt="GoBird — logo animation, first frame" width="1080" height="1920" loading="lazy" decoding="async">
+        <iframe class="featured__frame" id="featuredFrame" hidden title="GoBird preview" tabindex="-1" aria-hidden="true"
+                allow="autoplay; encrypted-media"></iframe>
+        <span class="featured__badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m23 9-6 6"/><path d="m17 9 6 6"/></svg>
+          Muted
+        </span>
       </div>
+      <aside class="featured__panel glass glass--tint">
+        <p class="sec-kicker">Featured edit</p>
+        <p class="featured__client">GoBird</p>
+        <p class="featured__meta">Logo animation · 0:31</p>
+        <div class="featured__cta">
+          <button class="btn btn--glass" id="featuredPlay" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
+            Watch with sound
+          </button>
+          <a class="btn btn--solid" href="https://wa.me/212646173884?text=Hi%20Khalid%2C%20I%20need%20Reels%20edited%20for%20my%20clinic." target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.4 15.2L2 22l4.9-1.6A9.9 9.9 0 1 0 12.04 2Zm0 18.1a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-2.9 1 1-2.9-.2-.3a8.2 8.2 0 1 1 6.6 3.6Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.7.9-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.6-1.3.1-.2 0-.3 0-.5l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s1 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
+            Want one like this?
+          </a>
+        </div>
+      </aside>
     </div>
   </div>
 </section>
 
-<!-- ================= GALLERY ================= -->
-<section class="gallery-sec" id="gallery">
+<div class="divider" aria-hidden="true"></div>
+
+<!-- ================= WHAT YOU GET ================= -->
+<section class="blk" id="services">
   <div class="wrap">
-    <header class="sec-head" data-reveal>
-      <span class="sec-kicker">The rest of the work</span>
-      <h2>More selected work<span class="dot">.</span></h2>
+    <header class="sec-head reveal">
+      <p class="sec-kicker">What you get</p>
+      <h2 class="sec-title">Three ways to work together.</h2>
+      <p class="sec-sub">All of them end the same way: vertical edits you can post straight away.</p>
     </header>
-
-    <div class="gallery" id="workGrid">
-
-      <div class="mini" data-reveal>
-        <a class="still work__card" href="https://vimeo.com/1230048945" data-project="dr-talaa-consultation" aria-label="Play project: Dr. Talaa">
-          <img src="https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, 46vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-          <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-        </a>
-        <div class="caption"><h3 class="caption__title">Dr. Talaa</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-      </div>
-
-      <div class="mini" data-reveal>
-        <a class="still work__card" href="https://vimeo.com/1230048853" data-project="dr-amr-teeth" aria-label="Play project: Dr Amr">
-          <img src="https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, 46vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-          <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-        </a>
-        <div class="caption"><h3 class="caption__title">Dr Amr</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-      </div>
-
-      <div class="mini" data-reveal>
-        <a class="still work__card" href="https://vimeo.com/1230048852" data-project="dr-haitham-implant" aria-label="Play project: Dr Haitham">
-          <img src="https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, 46vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-          <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-        </a>
-        <div class="caption"><h3 class="caption__title">Dr Haitham</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-      </div>
-
-      <div class="mini" data-reveal>
-        <a class="still work__card" href="https://vimeo.com/1230672379" data-project="dr-mohamad-ortho" aria-label="Play project: Dr Mohamad">
-          <img src="https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, 46vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-          <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-        </a>
-        <div class="caption"><h3 class="caption__title">Dr Mohamad</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-      </div>
-
-      <div class="mini" data-reveal>
-        <a class="still work__card" href="https://vimeo.com/1230676466" data-project="dr-fifi" aria-label="Play project: Dr Fifi">
-          <img src="https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, 46vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-          <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-        </a>
-        <div class="caption"><h3 class="caption__title">Dr Fifi</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-      </div>
-
-      <div class="mini" data-reveal>
-        <a class="still work__card" href="https://vimeo.com/1242514232" data-project="al-zeina-implants" aria-label="Play project: Implants — Al Zeina">
-          <img src="https://i.vimeocdn.com/video/2220785122-dd7bfb4deea0cd62e2c9b36933f654666aa6f41a0e39bc9968e9d901c8b32f65-d_720x1280?region=us" srcset="https://i.vimeocdn.com/video/2220785122-dd7bfb4deea0cd62e2c9b36933f654666aa6f41a0e39bc9968e9d901c8b32f65-d_540x960?region=us 540w, https://i.vimeocdn.com/video/2220785122-dd7bfb4deea0cd62e2c9b36933f654666aa6f41a0e39bc9968e9d901c8b32f65-d_720x1280?region=us 720w, https://i.vimeocdn.com/video/2220785122-dd7bfb4deea0cd62e2c9b36933f654666aa6f41a0e39bc9968e9d901c8b32f65-d_1080x1920?region=us 1080w" sizes="(max-width:640px) 92vw, 46vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-          <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-        </a>
-        <div class="caption"><h3 class="caption__title">Implants — Al Zeina</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-      </div>
-
-      <div class="mini" data-reveal>
-        <a class="still work__card" href="https://vimeo.com/1242514677" data-project="invisalign-copy-01" aria-label="Play project: Invisalign">
-          <img src="https://i.vimeocdn.com/video/2220785522-071b7c7d79c79cabab0cf765c088e6716255c8b89b791200f4f5a6127a289d3b-d_960x1706?region=us" srcset="https://i.vimeocdn.com/video/2220785522-071b7c7d79c79cabab0cf765c088e6716255c8b89b791200f4f5a6127a289d3b-d_640x1136?region=us 640w, https://i.vimeocdn.com/video/2220785522-071b7c7d79c79cabab0cf765c088e6716255c8b89b791200f4f5a6127a289d3b-d_960x1706?region=us 960w, https://i.vimeocdn.com/video/2220785522-071b7c7d79c79cabab0cf765c088e6716255c8b89b791200f4f5a6127a289d3b-d_1280x2276?region=us 1280w" sizes="(max-width:640px) 92vw, 46vw" alt="" width="540" height="960" loading="lazy" decoding="async" onerror="this.closest('.still').hidden=true">
-          <span class="still__play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13c0 .8.87 1.3 1.56.9l10.2-6.5a1.05 1.05 0 0 0 0-1.8L9.56 4.6A1.05 1.05 0 0 0 8 5.5Z"/></svg></span>
-        </a>
-        <div class="caption"><h3 class="caption__title">Invisalign</h3><p class="caption__meta">Healthcare Content · Video Editing</p></div>
-      </div>
-
+    <div class="svcs">
+      <article class="svc glass glass--tint reveal">
+        <p class="svc__n">01</p>
+        <h3>Talking-head Reels</h3>
+        <p>Your raw clips cut into vertical Reels: clean pacing, captions made for mobile, sound and motion that keep patients watching.</p>
+      </article>
+      <article class="svc glass glass--tint reveal">
+        <p class="svc__n">02</p>
+        <h3>Motion graphics &amp; logo animation</h3>
+        <p>Animated logos, titles and overlays that make clinic content look designed — not templated.</p>
+      </article>
+      <article class="svc glass glass--tint reveal">
+        <p class="svc__n">03</p>
+        <h3>Monthly content package</h3>
+        <p>A steady editing rhythm for your clinic: send footage during the week, get back ready-to-post Reels on a schedule you choose.</p>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- ================= CRAFT (services) ================= -->
-<section class="craft-sec" id="services">
-  <div class="wrap">
-    <header class="sec-head" data-reveal>
-      <span class="sec-kicker">What I do</span>
-      <h2>The craft behind the edit<span class="dot">.</span></h2>
-    </header>
+<div class="divider" aria-hidden="true"></div>
 
-    <ol class="craft" id="craft">
-      <li class="craft__item" data-reveal>
-        <span class="craft__num">01</span>
-        <div class="craft__body">
-          <h3 class="craft__title">Video Editing</h3>
-          <p class="craft__text">Storytelling, pacing, sound, and polished post-production.</p>
-        </div>
+<!-- ================= HOW IT WORKS ================= -->
+<section class="blk" id="process">
+  <div class="wrap">
+    <header class="sec-head reveal">
+      <p class="sec-kicker">How it works</p>
+      <h2 class="sec-title">From your camera roll to a posted Reel.</h2>
+    </header>
+    <ol class="steps">
+      <li class="step reveal">
+        <p class="step__n" aria-hidden="true">1</p>
+        <h3>Send your footage</h3>
+        <p>WhatsApp me the raw clips straight from your phone or camera — no file-transfer hoops, nothing to organise first.</p>
       </li>
-      <li class="craft__item" data-reveal>
-        <span class="craft__num">02</span>
-        <div class="craft__body">
-          <h3 class="craft__title">Motion Design</h3>
-          <p class="craft__text">Purposeful animation, kinetic typography, and visual communication.</p>
-        </div>
+      <li class="step reveal">
+        <p class="step__n" aria-hidden="true">2</p>
+        <h3>I edit</h3>
+        <p>Cuts, pacing, captions, sound and motion — built as a vertical edit that works on mute and with sound.</p>
       </li>
-      <li class="craft__item" data-reveal>
-        <span class="craft__num">03</span>
-        <div class="craft__body">
-          <h3 class="craft__title">Short-Form Content</h3>
-          <p class="craft__text">Social-first video editing for brands, creators, and businesses.</p>
-        </div>
+      <li class="step reveal">
+        <p class="step__n" aria-hidden="true">3</p>
+        <h3>You review and post</h3>
+        <p>You watch the draft and ask for changes if something's off. Once you approve, it's ready to post.</p>
       </li>
     </ol>
   </div>
 </section>
 
+<div class="divider" aria-hidden="true"></div>
+
 <!-- ================= ABOUT ================= -->
-<section class="about" id="about">
+<section class="blk" id="about">
   <div class="wrap about__grid">
-    <figure class="about__photo" data-reveal>
-      <img src="/khalid-portrait.png" alt="Portrait of Khalid" width="960" height="960" loading="lazy" decoding="async">
-    </figure>
-    <div class="about__copy" data-reveal>
-      <h2 class="about__title">The person behind the edit<span class="dot">.</span></h2>
-      <p class="about__lede">I'm Khalid, a video editor and motion designer based in <em>Casablanca</em>, working with brands and creators worldwide.</p>
-      <p class="about__sub">I focus on clear storytelling, precise pacing, and motion that adds meaning to every edit.</p>
+    <img class="about__pic" src="khalid-portrait.png" alt="Khalid — video editor"
+         width="960" height="960" loading="lazy" decoding="async">
+    <div>
+      <p class="sec-kicker">About</p>
+      <p class="about__quote reveal">I'm Khalid — a video editor working with doctors and clinics. You send the raw footage; I turn it into vertical Reels your patients actually watch.</p>
     </div>
   </div>
 </section>
 
+<div class="divider" aria-hidden="true"></div>
+
 <!-- ================= CONTACT ================= -->
-<section class="contact" id="contact">
-  <div class="wrap">
-    <h2 class="contact__title" data-reveal>Let's make something great<span class="dot">.</span></h2>
-    <p class="contact__sub" data-reveal>Have a project in mind? Tell me what you're looking to create.</p>
-
-    <form class="form" id="contactForm" method="post" action="#" novalidate data-reveal>
-      <div class="form__row">
-        <div class="field" id="field-name">
-          <label for="f-name">Name</label>
-          <input type="text" name="name" id="f-name" autocomplete="name" placeholder="Your name" required />
-          <p class="form__err" id="err-name" role="alert" hidden>Please enter your name.</p>
-        </div>
-        <div class="field" id="field-email">
-          <label for="f-email">Email</label>
-          <input type="email" name="email" id="f-email" autocomplete="email" placeholder="you@example.com" required />
-          <p class="form__err" id="err-email" role="alert" hidden>Please enter a valid email address.</p>
-        </div>
+<section class="blk" id="contact">
+  <div class="glow glow--orange" style="width:26vmax;height:26vmax;top:-10vmax;right:-10vmax" aria-hidden="true"></div>
+  <div class="glow glow--teal" style="width:34vmax;height:34vmax;top:auto;bottom:-14vmax;left:-12vmax" aria-hidden="true"></div>
+  <div class="wrap contact__grid">
+    <div>
+      <header class="sec-head">
+        <p class="sec-kicker">Contact</p>
+        <h2 class="sec-title">Want edits like these?</h2>
+        <p class="sec-sub">The fastest way to reach me is WhatsApp — send your footage, or just ask a question first.</p>
+      </header>
+      <div class="contact__actions">
+        <a class="btn btn--solid" href="https://wa.me/212646173884?text=Hi%20Khalid%2C%20I%20need%20Reels%20edited%20for%20my%20clinic." target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.4 15.2L2 22l4.9-1.6A9.9 9.9 0 1 0 12.04 2Zm0 18.1a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-2.9 1 1-2.9-.2-.3a8.2 8.2 0 1 1 6.6 3.6Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.7.9-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.6-1.3.1-.2 0-.3 0-.5l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s1 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
+          WhatsApp me
+        </a>
+        <a class="btn btn--glass" href="mailto:khalid1editor@gmail.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          khalid1editor@gmail.com
+        </a>
       </div>
+      <p class="contact__ig">Also on Instagram: <a href="https://instagram.com/khalid.vsl" target="_blank" rel="noopener">@khalid.vsl</a></p>
+    </div>
 
-      <div class="field" id="field-message">
-        <label for="f-message">Project description</label>
-        <textarea name="message" id="f-message" rows="4" placeholder="One or two lines about the footage and what you need." required></textarea>
-        <p class="form__err" id="err-message" role="alert" hidden>Please add a short message.</p>
+    <form class="enq glass glass--tint" id="enquiryForm" name="project-enquiry" method="POST"
+          data-netlify="true" netlify-honeypot="bot-field">
+      <div class="enq__flute" aria-hidden="true"></div>
+      <h3>Or send a short brief</h3>
+      <p class="enq__note">Tell me what you're posting and what you have — I'll reply with next steps.</p>
+      <input type="hidden" name="form-name" value="project-enquiry">
+      <p class="enq__hp" hidden aria-hidden="true">
+        <label>Don't fill this out if you're human: <input name="bot-field" tabindex="-1" autocomplete="off"></label>
+      </p>
+      <div class="field">
+        <label for="fName">Your name</label>
+        <input id="fName" name="name" type="text" required autocomplete="name" placeholder="Dr …">
       </div>
-
-      <div class="form__actions">
-        <button class="btn-solid" type="submit" id="formSubmitMail">
-          <span class="btn__label">Send Inquiry</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
-        </button>
+      <div class="field">
+        <label for="fClinic">Clinic <span>(optional)</span></label>
+        <input id="fClinic" name="clinic" type="text" autocomplete="organization">
       </div>
-
-      <p class="form__status" id="formStatus" role="status" hidden></p>
-      <p class="form__fallback">Prefer email? <a href="mailto:khalid1editor@gmail.com" id="mailtoFallback">khalid1editor@gmail.com</a></p>
+      <div class="field">
+        <label for="fReach">WhatsApp number or email</label>
+        <input id="fReach" name="contact" type="text" required placeholder="+212 …">
+      </div>
+      <div class="field">
+        <label for="fMsg">What do you need edited?</label>
+        <textarea id="fMsg" name="message" rows="4" placeholder="e.g. three talking-head clips for Instagram Reels"></textarea>
+      </div>
+      <button class="btn btn--solid enq__btn" type="submit">Send enquiry</button>
+      <p class="form-status" id="formStatus" role="status" aria-live="polite" hidden></p>
     </form>
   </div>
 </section>
-
 </main>
 
 <!-- ================= FOOTER ================= -->
 <footer class="footer">
-  <div class="wrap footer__inner">
-    <span class="footer__brand">khalid.vsl</span>
-    <span class="footer__legal">© <span id="footYear">2026</span> Khalid — Independent Video Editor &amp; Motion Designer</span>
-    <nav class="footer__links" aria-label="Footer">
-      <a data-chat="instagram" href="https://www.instagram.com/khalid.vsl/" target="_blank" rel="noreferrer">Instagram</a>
-      <a data-chat="whatsapp" href="https://wa.me/212646173884" target="_blank" rel="noreferrer">WhatsApp</a>
-      <a href="mailto:khalid1editor@gmail.com">Email</a>
-      <a href="#top">Back to top</a>
-    </nav>
+  <div class="wrap">
+    <div class="footer__row">
+      <a class="footer__brand" href="#top">khalid<b>.vsl</b></a>
+      <nav class="footer__nav" aria-label="Footer">
+        <a href="#work">Work</a>
+        <a href="#process">Process</a>
+        <a href="https://instagram.com/khalid.vsl" target="_blank" rel="noopener">Instagram</a>
+        <a href="mailto:khalid1editor@gmail.com">Email</a>
+      </nav>
+    </div>
+    <p class="footer__copy">© <span id="year">2026</span> khalid.vsl — short-form video editing for doctors and clinics.</p>
   </div>
 </footer>
 
-<!-- ================= PROJECT PLAYER (native dialog) ================= -->
-<dialog id="playerDialog" class="player" aria-labelledby="playerTitle">
-  <div class="player__head">
-    <div>
-      <h2 class="player__title" id="playerTitle" tabindex="-1">Project</h2>
-      <p class="player__meta" id="playerMeta">Talking Head</p>
+<!-- ================= PROJECT PLAYER ================= -->
+<dialog class="player glass flute" id="player" aria-label="Project video">
+  <button class="player__close" id="playerClose" type="button" aria-label="Close video">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+  </button>
+
+  <div class="player__grid">
+    <div class="player__stage" id="playerStage">
+      <div class="player__frame">
+        <img class="player__poster" id="playerPoster" alt="" width="1080" height="1920" decoding="async">
+        <div class="player__spinner" role="status" aria-label="Loading video"></div>
+        <iframe class="player__iframe" id="playerFrame" title="Vimeo video player" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <button class="player__nav player__nav--prev" id="playerPrev" type="button" aria-label="Previous video">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="player__nav player__nav--next" id="playerNext" type="button" aria-label="Next video">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
     </div>
-    <button class="player__close" type="button" id="playerClose" aria-label="Close video player">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
-    </button>
+
+    <aside class="player__side">
+      <p class="player__client" id="playerClient"></p>
+      <p class="player__meta" id="playerMeta"></p>
+      <div class="player__did">
+        <h3>What I did</h3>
+        <ul class="player__bullets" id="playerBullets"></ul>
+      </div>
+      <div class="player__cta">
+        <a class="btn btn--solid" id="playerWhatsApp" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.4 15.2L2 22l4.9-1.6A9.9 9.9 0 1 0 12.04 2Zm0 18.1a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-2.9 1 1-2.9-.2-.3a8.2 8.2 0 1 1 6.6 3.6Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.7.9-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.6-1.3.1-.2 0-.3 0-.5l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s1 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
+          Want edits like this? WhatsApp me
+        </a>
+      </div>
+    </aside>
   </div>
-  <div class="player__frame" id="playerFrame">
-    <span class="player__spin" id="playerSpin" aria-hidden="true">Loading</span>
-    <!-- iframe or <video> inserted here when a project opens -->
-  </div>
-  <p class="player__note" id="playerNote" hidden></p>
-  <p class="player__fallback player__note" id="playerFallback" hidden>
-    Having trouble playing embedded? <a id="playerOpen" href="#" target="_blank" rel="noopener">Open this video on Vimeo</a>.
-  </p>
 </dialog>
 
-<!-- motion stack (vendored locally — served from the same origin, no CDN dependency) -->
-<script src="/vendor/gsap.min.js"></script>
-<script src="/vendor/ScrollTrigger.min.js"></script>
-<script src="/vendor/lenis.min.js"></script>
+<!-- ================= MOBILE STICKY WHATSAPP BAR ================= -->
+<div class="stickybar glass glass--tint" id="stickyBar" role="complementary" aria-label="Contact">
+  <a class="btn btn--solid" href="https://wa.me/212646173884?text=Hi%20Khalid%2C%20I%20need%20Reels%20edited%20for%20my%20clinic." target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.4 15.2L2 22l4.9-1.6A9.9 9.9 0 1 0 12.04 2Zm0 18.1a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-2.9 1 1-2.9-.2-.3a8.2 8.2 0 1 1 6.6 3.6Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.7.9-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.6-1.3.1-.2 0-.3 0-.5l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s1 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
+    WhatsApp me
+  </a>
+</div>
+
 <script>
+/* ============================================================
+   DATA — one entry per video. To add a video, add one object:
+   client, vimeo (ID), cat ("talking"|"motion"), tag, dur (mm:ss),
+   hash (Vimeo still id), bullets (2 short lines, EDIT ME).
+   Poster URL = i.vimeocdn.com/video/{hash}-d_540x960?region=us
+   ============================================================ */
+var CONFIG = {
+  whatsapp: "https://wa.me/212646173884",
+  whatsappMsg: "?text=Hi%20Khalid%2C%20I%20need%20Reels%20edited%20for%20my%20clinic.",
+  previewsDir: "/previews/",          /* 480x854 muted MP4 loops, <1MB — drop files here named {id}.mp4 */
+  posterSize: "540x960",
+  playerPosterSize: "1080x1920",
+  hero: { vimeoId: "1230048855" },    /* Dr Salma — the brief's default. Set to null for no video. */
+  /* proof strip under the hero — ONLY with real numbers, never invented.
+     e.g. proof: [{ n: "40+", label: "Reels delivered" }] — null keeps it hidden. */
+  proof: null,
+  videos: [
+    { id:"gobird",      client:"GoBird",    vimeo:"1231079235", cat:"motion",  tag:"Logo animation",   dur:"0:31",
+      hash:"2206153944-72c4f9545b9ce5a060c734aba0df20f9091b67cfc8e5d4a5563756a293601d90",
+      /* EDIT ME — generic service bullets, replace per video anytime */
+      bullets:["Logo animation and motion design","Brand look carried through the edit"] },
+    { id:"dr-saheer",   client:"Dr Saheer", vimeo:"1230048854", cat:"talking", tag:"Talking-head edit", dur:"0:55",
+      hash:"2204862025-3dcd4b6d0ed5a6820bb183e87883291a5efa30c4561c6224d3e8f6ec4bcbc41b",
+      bullets:["Clean cuts and tight pacing","Captions designed for mobile"] },
+    { id:"dr-salma",    client:"Dr Salma",  vimeo:"1230048855", cat:"talking", tag:"Talking-head edit", dur:"0:37",
+      hash:"2204861990-92906d1309e2ff8986d45d53344fea7b2735f884af66e87a1586ab897af53b3f",
+      bullets:["Clean cuts and tight pacing","Captions designed for mobile"] },
+    { id:"dr-talaa",    client:"Dr Talaa",  vimeo:"1230048945", cat:"talking", tag:"Talking-head edit", dur:"0:32",
+      hash:"2204862017-fb6e5e32d783b44e2cfea034074c0d49412238a0466ccc890a8c01dfe480d238",
+      bullets:["Clean cuts and tight pacing","Captions designed for mobile"] },
+    { id:"dr-amr",      client:"Dr Amr",    vimeo:"1230048853", cat:"talking", tag:"Talking-head edit", dur:"0:50",
+      hash:"2204862018-4c25b6dd6268a48cdbc97cc6239412da30d0cd7a89e5e63ff3f8387ed9759dbe",
+      bullets:["Clean cuts and tight pacing","Captions designed for mobile"] },
+    { id:"dr-haitham",  client:"Dr Haitham",vimeo:"1230048852", cat:"talking", tag:"Talking-head edit", dur:"0:17",
+      hash:"2204861611-daca752eac7d8ffa92b4f7d73a554403d5b344f769ca0a0f8fb66ec15a49176a",
+      bullets:["Clean cuts and tight pacing","Captions designed for mobile"] },
+    { id:"dr-mohamad",  client:"Dr Mohamad",vimeo:"1230672379", cat:"talking", tag:"Talking-head edit", dur:"0:30",
+      hash:"2205624862-2a54f22ace3ca6d5c10144a1bd241f98bf9d441fa630eb08521ef5997b8df9c7",
+      bullets:["Clean cuts and tight pacing","Captions designed for mobile"] },
+    { id:"dr-fifi",     client:"Dr Fifi",   vimeo:"1230676466", cat:"talking", tag:"Talking-head edit", dur:"0:43",
+      hash:"2205629864-f2522de49f422036ec84b2a051ab300239804ba3fddf502871e118deefefa3af",
+      bullets:["Clean cuts and tight pacing","Captions designed for mobile"] },
+    { id:"al-zeina",    client:"Al Zeina",  vimeo:"1242514232", cat:"talking", tag:"Talking-head edit", dur:"1:03",
+      hash:"2220785122-dd7bfb4deea0cd62e2c9b36933f654666aa6f41a0e39bc9968e9d901c8b32f65",
+      bullets:["Clean cuts and tight pacing","Captions designed for mobile"] },
+    { id:"invisalign",  client:"Invisalign",vimeo:"1242514677", cat:"talking", tag:"Talking-head edit", dur:"0:28",
+      hash:"2220785522-071b7c7d79c79cabab0cf765c088e6716255c8b89b791200f4f5a6127a289d3b",
+      bullets:["Clean cuts and tight pacing","Captions designed for mobile"] }
+  ]
+};
+
 (function(){
   "use strict";
+  var $  = function(s,c){ return (c||document).querySelector(s); };
+  var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
+  var lite  = document.documentElement.classList.contains("perf-lite");
+  var reduce = false;
+  try { reduce = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch(e){}
+  var noAutoplay = lite || reduce;
+  var canHover  = false;
+  try { canHover = matchMedia("(hover: hover) and (pointer: fine)").matches; } catch(e){}
 
-  /* ============================================================
-     CONFIG — single source of truth. Edit everything here.
-     ============================================================ */
-  var CONFIG = {
-    brand: "khalid.vsl",
-    email: "khalid1editor@gmail.com",
-    whatsapp: "https://wa.me/212646173884",
-    instagram: "https://www.instagram.com/khalid.vsl/",
-    form: {
-      emailBackend: "https://formsubmit.co/ajax/khalid1editor@gmail.com"
-    },
-    projects: [
-      { id: "gobird-motion",        title: "GoBird",     clientLabel: "Motion Graphics",     vimeoId: "1231079235", aspectRatio: 9/16 },
-      { id: "dr-saheer-ibd",        title: "Dr Saheer",  clientLabel: "Healthcare Content",  vimeoId: "1230048854", aspectRatio: 9/16 },
-      { id: "dr-salma-vitamins",    title: "Dr Salma",   clientLabel: "Healthcare Content",  vimeoId: "1230048855", aspectRatio: 9/16 },
-      { id: "dr-talaa-consultation",title: "Dr. Talaa",  clientLabel: "Healthcare Content",  vimeoId: "1230048945", aspectRatio: 9/16 },
-      { id: "dr-amr-teeth",         title: "Dr Amr",     clientLabel: "Healthcare Content",  vimeoId: "1230048853", aspectRatio: 9/16 },
-      { id: "dr-haitham-implant",   title: "Dr Haitham", clientLabel: "Healthcare Content",  vimeoId: "1230048852", aspectRatio: 9/16 },
-      { id: "dr-mohamad-ortho",     title: "Dr Mohamad", clientLabel: "Healthcare Content",  vimeoId: "1230672379", aspectRatio: 9/16 },
-      { id: "dr-fifi",              title: "Dr Fifi",    clientLabel: "Healthcare Content",  vimeoId: "1230676466", aspectRatio: 9/16 },
-      { id: "al-zeina-implants",    title: "Implants — Al Zeina", clientLabel: "Healthcare Content", vimeoId: "1242514232", aspectRatio: 9/16 },
-      { id: "invisalign-copy-01",   title: "Invisalign", clientLabel: "Healthcare Content",  vimeoId: "1242514677", aspectRatio: 9/16 }
-    ]
+  var posterURL = function(hash,size){
+    return "https://i.vimeocdn.com/video/" + hash + "-d_" + size + "?region=us";
+  };
+  var waLink = function(text){
+    return CONFIG.whatsapp + (text ? "?text=" + encodeURIComponent(text) : CONFIG.whatsappMsg);
   };
 
-  /* helpers */
-  function $(s, c){ return (c || document).querySelector(s); }
-  function $$(s, c){ return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
-
-  var html = document.documentElement;
-  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var hasGSAP = typeof window.gsap !== "undefined" && typeof window.ScrollTrigger !== "undefined";
-  var hasLenis = typeof window.Lenis !== "undefined";
-  var desktopMQ = window.matchMedia("(min-width: 861px)");
-  var navH = 72;
-
-  /* ---------- year ---------- */
-  var yearEl = document.getElementById("footYear");
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-  /* ---------- chat links follow CONFIG ---------- */
-  var chatLinks = { whatsapp: CONFIG.whatsapp, instagram: CONFIG.instagram, email: "mailto:" + CONFIG.email };
-  Object.keys(chatLinks).forEach(function(k){
-    var a = $('[data-chat="' + k + '"]');
-    if (a && chatLinks[k]) a.setAttribute("href", chatLinks[k]);
-  });
-
-  /* ---------- body scroll lock (shared, conflict-free) ---------- */
-  var locks = 0;
-  var lenis = null;
-  function lockScroll(on){
-    if (on){
-      locks++;
-      document.body.style.overflow = "hidden";
-      if (lenis) lenis.stop();
-      html.classList.add("is-locked");
-    } else {
-      locks = Math.max(0, locks - 1);
-      if (!locks){
-        document.body.style.overflow = "";
-        if (lenis) lenis.start();
-        html.classList.remove("is-locked");
-      }
-    }
-  }
-
-  /* ---------- mobile drawer (native dialog) ---------- */
-  var burger = document.getElementById("navBurger");
-  var panel = document.getElementById("mobilePanel");
-  function openDrawer(){
-    if (typeof panel.showModal === "function") panel.showModal();
-    else panel.setAttribute("open", "");
-    burger.setAttribute("aria-expanded", "true");
-    burger.setAttribute("aria-label", "Close menu");
-    lockScroll(true);
-    var first = $("a", panel); if (first) first.focus();
-  }
-  function closeDrawer(){
-    if (panel.open) panel.close();
-    else panel.removeAttribute("open");
-    burger.setAttribute("aria-expanded", "false");
-    burger.setAttribute("aria-label", "Open menu");
-    lockScroll(false);
-  }
-  if (typeof panel.showModal === "function"){
-    panel.addEventListener("close", function(){
-      burger.setAttribute("aria-expanded", "false");
-      burger.setAttribute("aria-label", "Open menu");
-      lockScroll(false);
-    });
-  }
-  burger.addEventListener("click", function(){ if (panel.open) closeDrawer(); else openDrawer(); });
-  panel.addEventListener("click", function(e){ if (e.target.closest("a")) closeDrawer(); });
-
-  /* ---------- project player (native dialog) ---------- */
-  var pDialog = document.getElementById("playerDialog");
-  var pTitle = document.getElementById("playerTitle");
-  var pMeta = document.getElementById("playerMeta");
-  var pFrame = document.getElementById("playerFrame");
-  var pSpin = document.getElementById("playerSpin");
-  var pNote = document.getElementById("playerNote");
-  var pFallback = document.getElementById("playerFallback");
-  var pOpen = document.getElementById("playerOpen");
-  var pClose = document.getElementById("playerClose");
-  var lastFocus = null;
-  var spinTimer = null;
-
-  function showSpin(){ pSpin.classList.add("show"); }
-  function hideSpin(){ pSpin.classList.remove("show"); if (spinTimer){ clearTimeout(spinTimer); spinTimer = null; } }
-
-  function clearPlayer(){
-    if (spinTimer){ clearTimeout(spinTimer); spinTimer = null; }
-    hideSpin();
-    pNote.hidden = true;
-    pFallback.classList.remove("show");
-    Array.prototype.slice.call(pFrame.children).forEach(function(ch){ if (ch !== pSpin) pFrame.removeChild(ch); });
-  }
-
-  function openProject(id, trigger){
-    var p = null;
-    CONFIG.projects.forEach(function(x){ if (x.id === id) p = x; });
-    if (!p) return;
-    if (panel.open) closeDrawer();
-    lastFocus = trigger || document.activeElement;
-
-    clearPlayer();
-    pTitle.textContent = p.title;
-    pMeta.textContent = (p.clientLabel || "Talking Head") + " · " +
-      (p.aspectRatio && p.aspectRatio < 1 ? "9:16" : "16:9");
-    pOpen.href = p.vimeoId ? ("https://vimeo.com/" + p.vimeoId) : "#";
-    pFrame.classList.toggle("player__frame--tall", !!p.aspectRatio && p.aspectRatio < 1);
-
-    showSpin();
-    if (p.vimeoId){
-      var iframe = document.createElement("iframe");
-      iframe.setAttribute("src", "https://player.vimeo.com/video/" + p.vimeoId +
-        "?autoplay=1&playsinline=1&title=0&byline=0&portrait=0&color=F27A35&dnt=1");
-      iframe.setAttribute("allow", "autoplay; fullscreen; picture-in-picture");
-      iframe.setAttribute("allowfullscreen", "");
-      iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
-      iframe.title = "Video player — " + p.title;
-      iframe.addEventListener("load", hideSpin);
-      spinTimer = setTimeout(function(){
-        hideSpin();
-        pNote.hidden = false;
-        pNote.textContent = "Still loading? ";
-        var lnk = document.createElement("a");
-        lnk.href = "https://vimeo.com/" + p.vimeoId;
-        lnk.target = "_blank"; lnk.rel = "noopener";
-        lnk.textContent = "Open this video on Vimeo";
-        pNote.appendChild(lnk);
-        pNote.appendChild(document.createTextNode("."));
-      }, 7000);
-      pFrame.appendChild(iframe);
-    } else {
-      hideSpin();
-      pNote.hidden = false;
-      pNote.textContent = "No playable file is configured for this project yet.";
-    }
-
-    if (typeof pDialog.showModal === "function"){ pDialog.showModal(); }
-    else pDialog.setAttribute("open", "");
-    pTitle.focus();
-    lockScroll(true);
-  }
-
-  function closePlayer(){
-    if (pDialog.open) pDialog.close();
-    else pDialog.removeAttribute("open");
-    lockScroll(false);
-    hideSpin();
-    clearPlayer();
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
-  }
-
-  if (typeof pDialog.showModal === "function"){
-    pDialog.addEventListener("close", function(){
-      lockScroll(false); clearPlayer();
-      if (lastFocus && lastFocus.focus) lastFocus.focus();
-    });
-    pDialog.addEventListener("cancel", function(e){ e.preventDefault(); closePlayer(); });
-  }
-  pClose.addEventListener("click", closePlayer);
-
-  /* any [data-project] anchor opens the player (featured slides + gallery) */
-  document.addEventListener("click", function(e){
-    var a = e.target.closest ? e.target.closest("a[data-project]") : null;
-    if (!a) return;
-    e.preventDefault();
-    openProject(a.getAttribute("data-project"), a);
-  });
-
-  document.addEventListener("keydown", function(e){
-    if (e.key === "Escape"){
-      if (pDialog && (pDialog.open || pDialog.hasAttribute("open"))) closePlayer();
-      if (panel && (panel.open || panel.hasAttribute("open"))) closeDrawer();
-    }
-  });
-
   /* ============================================================
-     CONTACT FORM — one primary action via the FormSubmit backend.
+     HERO — Dr Salma by default (CONFIG.hero.vimeoId). Sharp 9:16
+     frame in front; behind the glass, the light is a blurred, enlarged
+     copy of the same video (a muted looping Vimeo stream, or the
+     poster on slow devices), which the SVG refraction filter bends
+     into bands.
      ============================================================ */
-  var form = document.getElementById("contactForm");
-  var submitMailBtn = document.getElementById("formSubmitMail");
-  var submitLabel = submitMailBtn ? submitMailBtn.querySelector(".btn__label") : null;
-  var statusEl = document.getElementById("formStatus");
-  var fallbackLink = document.getElementById("mailtoFallback");
-  var fields = {
-    name: { el: document.getElementById("f-name"), err: document.getElementById("err-name"), field: document.getElementById("field-name") },
-    email: { el: document.getElementById("f-email"), err: document.getElementById("err-email"), field: document.getElementById("field-email") },
-    message: { el: document.getElementById("f-message"), err: document.getElementById("err-message"), field: document.getElementById("field-message") }
-  };
-  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  function setErr(key, msg){
-    var f = fields[key]; if (!f) return;
-    f.field.classList.toggle("field--invalid", !!msg);
-    f.err.textContent = msg || "";
-    f.err.hidden = !msg;
-    if (f.el) f.el.setAttribute("aria-invalid", msg ? "true" : "false");
-  }
-  function validate(){
-    var ok = true, firstBad = null;
-    setErr("name", ""); setErr("email", ""); setErr("message", "");
-    if (!fields.name.el.value.trim()){ setErr("name", "Please enter your name."); ok = false; firstBad = firstBad || fields.name.el; }
-    var em = fields.email.el.value.trim();
-    if (!em){ setErr("email", "Please enter your email address."); ok = false; firstBad = firstBad || fields.email.el; }
-    else if (!EMAIL_RE.test(em)){ setErr("email", "That email address doesn't look right — please check it."); ok = false; firstBad = firstBad || fields.email.el; }
-    if (!fields.message.el.value.trim()){ setErr("message", "Please add a short message."); ok = false; firstBad = firstBad || fields.message.el; }
-    if (firstBad){ firstBad.focus(); }
-    return ok;
-  }
-  function setStatus(msg){ statusEl.textContent = msg; statusEl.hidden = !msg; }
-  function collect(){
-    return { name: fields.name.el.value.trim(), email: fields.email.el.value.trim(), message: fields.message.el.value.trim() };
-  }
-  function buildBody(d){
-    return "Hi,\n\nI'd like to discuss a project.\n\n" +
-      "Name: " + d.name + "\nEmail: " + d.email + "\n\nAbout the project:\n" + d.message + "\n\n— " + d.name;
-  }
-  function sendEmailBackend(d){
-    submitMailBtn.disabled = true;
-    if (submitLabel) submitLabel.textContent = "Sending…";
-    setStatus("");
-    fetch(CONFIG.form.emailBackend, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({ _subject: "Website enquiry — khalid.vsl", name: d.name, email: d.email, message: d.message })
-    }).then(function(r){
-      if (!r.ok) throw new Error("bad status " + r.status);
-      return r.json();
-    }).then(function(){
-      submitMailBtn.disabled = false;
-      if (submitLabel) submitLabel.textContent = "Send Inquiry";
-      setStatus("Thanks — your message is on its way. I'll reply as soon as I can.");
-      form.reset();
-    }).catch(function(){
-      submitMailBtn.disabled = false;
-      if (submitLabel) submitLabel.textContent = "Send Inquiry";
-      setStatus("Something went wrong — please try again, or use the email link below. Your details are still in the form.");
-    });
-  }
-  function sendMailto(d){
-    var href = "mailto:" + CONFIG.email + "?subject=" + encodeURIComponent("Project enquiry") + "&body=" + encodeURIComponent(buildBody(d));
-    window.location.href = href;
-    setStatus("Your email app should now be open with the draft ready. Nothing is sent until you press send there.");
-  }
-  form.addEventListener("submit", function(e){
-    e.preventDefault();
-    if (!validate()){ setStatus(""); return; }
-    var d = collect();
-    if (CONFIG.form.emailBackend){ sendEmailBackend(d); return; }
-    sendMailto(d);
-  });
-  if (fallbackLink){
-    fallbackLink.addEventListener("click", function(e){
-      if (!validate()){ e.preventDefault(); setStatus(""); return; }
-      e.preventDefault(); sendMailto(collect());
-    });
-  }
-
-  /* ============================================================
-     MOTION — Lenis smooth scroll + GSAP ScrollTrigger.
-     Everything below is progressive: without the libraries (or with
-     reduced-motion) the page stays a calm, fully visible static site.
-     ============================================================ */
-  var motionEnabled = hasGSAP && !reduced;
-  if (motionEnabled){
-   try{
-    html.classList.add("motion");
-    gsap.registerPlugin(ScrollTrigger);
-
-    /* ---------- Lenis smooth scrolling (desktop pointer only) ---------- */
-    if (hasLenis && desktopMQ.matches){
-      lenis = new Lenis({
-        /* Cinematic glide: frame-rate-independent interpolation rather than a
-           hard-timed tween, so the motion eases to rest instead of arriving.
-           lerp 0.075 is slightly longer than Lenis's 0.1 default while staying
-           fully responsive to input. Duration is intentionally omitted so
-           Lenis uses lerp. */
-        lerp: 0.075,
-        wheelMultiplier: 1,
-        touchMultiplier: 1.6,
-        smoothWheel: true,
-        syncTouch: false
-      });
-      lenis.on("scroll", ScrollTrigger.update);
-      gsap.ticker.add(function(time){ lenis.raf(time * 1000); });
-      gsap.ticker.lagSmoothing(0);
-      html.classList.add("has-lenis");
-    }
-
-    /* ---------- anchor links + back-to-top through Lenis ---------- */
-    $$('a[href^="#"]').forEach(function(a){
-      a.addEventListener("click", function(e){
-        var id = a.getAttribute("href");
-        if (!id || id.length < 2) return;
-        var target = document.querySelector(id);
-        if (!target) return;
-        e.preventDefault();
-        var y = (id === "#top") ? 0 : (target.getBoundingClientRect().top + window.scrollY - navH + 1);
-        if (lenis){ if (lenis.isStopped) lenis.start(); lenis.scrollTo(y, { duration: 1.2 }); }
-        else window.scrollTo({ top: y, behavior: reduced ? "auto" : "smooth" });
-        if (history.replaceState) history.replaceState(null, "", id);
-      });
+  (function hero(){
+    var hero = $("#top"), stage = $("#heroStage");
+    var v = CONFIG.hero.vimeoId;
+    if (!v) return;
+    hero.classList.add("has-video");
+    stage.hidden = false;
+    var play = noAutoplay ? "0" : "1";
+    var heroData = CONFIG.videos.filter(function(x){ return x.vimeo === v; })[0];
+    var heroPosterURL = posterURL(heroData.hash, CONFIG.playerPosterSize);
+    var src = "https://player.vimeo.com/video/" + v +
+      "?api=1&player_id=heroVimeo&autoplay=" + play + "&loop=1&muted=1&title=0&byline=0&portrait=0";
+    stage.innerHTML =
+      '<iframe id="heroVimeo" src="' + src + '" title="Showreel" ' +
+      'allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>' +
+      '<img class="hero__poster" src="' + heroPosterURL + '" ' +
+      'alt="" width="1080" height="1920" decoding="async">' +
+      '<button class="hero__sound" id="heroSound" type="button">' +
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>' +
+      'Tap for sound</button>';
+    var soundBtn = $("#heroSound"), on = false;
+    soundBtn.addEventListener("click", function(){
+      on = !on;
+      $("#heroVimeo").contentWindow.postMessage(JSON.stringify({ method:"setMuted", value:!on }), "*");
+      soundBtn.lastChild.textContent = on ? "Sound on" : "Tap for sound";
     });
 
-    /* ---------- hero intro ---------- */
-    var heroItems = $$(".hero__role, .hero__title, .hero__line, .hero__cta");
-    if (heroItems.length){
-      var hl = gsap.timeline({ defaults: { ease: "power3.out", duration: .8 } });
-      hl.from(".nav__inner", { y: -12, opacity: 0, duration: .6 }, 0)
-        .from(".hero__role", { y: 20, opacity: 0 }, .05)
-        .from(".hero__title", { y: 34, opacity: 0 }, .12)
-        .from(".hero__line", { y: 20, opacity: 0, duration: .7 }, .28)
-        .from(".hero__cta", { y: 16, opacity: 0, duration: .6 }, .4)
-        .from(".hero__scroll", { opacity: 0, duration: .6 }, .6);
-    }
+    /* the light behind the glass: blurred enlarged copy of the video
+       (live stream on capable devices, poster otherwise) */
+    var light = $("#heroVideoLight");
+    light.hidden = false;
+    light.innerHTML = noAutoplay
+      ? '<img src="' + heroPosterURL + '" alt="" width="1080" height="1920" decoding="async">'
+      : '<iframe src="https://player.vimeo.com/video/' + v +
+        '?background=1&autoplay=1&loop=1&muted=1" title="" tabindex="-1" ' +
+        'allow="autoplay; encrypted-media"></iframe>';
 
-    /* ---------- hero drifts away, handing over to the featured work ---------- */
-    gsap.to(".hero__inner", {
-      y: -46, opacity: .28, ease: "none",
-      scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true }
-    });
-
-    /* ---------- featured work — the pinned chapter scroll ---------- */
-    var track = document.getElementById("featTrack");
-    if (track){
-      var slides = $$(".slide", track);
-      var nums = $$(".feat-index__num");
-      var currentEl = document.getElementById("featCurrent");
-      var totalEl = document.getElementById("featTotal");
-      var n = slides.length;
-      var current = -1;
-
-      if (totalEl) totalEl.textContent = (n < 10 ? "0" : "") + n;
-
-      function setChapter(i){
-        if (i === current) return;
-        current = i;
-        slides.forEach(function(s, k){
-          var on = k === i;
-          s.classList.toggle("is-active", on);
-          s.setAttribute("aria-hidden", on ? "false" : "true");
-        });
-        nums.forEach(function(b, k){
-          b.classList.toggle("is-active", k === i);
-          if (k === i) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
-        });
-        if (currentEl) currentEl.textContent = (i + 1 < 10 ? "0" : "") + (i + 1);
-      }
-
-      function buildChapterScroll(){
-        if (!desktopMQ.matches){ return null; }
-        return ScrollTrigger.create({
-          trigger: document.getElementById("featStage"),
-          start: "top top",
-          end: "bottom bottom",
-          onUpdate: function(self){ setChapter(Math.min(n - 1, Math.floor(self.progress * n))); }
-        });
-      }
-
-      var chapterST = buildChapterScroll();
-      if (chapterST) setChapter(0); else current = -1;
-
-      /* chapter index click → scroll to that chapter's centre */
-      nums.forEach(function(b, k){
-        b.addEventListener("click", function(){
-          var stage = document.getElementById("featStage");
-          if (!stage || !desktopMQ.matches) return;
-          var top = stage.getBoundingClientRect().top + window.scrollY;
-          var range = stage.offsetHeight - window.innerHeight;
-          var y = top + range * ((k + .5) / n);
-          if (lenis) lenis.scrollTo(y, { duration: 1.1 });
-          else window.scrollTo({ top: y, behavior: "smooth" });
-        });
-      });
-
-      /* keep pin state correct on breakpoint changes */
-      var rebuild = function(){
-        if (chapterST){ chapterST.kill(); chapterST = null; }
-        html.classList.toggle("motion-desktop", desktopMQ.matches);
-        if (desktopMQ.matches){
-          chapterST = buildChapterScroll();
-          setChapter(0);
-        } else {
-          slides.forEach(function(s, k){ s.classList.toggle("is-active", k === 0); s.setAttribute("aria-hidden", "false"); });
-          current = -1;
-        }
-        ScrollTrigger.refresh();
-      };
-      html.classList.toggle("motion-desktop", desktopMQ.matches);
-      if (!desktopMQ.matches) slides.forEach(function(s){ s.setAttribute("aria-hidden", "false"); });
-      if (window.addEventListener){ window.addEventListener("resize", debounce(rebuild, 200)); }
-    }
-
-    /* ---------- scroll entrances ---------- */
-    $$("[data-reveal]").forEach(function(el){
-      ScrollTrigger.create({
-        trigger: el, start: "top 88%", once: true,
-        onEnter: function(){ el.classList.add("in"); }
-      });
-    });
-    /* anything already above the fold on load reveals immediately */
-    requestAnimationFrame(function(){
-      $$("[data-reveal]").forEach(function(el){
-        if (el.getBoundingClientRect().top < window.innerHeight * .92) el.classList.add("in");
-      });
-    });
-
-    /* ---------- craft items become active in sequence ---------- */
-    $$(".craft__item").forEach(function(item){
-      ScrollTrigger.create({
-        trigger: item, start: "top 66%", end: "bottom 34%",
-        onToggle: function(self){ item.classList.toggle("is-active", self.isActive); },
-        onEnter: function(){ item.classList.add("is-active"); }
-      });
-    });
-
-    ScrollTrigger.refresh();
-   }catch(err){
-     /* motion failed to initialise — guarantee a fully visible, static page */
-     html.classList.remove("motion","motion-desktop");
-     $$("[data-reveal]").forEach(function(el){ el.classList.add("in"); });
-     $$(".slide").forEach(function(s){ s.classList.add("is-active"); s.setAttribute("aria-hidden","false"); });
-     $$(".craft__item").forEach(function(item){ item.classList.add("is-active"); });
-   }
-  } else {
-    /* no motion libs / reduced motion — reveal everything */
-    $$("[data-reveal]").forEach(function(el){ el.classList.add("in"); });
-    $$(".slide").forEach(function(s){ s.classList.add("is-active"); s.setAttribute("aria-hidden", "false"); });
-    $$(".craft__item").forEach(function(item){ item.classList.add("is-active"); });
-  }
-
-  /* ============================================================
-     THEME — light / dark. The scheme is applied before first paint by
-     the inline script in <head>, so this only wires the nav control,
-     remembers the choice, and keeps following the OS while untouched.
-     ============================================================ */
-  (function initTheme(){
-    var root = document.documentElement;
-    var btn  = document.getElementById("themeToggle");
-    var meta = document.querySelector('meta[name="theme-color"]');
-    var KEY  = "khalid.theme";
-    var mq   = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
-    var saved = null;
-    try { saved = localStorage.getItem(KEY); } catch (e) {}
-
-    function current(){ return root.getAttribute("data-theme") === "dark" ? "dark" : "light"; }
-    function paint(t){
-      root.setAttribute("data-theme", t);
-      if (btn) btn.setAttribute("aria-pressed", t === "dark" ? "true" : "false");
-      if (meta) meta.setAttribute("content", t === "dark" ? "#161514" : "#F6F3ED");
-    }
-
-    paint(current());
-
-    if (btn) btn.addEventListener("click", function(){
-      var next = current() === "dark" ? "light" : "dark";
-      saved = next;
-      paint(next);
-      try { localStorage.setItem(KEY, next); } catch (e) {}
-    });
-
-    /* no explicit choice yet → keep pace with the operating system */
-    if (mq){
-      var follow = function(e){ if (!saved) paint(e.matches ? "dark" : "light"); };
-      if (mq.addEventListener) mq.addEventListener("change", follow);
-      else if (mq.addListener) mq.addListener(follow);
-    }
+    /* static replica inside the refraction layer — same colours plus
+       the poster, so the filter is computed once and never re-runs */
+    $("#heroReplica").innerHTML =
+      '<img src="' + heroPosterURL + '" alt="" width="1080" height="1920" decoding="async">';
   })();
 
-  /* ---------- navbar state ---------- */
-  var nav = document.getElementById("nav");
-  function onScroll(){ nav.classList.toggle("is-scrolled", window.scrollY > 12); }
-  window.addEventListener("scroll", onScroll, { passive: true });
+  /* ============================================================
+     WORK WALL — render cards from the data list.
+     ============================================================ */
+  var wall = $("#wall");
+  var playIcon = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>';
+
+  CONFIG.videos.forEach(function(v, i){
+    var li = document.createElement("li");
+    li.className = "card reveal";
+    li.dataset.cat = v.cat; li.dataset.index = i;
+    li.innerHTML =
+      '<button class="card__btn" type="button" data-index="' + i + '" ' +
+        'aria-label="Play ' + v.client + ' — ' + v.tag + ', ' + v.dur + '">' +
+        '<span class="card__media">' +
+          '<img class="card__poster" src="' + posterURL(v.hash, CONFIG.posterSize) + '" ' +
+            (i < 5 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"') +
+            ' decoding="async" width="540" height="960" alt="' + v.client + ' — ' + v.tag + '">' +
+          '<span class="card__preview" aria-hidden="true"></span>' +
+          '<span class="card__play" aria-hidden="true">' + playIcon + '</span>' +
+          '<span class="card__label glass">' +
+            '<span class="card__row"><span class="card__client">' + v.client + '</span>' +
+            '<span class="card__dur">' + v.dur + '</span></span>' +
+            '<span class="card__tag">' + v.tag + '</span>' +
+          '</span>' +
+        '</span>' +
+      '</button>';
+    wall.appendChild(li);
+    /* posters fade in when ready — never a glass veil over them */
+    var img = $(".card__poster", li);
+    var show = function(){ li.classList.add("is-loaded"); };
+    if (img.complete && img.naturalWidth > 0) show();
+    else { img.addEventListener("load", show); img.addEventListener("error", show); }
+  });
+  $$(".chip .chip__n").forEach(function(n){
+    var k = n.dataset.count;
+    n.textContent = k === "all" ? CONFIG.videos.length :
+      CONFIG.videos.filter(function(v){ return v.cat === k; }).length;
+  });
+
+  /* ---------- preview manager ----------
+     MP4 in /previews/ first; if missing, a muted looping Vimeo embed
+     (background mode) — loaded only when needed, max 3 live at once. */
+  var MAX_LIVE = 3;
+  var live = new Map();          // card element → media node
+  var lru  = [];                 // most recent at the end
+  var failed = new WeakSet();    // cards whose MP4 + embed both failed
+
+  function deactivate(card){
+    if (!live.has(card)) return;
+    var node = live.get(card); node.remove();
+    live.delete(card);
+    lru = lru.filter(function(c){ return c !== card; });
+    card.classList.remove("is-live");
+  }
+  function evict(){
+    while (live.size >= MAX_LIVE && lru.length) deactivate(lru[0]);
+  }
+  function embedFallback(card, v){
+    if (failed.has(card)) { card._pending = false; return; }
+    var slot = $(".card__preview", card);
+    var f = document.createElement("iframe");
+    f.src = "https://player.vimeo.com/video/" + v.vimeo +
+      "?background=1&autoplay=1&loop=1&muted=1&controls=0";
+    f.title = v.client + " preview";
+    f.allow = "autoplay; encrypted-media";
+    f.tabIndex = -1;
+    var done = false;
+    f.addEventListener("load", function(){
+      if (done) return; done = true;
+      setTimeout(function(){ card.classList.add("is-live"); card._pending = false; }, 600);
+    });
+    f.addEventListener("error", function(){
+      failed.add(card); card._pending = false; f.remove();
+    });
+    slot.appendChild(f);
+    live.set(card, f); lru.push(card);
+  }
+  function activate(card){
+    if (noAutoplay || card.classList.contains("is-live") || card._pending || failed.has(card)) return;
+    var v = CONFIG.videos[+card.dataset.index];
+    evict();
+    card._pending = true;
+    var slot = $(".card__preview", card);
+    var vid = document.createElement("video");
+    vid.muted = true; vid.loop = true; vid.playsInline = true;
+    vid.setAttribute("playsinline",""); vid.setAttribute("muted","");
+    vid.preload = "auto"; vid.tabIndex = -1;
+    var settled = false;
+    vid.addEventListener("loadeddata", function(){
+      if (settled) return; settled = true;
+      slot.appendChild(vid);
+      live.set(card, vid); lru.push(card);
+      var p = vid.play(); if (p && p.catch) p.catch(function(){});
+      card.classList.add("is-live");
+      card._pending = false;
+    });
+    vid.addEventListener("error", function(){
+      if (settled) return; settled = true;
+      embedFallback(card, v);
+    });
+    vid.src = CONFIG.previewsDir + v.id + ".mp4";
+  }
+  function activateIfEligible(card){
+    if (canHover) return;                       // desktop: hover only (below)
+    if (noAutoplay) return;                     // reduced motion / slow: play badge
+    var r = card.getBoundingClientRect();
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+    if (visible > 0 && visible > r.height * 0.55) activate(card);
+    else if (visible <= 0) deactivate(card);
+  }
+
+  /* desktop hover activation */
+  if (canHover && !noAutoplay){
+    wall.addEventListener("pointerenter", function(e){
+      var card = e.target.closest(".card");
+      if (card) activate(card);
+    }, true);
+  }
+  /* mobile in-view activation */
+  if (!canHover){
+    var pvIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        var card = en.target;
+        if (en.intersectionRatio >= 0.55) activateIfEligible(card);
+        else if (en.intersectionRatio === 0) deactivate(card);
+      });
+    }, { threshold:[0, .55] });
+    var observeCards = function(){ $$(".card", wall).forEach(function(c){ pvIO.observe(c); }); };
+    observeCards();
+  }
+  window.addEventListener("scroll", function(){
+    if (canHover) return;
+    live.forEach(function(_, card){ activateIfEligible(card); });
+  }, { passive:true });
+
+  /* ---------- filter chips ---------- */
+  $$(".chip").forEach(function(chip){
+    chip.addEventListener("click", function(){
+      $$(".chip").forEach(function(c){ c.setAttribute("aria-pressed", c === chip ? "true" : "false"); });
+      var f = chip.dataset.filter;
+      $$(".card", wall).forEach(function(card){
+        var show = f === "all" || card.dataset.cat === f;
+        card.hidden = !show;
+        if (!show) deactivate(card);
+        else activateIfEligible(card);
+      });
+    });
+  });
+
+  /* ============================================================
+     PLAYER — full-screen glass sheet, sound on, Reels-style nav.
+     Poster + loading ring until the Vimeo player confirms playback;
+     never a black box. Close: X / Esc / tap outside. Scroll locked.
+     ============================================================ */
+  var player    = $("#player"),   frame   = $("#playerFrame"),
+      poster    = $("#playerPoster"), stage = $("#playerStage"),
+      openIndex = -1, opener = null, spinTimer = null;
+  var order = function(){ return $$(".card", wall).filter(function(c){ return !c.hidden; }); };
+
+  function loadVideo(i){
+    var cards = order();
+    i = (i + cards.length) % cards.length;
+    openIndex = i;
+    var v = CONFIG.videos[+cards[i].dataset.index];
+    player.classList.remove("is-playing");
+    poster.src = posterURL(v.hash, CONFIG.playerPosterSize);
+    poster.alt = v.client + " — " + v.tag;
+    $("#playerClient").textContent = v.client;
+    $("#playerMeta").textContent = v.tag + " · " + v.dur;
+    $("#playerBullets").innerHTML = v.bullets.map(function(b){ return "<li>" + b + "</li>"; }).join("");
+    $("#playerWhatsApp").href = waLink("Hi Khalid — I want edits like the " + v.client + " video.");
+    frame.src = "https://player.vimeo.com/video/" + v.vimeo +
+      "?api=1&player_id=playerFrame&autoplay=1&title=0&byline=0&portrait=0";
+    clearTimeout(spinTimer);
+    spinTimer = setTimeout(function(){ player.classList.add("is-playing"); }, 5000); // fallback: never a stuck ring
+  }
+  function openPlayer(card){
+    opener = card;
+    live.forEach(function(_, c){ deactivate(c); });          // quiet the wall
+    loadVideo(order().indexOf(card));
+    player.showModal();
+    document.documentElement.style.overflow = "hidden";      // scroll lock
+    document.body.style.overflow = "hidden";
+    $("#playerClose").focus();
+  }
+  function closePlayer(){
+    player.close();
+  }
+  player.addEventListener("close", function(){
+    clearTimeout(spinTimer);
+    frame.src = "about:blank";                               // stop sound + download
+    document.documentElement.style.overflow = "";
+    document.body.style.overflow = "";
+    player.classList.remove("is-playing");
+    if (opener) opener.focus();
+  });
+  $("#playerClose").addEventListener("click", closePlayer);
+  $("#playerPrev").addEventListener("click", function(){ loadVideo(openIndex - 1); });
+  $("#playerNext").addEventListener("click", function(){ loadVideo(openIndex + 1); });
+  player.addEventListener("click", function(e){ if (e.target === player) closePlayer(); }); // tap outside
+  document.addEventListener("keydown", function(e){
+    if (!player.open) return;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown"){ e.preventDefault(); loadVideo(openIndex + 1); }
+    if (e.key === "ArrowLeft"  || e.key === "ArrowUp"){ e.preventDefault(); loadVideo(openIndex - 1); }
+  });
+  /* swipe up/down = next/prev (Reels-style) */
+  var tY = null, tX = null;
+  stage.addEventListener("touchstart", function(e){
+    tY = e.touches[0].clientY; tX = e.touches[0].clientX;
+  }, { passive:true });
+  stage.addEventListener("touchend", function(e){
+    if (tY === null) return;
+    var dy = e.changedTouches[0].clientY - tY;
+    var dx = e.changedTouches[0].clientX - tX;
+    if (Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx)) loadVideo(openIndex + (dy < 0 ? 1 : -1));
+    tY = null;
+  }, { passive:true });
+  /* Vimeo postMessage handshake: swap poster+ring for the iframe on 'play' */
+  window.addEventListener("message", function(e){
+    if (!e.origin || e.origin.indexOf("vimeo") === -1) return;
+    var d = e.data;
+    if (typeof d === "string") { try { d = JSON.parse(d); } catch(err){ return; } }
+    if (d && d.event === "ready" && frame.contentWindow){
+      frame.contentWindow.postMessage(JSON.stringify({ method:"addEventListener", value:"play" }), "*");
+    }
+    if (d && d.event === "play"){
+      if (d.player_id === "heroVimeo"){
+        var hs = document.getElementById("heroStage");
+        if (hs) hs.classList.add("is-playing");
+      } else {
+        player.classList.add("is-playing");
+      }
+    }
+  });
+  wall.addEventListener("click", function(e){
+    var btn = e.target.closest(".card__btn");
+    if (btn) openPlayer(btn.closest(".card"));
+  });
+
+  /* ============================================================
+     STICKY WHATSAPP BAR — appears once the hero is scrolled past.
+     ============================================================ */
+  var bar = $("#stickyBar"), heroEl = $("#top");
+  if ("IntersectionObserver" in window){
+    new IntersectionObserver(function(entries){
+      bar.classList.toggle("is-on", !entries[0].isIntersecting);
+    }, { threshold:.08 }).observe(heroEl);
+  }
+
+  /* ---------- header scrolled state ---------- */
+  var head = $("#siteHead");
+  var onScroll = function(){ head.classList.toggle("is-scrolled", scrollY > 8); };
+  addEventListener("scroll", onScroll, { passive:true });
   onScroll();
 
-  /* ---------- active nav link (scroll spy) ---------- */
-  var navLinks = $$("#navLinks a");
-  if (navLinks.length && "IntersectionObserver" in window){
-    var spySections = navLinks
-      .map(function(a){ return document.getElementById((a.getAttribute("href") || "").slice(1)); })
-      .filter(Boolean);
-    var spy = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        if (!en.isIntersecting) return;
-        var id = "#" + en.target.id;
-        navLinks.forEach(function(a){ a.classList.toggle("is-active", a.getAttribute("href") === id); });
+  /* ============================================================
+     PHASE 2 — featured preview · enquiry form · sticky-bar handoff ·
+     footer year · config-guarded proof strip
+     ============================================================ */
+
+  /* ---------- featured: muted in-view preview + "watch with sound" ---------- */
+  (function(){
+    var stage = $("#featuredStage"), frame = $("#featuredFrame"), playBtn = $("#featuredPlay");
+    if (!stage || !frame || !playBtn) return;
+    var v = CONFIG.videos[0];                     /* GoBird */
+    var live = false;
+    function mount(){
+      if (noAutoplay || live) return;
+      live = true;
+      frame.hidden = false;
+      frame.src = "https://player.vimeo.com/video/" + v.vimeo +
+        "?background=1&autoplay=1&loop=1&muted=1&controls=0&title=0&byline=0";
+    }
+    function unmount(){
+      if (!live) return;
+      live = false;
+      frame.hidden = true;
+      frame.src = "about:blank";                  /* stop the stream when off-screen */
+    }
+    if ("IntersectionObserver" in window){
+      new IntersectionObserver(function(en){
+        if (en[0].isIntersecting) mount(); else unmount();
+      }, { threshold:.35 }).observe(stage);
+    } else { mount(); }
+    playBtn.addEventListener("click", function(){
+      var card = document.querySelector('.card[data-index="0"]');
+      if (card && card.hidden){                   /* a filter is hiding GoBird — reset to All */
+        var all = $('.chip[data-filter="all"]');
+        if (all) all.click();
+      }
+      if (card) openPlayer(card);
+    });
+  })();
+
+  /* ---------- sticky WhatsApp bar steps aside when contact is on screen ---------- */
+  (function(){
+    var contact = $("#contact");
+    if (!contact || !bar || !("IntersectionObserver" in window)) return;
+    new IntersectionObserver(function(en){
+      bar.classList.toggle("is-off", en[0].isIntersecting);
+    }, { threshold:.12 }).observe(contact);
+  })();
+
+  /* ---------- enquiry form: Netlify AJAX submit, inline status ---------- */
+  (function(){
+    var form = $("#enquiryForm");
+    if (!form) return;
+    var status = $("#formStatus");
+    var say = function(cls, msg){
+      status.hidden = false;
+      status.className = "form-status " + cls;
+      status.textContent = msg;
+    };
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      var btn = form.querySelector('[type="submit"]');
+      btn.disabled = true; btn.setAttribute("aria-busy", "true");
+      say("is-busy", "Sending…");
+      var body = new URLSearchParams(new FormData(form)).toString();
+      fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body
+      }).then(function(r){
+        if (!r.ok) throw new Error("bad status");
+        form.reset();
+        say("is-ok", "Thanks — your message is on its way. I'll get back to you on WhatsApp or email.");
+      }).catch(function(){
+        say("is-err", "That didn't send. Please WhatsApp me instead — the orange button next to this form.");
+      }).then(function(){
+        btn.disabled = false; btn.removeAttribute("aria-busy");
       });
-    }, { rootMargin: "-45% 0px -50% 0px" });
-    spySections.forEach(function(s){ spy.observe(s); });
-  }
+    });
+  })();
 
-  function debounce(fn, ms){
-    var t; return function(){ var args = arguments, self = this; clearTimeout(t); t = setTimeout(function(){ fn.apply(self, args); }, ms); };
-  }
+  /* ---------- footer year ---------- */
+  (function(){ var y = $("#year"); if (y) y.textContent = String(new Date().getFullYear()); })();
 
+  /* ---------- proof strip: renders only with real numbers ---------- */
+  (function(){
+    var proof = $("#proof"), row = $("#proofRow");
+    if (!proof || !row || !CONFIG.proof) return;   /* CONFIG.proof = null → stays hidden */
+    row.innerHTML = CONFIG.proof.map(function(p){
+      return '<div class="proof__cell"><p class="proof__n">' + p.n +
+             '</p><p class="proof__l">' + p.label + '</p></div>';
+    }).join("");
+    proof.hidden = false;
+  })();
+
+  /* ---------- small fade-in reveals ---------- */
+  if ("IntersectionObserver" in window && !reduce){
+    var rIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting){ en.target.classList.add("in"); rIO.unobserve(en.target); }
+      });
+    }, { threshold:.12, rootMargin:"0px 0px -6% 0px" });
+    $$(".reveal").forEach(function(el){ rIO.observe(el); });
+  } else {
+    $$(".reveal").forEach(function(el){ el.classList.add("in"); });
+  }
 })();
 </script>
 </body>
